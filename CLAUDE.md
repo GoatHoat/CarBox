@@ -34,3 +34,8 @@ CarBox is a mobile-first car enthusiast app: build/maintenance logbook + goal-ba
 
 ## Screen order
 1. Log (timeline) → 2. Upgrades → 3. Goal picker → 4. Entry detail → 5. Add Entry bottom sheet (overlay on Log) → 6. Pro paywall popup → 7. Wire navigation + localStorage state → 8. Settings (no mockup — reuse existing components/patterns only)
+
+## Status (2026-07-20)
+- Built + interactive: Garage, Log, Upgrades, Goal picker, Entry detail, Settings. Shared infra: `app/state.js` (store, localStorage "carbox.v1"), `app/ui.js` (toast/sheet/pressable/stagger/count-up), `app/nav.js` (draggable spring nav pill).
+- Deferred by owner: the Pro paywall (everything Pro-gated is visible but inert → toast) and the Add Entry flow (FAB toasts "Coming soon"; the finished sheet in log.html stays dormant, reachable via `log.html#add` — re-enable by pointing the FAB back at `openSheet`).
+- Motion rules: one easing family `cubic-bezier(.3,1.4,.4,1)`, fades ease-out, 180–450ms, transform/opacity only, `prefers-reduced-motion` → fades.
