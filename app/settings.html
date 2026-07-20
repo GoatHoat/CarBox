@@ -118,6 +118,12 @@
     padding:9px 13px;font-family:'League Spartan',sans-serif;font-size:12.5px;font-weight:700;
     color:var(--meta);min-height:34px;
   }
+  .monorow{display:flex;gap:7px;margin-top:10px}
+  .monoswatch{
+    flex:1;height:30px;min-width:0;border-radius:999px;border:none;cursor:pointer;padding:0;
+    box-shadow:var(--shadow),inset 0 0 0 1px rgba(0,0,0,.08);
+  }
+  .monoswatch.sel{box-shadow:var(--shadow),0 0 0 2.5px #6E5A46}
 
   .field{
     background:var(--surface,#F5F3F4);border-radius:20px;box-shadow:var(--shadow);
@@ -183,6 +189,7 @@
           </div>
           <button class="greychip" id="greyChip">Original grey</button>
         </div>
+        <div class="monorow" id="monoRow" role="group" aria-label="Monotone colors"></div>
         <div class="field"><div class="flab">Car name</div><input id="f-name" type="text" autocomplete="off"></div>
         <div class="fieldrow">
           <div class="field"><div class="flab">Year</div><input id="f-year" inputmode="numeric" autocomplete="off"></div>
@@ -386,11 +393,42 @@ document.addEventListener('DOMContentLoaded', function () {
   /* hue slider */
   var slider = $('hueSlider'), knob = $('hueKnob');
   function paintKnob() {
-    var h = car.hue === null || car.hue === undefined ? 0 : car.hue;
+    var isHue = typeof car.hue === 'number';
+    var h = isHue ? car.hue : 0;
     knob.style.left = (h / 360 * 100) + '%';
-    knob.classList.toggle('off', car.hue === null || car.hue === undefined);
+    knob.classList.toggle('off', !isHue);
     slider.setAttribute('aria-valuenow', String(Math.round(h)));
   }
+
+  /* monotone swatches: black -> greys -> white */
+  var monoRow = $('monoRow');
+  function paintMono() {
+    monoRow.querySelectorAll('.monoswatch').forEach(function (sw, k) {
+      sw.classList.toggle('sel', car.hue === 'mono-' + k);
+    });
+  }
+  (function buildMono() {
+    for (var k = 0; k < 8; k++) {
+      var M = 0.08 + k * (0.92 - 0.08) / 7;
+      var v = Math.round(M * 255);
+      var sw = document.createElement('button');
+      sw.className = 'monoswatch';
+      sw.style.background = 'rgb(' + v + ',' + v + ',' + v + ')';
+      sw.setAttribute('aria-label', k === 0 ? 'Black' : k === 7 ? 'White' : 'Grey ' + k);
+      (function (kk) {
+        sw.addEventListener('click', function () {
+          car.hue = 'mono-' + kk;
+          saveCar();
+          paintKnob();
+          paintMono();
+          drawPreview();
+          pulsePreview();
+          refreshHeadSprite();
+        });
+      })(k);
+      monoRow.appendChild(sw);
+    }
+  })();
   var dragging = false, pendingHue = null, rafQueued = false;
   function hueFromEvent(e) {
     var r = slider.getBoundingClientRect();
@@ -400,6 +438,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function applyHue(h, persist) {
     car.hue = h;
     paintKnob();
+    paintMono();
     drawPreview();
     if (persist) { saveCar(); refreshHeadSprite(); }
   }
@@ -426,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function () {
     pulsePreview();
   });
   slider.addEventListener('keydown', function (e) {
-    var h = car.hue === null ? 0 : car.hue;
+    var h = typeof car.hue === 'number' ? car.hue : 0;
     if (e.key === 'ArrowRight') { e.preventDefault(); applyHue(Math.min(360, h + 10), true); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); applyHue(Math.max(0, h - 10), true); }
   });
@@ -434,6 +473,7 @@ document.addEventListener('DOMContentLoaded', function () {
     car.hue = null;
     saveCar();
     paintKnob();
+    paintMono();
     drawPreview();
     pulsePreview();
     refreshHeadSprite();
@@ -466,6 +506,7 @@ document.addEventListener('DOMContentLoaded', function () {
   refreshHeadSprite();
   loadBase(drawPreview);
   paintKnob();
+  paintMono();
   fillFields();
 
   /* ════ APPEARANCE ════ */

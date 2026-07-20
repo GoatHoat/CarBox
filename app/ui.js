@@ -239,8 +239,20 @@ window.UI = (function () {
             var out = new ImageData(new Uint8ClampedArray(d), w, h);
             if (hue !== null && hue !== undefined && hue !== '') {
               var lut = new Uint8Array(256 * 3);
+              var mono = typeof hue === 'string' && hue.indexOf('mono-') === 0;
               for (var L = 0; L < 256; L++) {
-                var rgb = hslToRgb(hue, TINT_SAT, L / 255);
+                var rgb;
+                if (mono) {
+                  /* levels remap toward the target grey M, contrast preserved */
+                  var k = parseInt(hue.slice(5), 10) || 0;
+                  var M = 0.08 + k * (0.92 - 0.08) / 7;
+                  var l = L / 255;
+                  var v = M <= 0.5 ? l * (M / 0.5) : 1 - (1 - l) * ((1 - M) / 0.5);
+                  v = Math.round(v * 255);
+                  rgb = [v, v, v];
+                } else {
+                  rgb = hslToRgb(hue, TINT_SAT, L / 255);
+                }
                 lut[L * 3] = rgb[0]; lut[L * 3 + 1] = rgb[1]; lut[L * 3 + 2] = rgb[2];
               }
               var od = out.data;
