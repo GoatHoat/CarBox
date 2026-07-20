@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CarBox — Upgrades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Upgrades page — bg and cards per its mockup */
+  .phone{background:#F7EEE5}
+
+  .upghead{display:flex;align-items:flex-start;justify-content:space-between}
+  .upghead h1{font-size:44px;color:#141210;line-height:1}
+  .upghead .sub{font-size:18px;font-weight:500;color:var(--warmgray);margin-top:4px}
+
+  .goalrow{display:flex;gap:11px;margin-top:18px}
+  .goalpill{
+    display:flex;align-items:center;gap:10px;
+    background:#796457;border-radius:999px;border:none;cursor:pointer;
+    padding:11px 18px;box-shadow:var(--shadow);
+  }
+  .goalpill span{color:#FBF8F4;font-weight:600;font-size:16px;white-space:nowrap}
+  .goalpill img{width:13px}
+  .changegoal{
+    background:transparent;border:2.5px solid #C2B6AA;border-radius:999px;cursor:pointer;
+    padding:9px 20px;color:#8D8579;font-family:'Fredoka',sans-serif;font-weight:600;font-size:16px;
+  }
+
+  .stages{position:relative;margin-top:18px}
+  .stages .rail{
+    position:absolute;left:9px;top:44px;bottom:44px;width:3px;
+    background:#6E5B4B;border-radius:2px;
+  }
+  .stage{position:relative;margin-left:30px;margin-bottom:14px}
+  .stage .dot{
+    position:absolute;left:-27px;top:50%;transform:translateY(-50%);
+    width:13px;height:13px;border-radius:50%;background:#6E5B4B;
+  }
+  .scard{
+    background:#F5F3F4;border-radius:20px;box-shadow:var(--shadow);
+    padding:14px 16px;position:relative;
+  }
+  .schip{
+    display:inline-block;border-radius:999px;padding:4px 13px;
+    background:#7B6558;color:#FBF8F4;
+    font-size:11.5px;font-weight:600;letter-spacing:.05em;
+  }
+  .scard .stitle{font-size:21px;font-weight:600;color:#17130F;margin-top:7px;line-height:1.1}
+  .scard .smeta{font-size:15px;font-weight:600;color:var(--meta);margin-top:3px}
+  .addplan{
+    position:absolute;right:16px;bottom:14px;
+    background:none;border:none;cursor:pointer;
+    color:#776357;font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;
+  }
+
+  .mapcard{
+    background:#F5F3F4;border-radius:22px;box-shadow:var(--shadow);
+    margin-top:16px;padding:16px 16px 14px;
+  }
+  .mapcard h2{font-size:21px;font-weight:600;color:#17130F;font-family:'Fredoka',sans-serif}
+  .mapcard .msub{font-size:15px;font-weight:500;color:var(--warmgray);margin-top:2px}
+  .mapimg{width:100%;border-radius:14px;margin-top:11px}
+  .shoprow{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:10px}
+  .shoprow .sname{font-size:19px;font-weight:600;color:#17130F;line-height:1.15}
+  .shoprow .srate{font-size:14.5px;font-weight:600;color:var(--meta);margin-top:2px}
+  .directions{
+    background:transparent;border:2.5px solid #A79A8C;border-radius:999px;cursor:pointer;
+    padding:8px 16px;color:#776357;font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;
+    flex:none;
+  }
+  .seeall{
+    width:100%;margin-top:13px;
+    background:#786557;color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:12px 0;font-family:'Fredoka',sans-serif;font-weight:600;font-size:16px;
+    box-shadow:var(--shadow);
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="upghead">
+    <div>
+      <h1 class="serif">Upgrades</h1>
+      <div class="sub">for your Bugatti Chiron</div>
+    </div>
+    <button class="roundbtn" aria-label="Notifications">
+      <img class="i-bell" src="assets/icon_bell.png" alt="">
+      <span class="badge">1</span>
+    </button>
+  </div>
+
+  <div class="goalrow">
+    <button class="goalpill">
+      <span>Goal: More power</span>
+      <img src="assets/icon_chevron.png" alt="">
+    </button>
+    <button class="changegoal">Change goal</button>
+  </div>
+
+  <div class="stages">
+    <div class="rail"></div>
+
+    <div class="stage">
+      <span class="dot"></span>
+      <div class="scard">
+        <span class="schip">STAGE 1</span>
+        <div class="stitle">ECU tune</div>
+        <div class="smeta">+120 hp &middot; ~$4,500</div>
+        <button class="addplan">Add to plan</button>
+      </div>
+    </div>
+
+    <div class="stage">
+      <span class="dot"></span>
+      <div class="scard">
+        <span class="schip">STAGE 2</span>
+        <div class="stitle">Downpipes + intercooler</div>
+        <div class="smeta">+90 hp &middot; ~$8,200</div>
+        <button class="addplan">Add to plan</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mapcard">
+    <h2>Where to get it done</h2>
+    <div class="msub">ECU tune &middot; 4 shops near you</div>
+    <img class="mapimg" src="assets/map_shops.png" alt="Map of nearby shops">
+    <div class="shoprow">
+      <div>
+        <div class="sname">Apex Performance Tuning</div>
+        <div class="srate">4.8 &#9733; &middot; 2.1 mi &middot; from $3,900</div>
+      </div>
+      <button class="directions">Directions</button>
+    </div>
+    <button class="seeall">See all 4 shops</button>
+  </div>
+
+  <nav class="nav">
+    <a class="tab" href="index.html"><img class="i-navtire" src="assets/nav_tire_v2.png" alt=""><span class="lbl">Garage</span></a>
+    <a class="tab" href="log.html"><img class="i-navwrench" src="assets/nav_wrench.png" alt=""><span class="lbl">log</span></a>
+    <a class="tab active" href="upgrades.html"><img class="i-navgear" src="assets/nav_gear.png" alt=""><span class="lbl">upgrades</span></a>
+  </nav>
+
+</div>
+</body>
+</html>
