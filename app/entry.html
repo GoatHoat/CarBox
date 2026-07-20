@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Entry</title>
 <style>html{background:#E9E9E9}</style>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -26,13 +27,13 @@
     font-size:11.5px;font-weight:600;letter-spacing:.04em;margin-top:8px;
   }
   .echip.mod{background:var(--brown-warm);color:#FBF8F4}
-  .echip.maint{background:#D9D4D0;color:#4A4038}
+  .echip.maint{background:var(--ctl,#D9D4D0);color:var(--meta)}
   .echip.repair{background:#656469;color:#F2F0EE}
-  .echip.cosmetic{background:#CFC8BF;color:#4A4038}
+  .echip.cosmetic{background:#CFC8BF;color:var(--meta)}
 
   .etitle-hero{view-transition-name:entry-hero}
-  .etitle-hero h1{font-size:29px;color:#0E0E0E;line-height:1.08;margin-top:6px}
-  .emeta{font-size:15.5px;font-weight:600;color:#4A4038;margin-top:4px}
+  .etitle-hero h1{font-size:29px;color:var(--tx,#0E0E0E);line-height:1.08;margin-top:6px}
+  .emeta{font-size:15.5px;font-weight:600;color:var(--meta);margin-top:4px}
 
   .photos{
     display:grid;grid-template-columns:1fr 81px;grid-template-rows:87px 87px;
@@ -42,16 +43,16 @@
   .photos .pbig{grid-row:1 / 3}
 
   .notescard{
-    background:#F5F3F4;border-radius:18px;box-shadow:var(--shadow);
+    background:var(--surface,#F5F3F4);border-radius:18px;box-shadow:var(--shadow);
     margin-top:14px;padding:13px 15px 14px;
   }
-  .notescard h2{font-family:'League Spartan',sans-serif;font-size:19px;font-weight:700;color:#141210}
-  .notescard p{font-size:15.5px;font-weight:600;color:#3E3630;line-height:1.35;margin-top:6px}
+  .notescard h2{font-family:'League Spartan',sans-serif;font-size:19px;font-weight:700;color:var(--tx,#141210)}
+  .notescard p{font-size:15.5px;font-weight:600;color:var(--tx2,#3E3630);line-height:1.35;margin-top:6px}
 
   .psrow{display:flex;gap:16px;margin-top:15px}
   .psrow .col{flex:1;min-width:0}
-  .psrow .pslab{font-size:12.5px;font-weight:700;letter-spacing:.07em;color:#8D8579}
-  .psrow .psval{font-size:16.5px;font-weight:600;color:#17130F;margin-top:3px;line-height:1.2}
+  .psrow .pslab{font-size:12.5px;font-weight:700;letter-spacing:.07em;color:var(--mut,#8D8579)}
+  .psrow .psval{font-size:16.5px;font-weight:600;color:var(--tx,#17130F);margin-top:3px;line-height:1.2}
 
   .ebtns{display:flex;gap:11px;margin-top:16px}
   .ebtns button{

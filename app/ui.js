@@ -164,10 +164,61 @@ window.UI = (function () {
     setTimeout(function () { el.classList.remove('wiggle'); }, 320);
   }
 
+  /* ── sprite tinting: grey pixel art -> any hue, outlines + alpha preserved ──
+     "color" composite keeps the sprite's luminosity (dark outlines stay dark),
+     then destination-in restores the original alpha. Rendered at natural size
+     so the pixel art stays crisp. */
+  var tintCache = {};
+  function tintSprite(src, hue, cb) {
+    if (hue === null || hue === undefined || hue === '') { cb(src); return; }
+    var key = src + '|' + hue;
+    if (tintCache[key]) { cb(tintCache[key]); return; }
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        var x = c.getContext('2d');
+        x.drawImage(img, 0, 0);
+        x.globalCompositeOperation = 'color';
+        x.fillStyle = 'hsl(' + hue + ',75%,50%)';
+        x.fillRect(0, 0, c.width, c.height);
+        x.globalCompositeOperation = 'destination-in';
+        x.drawImage(img, 0, 0);
+        var url = c.toDataURL('image/png');
+        tintCache[key] = url;
+        cb(url);
+      } catch (e) { cb(src); }
+    };
+    img.onerror = function () { cb(src); };
+    img.src = src;
+  }
+  /* apply the saved {presetId, hue} to any <img> that shows the car */
+  function carSprite(imgEl) {
+    if (!imgEl || !window.CarBox) return;
+    var car = CarBox.get('car') || { presetId: 'sprite_chiron', hue: null };
+    tintSprite('assets/' + car.presetId + '.png', car.hue, function (url) { imgEl.src = url; });
+  }
+
+  /* ── theme: resolve system + follow live changes ── */
+  function applyTheme(pref) {
+    var t = pref;
+    if (t === 'system' || !t) {
+      t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initPressable();
     initEnter();
+    if (window.matchMedia && window.CarBox) {
+      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+        if ((CarBox.get('theme') || 'system') === 'system') applyTheme('system');
+      });
+    }
   });
 
-  return { toast: toast, sheet: sheet, countUp: countUp, wiggle: wiggle, reduced: reduced, SPRING: SPRING };
+  return { toast: toast, sheet: sheet, countUp: countUp, wiggle: wiggle, reduced: reduced,
+           tintSprite: tintSprite, carSprite: carSprite, applyTheme: applyTheme, SPRING: SPRING };
 })();

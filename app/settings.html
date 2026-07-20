@@ -5,42 +5,150 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Settings</title>
 <style>html{background:#E9E9E9}</style>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
 <script defer src="ui.js"></script>
-<script defer src="nav.js"></script>
 <link rel="prefetch" href="index.html">
 <style>
 
+  .phone{padding-bottom:48px}
   .backbtn{
     background:none;border:none;cursor:pointer;padding:6px 8px 6px 0;
     display:flex;align-items:center;min-height:44px;
   }
   .backbtn img{width:32px}
-  .sethead h1{font-size:34px;color:#141210;line-height:1;margin-top:2px}
+  .sethead h1{font-size:34px;color:var(--tx,#141210);line-height:1;margin-top:2px}
 
-  .setprofile{display:flex;align-items:center;gap:16px;margin-top:16px}
+  .sec-label{
+    font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--mut,#8D8D8B);margin:14px 4px 6px;
+  }
+  .sec-mini{
+    font-size:11px;font-weight:700;letter-spacing:.08em;
+    color:var(--mut,#9B918F);margin-top:12px;
+  }
 
   .setcard{
     background:var(--card);border-radius:18px;box-shadow:var(--shadow);
-    margin-top:14px;padding:3px 16px;
+    padding:3px 16px;
   }
   .setrow{
     display:flex;align-items:center;justify-content:space-between;gap:12px;
-    padding:12px 0;border-bottom:1px solid var(--hairline);min-height:44px;
+    padding:12px 0;border-bottom:1px solid var(--hairline);min-height:48px;
   }
   .setrow:last-child{border-bottom:none}
-  .setrow .stx{font-size:15px;font-weight:600;color:#141311}
+  .setrow .stx{font-size:15px;font-weight:600;color:var(--tx,#141311)}
   .setrow .ssub{font-size:12.5px;font-weight:500;color:var(--warmgray);margin-top:1px}
   .setrow .sval{font-size:14px;font-weight:600;color:var(--warmgray)}
+  .setrow.rowbtn{cursor:pointer}
+  .setrow.danger .stx{color:#B3402F}
 
-  .prorow-set{opacity:.55;cursor:pointer}
-  .prorow-set .left{display:flex;align-items:center;gap:10px}
-  .prorow-set .left img.lk{width:15px}
-  .prorow-set img.pb{width:44px}
+  .chev-r{width:12px;flex:none;transform:rotate(-90deg);filter:brightness(.35)}
+  html[data-theme="dark"] .chev-r{filter:none}
+  .avatar-sm{
+    width:44px;height:44px;border-radius:50%;background:#080808;
+    border:2.5px solid #6E5A46;flex:none;
+  }
+  .rowleft{display:flex;align-items:center;gap:12px;min-width:0}
+  .upchip{
+    background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:7px 14px;font-family:'League Spartan',sans-serif;font-size:12.5px;font-weight:700;
+    min-height:30px;flex:none;
+  }
+
+  /* ── My Car (collapsible) ── */
+  .mycar-head{
+    display:flex;align-items:center;gap:12px;width:100%;
+    background:none;border:none;cursor:pointer;text-align:left;
+    padding:9px 0;min-height:64px;
+  }
+  .mchead-sprite{width:90px;flex:none}
+  .mchead-name{font-size:17px;font-weight:700;color:var(--tx,#141311)}
+  .mchead-sub{font-size:12.5px;font-weight:500;color:var(--mut,#9A928B);margin-top:1px}
+  .mchead-chev{
+    width:14px;margin-left:auto;flex:none;filter:brightness(.35);
+    transition:transform .45s cubic-bezier(.3,1.4,.4,1);
+  }
+  html[data-theme="dark"] .mchead-chev{filter:none}
+  .mycar.open .mchead-chev{transform:rotate(180deg)}
+  .mycar-body{
+    height:0;opacity:0;overflow:hidden;
+    transition:height .45s cubic-bezier(.3,1.4,.4,1),opacity .3s ease-out;
+  }
+  .mycar.open .mycar-body{opacity:1}
+  .mycar-body .inner{padding:2px 0 14px}
+
+  .mc-preview{width:300px;max-width:100%;height:auto;display:block;margin:6px auto 2px}
+  @keyframes mcpulse{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
+  .mc-preview.pulse{animation:mcpulse .15s ease-out}
+
+  .presetrow{
+    display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;
+    scroll-snap-type:x mandatory;margin:8px -16px 0;padding:2px 16px 6px;
+  }
+  .presetrow::-webkit-scrollbar{display:none}
+  .presettile{
+    flex:none;width:104px;height:64px;border-radius:14px;
+    background:var(--pill);box-shadow:var(--shadow);border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;padding:0;
+    scroll-snap-align:start;
+  }
+  .presettile img{width:88px;max-height:52px;object-fit:contain}
+  .presettile.sel{box-shadow:var(--shadow),inset 0 0 0 2.5px #6E5A46}
+
+  .huewrap{display:flex;align-items:center;gap:10px;margin-top:8px}
+  .hueslider{
+    position:relative;flex:1;height:34px;border-radius:999px;cursor:pointer;touch-action:none;
+    background:linear-gradient(to right,
+      hsl(0,75%,55%),hsl(60,75%,55%),hsl(120,70%,45%),hsl(180,70%,45%),
+      hsl(240,75%,58%),hsl(300,75%,55%),hsl(360,75%,55%));
+  }
+  .hueknob{
+    position:absolute;top:50%;left:0;width:26px;height:26px;border-radius:50%;
+    background:#FDFDFC;box-shadow:0 2px 8px rgba(0,0,0,.35);
+    transform:translate(-50%,-50%);pointer-events:none;
+  }
+  .hueknob.off{opacity:.45}
+  .greychip{
+    flex:none;background:var(--ctl,#D9D4D0);border:none;border-radius:999px;cursor:pointer;
+    padding:9px 13px;font-family:'League Spartan',sans-serif;font-size:12.5px;font-weight:700;
+    color:var(--meta);min-height:34px;
+  }
+
+  .field{
+    background:var(--surface,#F5F3F4);border-radius:20px;box-shadow:var(--shadow);
+    padding:9px 15px 10px;margin-top:9px;
+  }
+  .field .flab{font-size:12.5px;font-weight:600;color:var(--mut,#9B918F)}
+  .field input{
+    width:100%;border:none;background:transparent;outline:none;
+    font-family:'League Spartan',sans-serif;font-size:17px;font-weight:600;color:var(--tx,#141210);
+    margin-top:2px;padding:0;
+  }
+  .fieldrow{display:flex;gap:9px}
+  .fieldrow .field{flex:1;min-width:0}
+
+  /* 3-way segmented (theme) */
+  .seg3{width:186px}
+  .seg3 .segpill{width:calc((100% - 4px)/3)}
+  .seg3[data-i="1"] .segpill{transform:translateX(100%)}
+  .seg3[data-i="2"] .segpill{transform:translateX(200%)}
+
+  .sheetbtn{
+    width:100%;margin-top:12px;
+    background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:11px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:16px;
+    box-shadow:var(--shadow);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .mycar-body,.mchead-chev,.seg3 .segpill{transition-duration:.01ms}
+    .mc-preview.pulse{animation:none}
+  }
 </style>
 </head>
 <body>
@@ -53,26 +161,52 @@
     <h1 class="serif">Settings</h1>
   </div>
 
-  <div class="setprofile">
-    <div class="avatar"></div>
-    <div>
-      <div class="pname" style="font-size:24px">Vojtech13</div>
-      <div class="phandle" style="font-size:15px">@Vojtech.Arkes</div>
+  <div class="sec-label">My Car</div>
+  <div class="setcard mycar" id="mycar">
+    <button class="mycar-head" id="mycarHead" aria-expanded="false" aria-controls="mycarBody">
+      <img class="mchead-sprite" id="mcheadSprite" src="assets/sprite_chiron.png" alt="">
+      <div>
+        <div class="mchead-name" id="mcheadName">Bugatti Chiron</div>
+        <div class="mchead-sub">Tap to customize</div>
+      </div>
+      <img class="mchead-chev" src="assets/icon_chevron.png" alt="">
+    </button>
+    <div class="mycar-body" id="mycarBody">
+      <div class="inner">
+        <canvas class="mc-preview" id="mcPreview" aria-label="Car preview"></canvas>
+        <div class="sec-mini">BODY STYLE</div>
+        <div class="presetrow" id="presetRow"></div>
+        <div class="sec-mini">COLOR</div>
+        <div class="huewrap">
+          <div class="hueslider" id="hueSlider" role="slider" aria-label="Car color" aria-valuemin="0" aria-valuemax="360" tabindex="0">
+            <span class="hueknob" id="hueKnob"></span>
+          </div>
+          <button class="greychip" id="greyChip">Original grey</button>
+        </div>
+        <div class="field"><div class="flab">Car name</div><input id="f-name" type="text" autocomplete="off"></div>
+        <div class="fieldrow">
+          <div class="field"><div class="flab">Year</div><input id="f-year" inputmode="numeric" autocomplete="off"></div>
+          <div class="field"><div class="flab" id="milesLab">Mileage (mi)</div><input id="f-miles" inputmode="numeric" autocomplete="off"></div>
+        </div>
+      </div>
     </div>
   </div>
 
+  <div class="sec-label">Appearance</div>
   <div class="setcard">
     <div class="setrow">
-      <div>
-        <div class="stx">Units</div>
-        <div class="ssub">Applies to every mileage in the app</div>
-      </div>
-      <div class="seg" id="seg-units" role="group" aria-label="Units">
+      <div class="stx">Theme</div>
+      <div class="seg seg3" id="segTheme" data-i="2" role="group" aria-label="Theme">
         <span class="segpill" aria-hidden="true"></span>
-        <button data-u="mi" aria-label="Miles">mi</button>
-        <button data-u="km" aria-label="Kilometers">km</button>
+        <button data-t="light">Light</button>
+        <button data-t="dark">Dark</button>
+        <button data-t="system">System</button>
       </div>
     </div>
+  </div>
+
+  <div class="sec-label">Preferences</div>
+  <div class="setcard">
     <div class="setrow">
       <div>
         <div class="stx">Service reminders</div>
@@ -87,51 +221,290 @@
       </div>
       <button class="switch" id="sw-notif" role="switch" aria-checked="true" aria-label="Notifications"></button>
     </div>
-  </div>
-
-  <div class="setcard">
-    <div class="setrow prorow-set" id="prorow" role="button" tabindex="0" aria-label="CarBox Pro — coming soon">
-      <div class="left">
-        <img class="lk" src="assets/badge_lock.png" alt="">
-        <div class="stx">CarBox Pro</div>
-      </div>
-      <img class="pb" src="assets/badge_pro.png" alt="">
-    </div>
     <div class="setrow">
-      <div class="stx">About</div>
-      <div class="sval">CarBox 0.1.0 — early build</div>
+      <div>
+        <div class="stx">Units</div>
+        <div class="ssub">Applies to every mileage in the app</div>
+      </div>
+      <div class="seg" id="segUnits" role="group" aria-label="Units">
+        <span class="segpill" aria-hidden="true"></span>
+        <button data-u="mi">mi</button>
+        <button data-u="km">km</button>
+      </div>
+    </div>
+    <div class="setrow rowbtn" id="currencyRow" role="button" tabindex="0">
+      <div class="stx">Currency</div>
+      <div class="rowleft">
+        <div class="sval" id="currencyVal">USD</div>
+        <img class="chev-r" src="assets/icon_chevron.png" alt="">
+      </div>
     </div>
   </div>
 
-  <nav class="nav" data-active="0">
-    <span class="navpill" aria-hidden="true"></span>
-    <a class="tab active" href="index.html"><img class="i-navtire" src="assets/nav_tire_v2.png" alt=""><span class="lbl">Garage</span></a>
-    <a class="tab" href="log.html"><img class="i-navwrench" src="assets/nav_wrench.png" alt=""><span class="lbl">log</span></a>
-    <a class="tab" href="upgrades.html"><img class="i-navgear" src="assets/nav_gear.png" alt=""><span class="lbl">upgrades</span></a>
-  </nav>
+  <div class="sec-label">Account</div>
+  <div class="setcard">
+    <div class="setrow rowbtn" id="profileRow" role="button" tabindex="0" aria-label="Edit profile">
+      <div class="rowleft">
+        <div class="avatar-sm"></div>
+        <div>
+          <div class="stx" id="profName">Vojtech13</div>
+          <div class="ssub" id="profHandle">@Vojtech.Arkes</div>
+        </div>
+      </div>
+      <img class="chev-r" src="assets/icon_chevron.png" alt="">
+    </div>
+    <div class="setrow rowbtn" id="signout" role="button" tabindex="0">
+      <div class="stx">Sign out</div>
+    </div>
+    <div class="setrow rowbtn danger" id="delacct" role="button" tabindex="0">
+      <div class="stx">Delete account</div>
+    </div>
+  </div>
+
+  <div class="sec-label">CarBox Pro</div>
+  <div class="setcard">
+    <div class="setrow">
+      <div>
+        <div class="stx">Current plan</div>
+        <div class="ssub">Free</div>
+      </div>
+      <button class="upchip" id="upgrade">Upgrade</button>
+    </div>
+    <div class="setrow rowbtn" id="restore" role="button" tabindex="0">
+      <div class="stx">Restore purchases</div>
+    </div>
+    <div class="setrow rowbtn" id="managesub" role="button" tabindex="0">
+      <div class="stx">Manage subscription</div>
+    </div>
+  </div>
+
+  <div class="sec-label">About &amp; Legal</div>
+  <div class="setcard">
+    <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Privacy Policy</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
+    <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Terms of Use</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
+    <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Contact support</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
+    <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Rate CarBox</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
+    <div class="setrow" id="versionRow">
+      <div class="stx">Version</div>
+      <div class="sval">CarBox 1.0.0</div>
+    </div>
+  </div>
 
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var SPRING_MS = 460;
+
   document.getElementById('back').addEventListener('click', function () {
     if (document.referrer && document.referrer.indexOf(location.origin) === 0) history.back();
     else location.href = 'index.html';
   });
 
-  /* units segmented control */
-  var seg = document.getElementById('seg-units');
-  function paintUnits() { seg.classList.toggle('km', CarBox.get('units') === 'km'); }
-  paintUnits();
-  seg.querySelectorAll('button').forEach(function (btn) {
+  /* ════ MY CAR ════ */
+  var PRESETS = [
+    { id: 'sprite_chiron', label: 'Chiron' },
+    { id: 'preset_coupe', label: 'Coupe' },
+    { id: 'preset_sedan', label: 'Sedan' },
+    { id: 'preset_pickup', label: 'Pickup' },
+    { id: 'preset_suv', label: 'SUV' },
+    { id: 'preset_wagon', label: 'Wagon' },
+    { id: 'preset_muscle', label: 'Muscle' }
+  ];
+  var car = CarBox.get('car') || { presetId: 'sprite_chiron', hue: null };
+  var vehicle = CarBox.get('vehicle');
+
+  var mycar = $('mycar'), head = $('mycarHead'), body = $('mycarBody');
+  var preview = $('mcPreview'), ctx = preview.getContext('2d');
+  var baseImg = null;
+
+  function pulsePreview() {
+    preview.classList.remove('pulse');
+    void preview.offsetWidth;
+    preview.classList.add('pulse');
+  }
+  /* live tint straight onto the canvas — no toDataURL per frame, stays 60fps */
+  function drawPreview() {
+    if (!baseImg) return;
+    preview.width = baseImg.naturalWidth;
+    preview.height = baseImg.naturalHeight;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, preview.width, preview.height);
+    ctx.drawImage(baseImg, 0, 0);
+    if (car.hue !== null && car.hue !== undefined) {
+      ctx.globalCompositeOperation = 'color';
+      ctx.fillStyle = 'hsl(' + car.hue + ',75%,50%)';
+      ctx.fillRect(0, 0, preview.width, preview.height);
+      ctx.globalCompositeOperation = 'destination-in';
+      ctx.drawImage(baseImg, 0, 0);
+    }
+  }
+  function loadBase(cb) {
+    var img = new Image();
+    img.onload = function () { baseImg = img; if (cb) cb(); };
+    img.src = 'assets/' + car.presetId + '.png';
+  }
+  function saveCar() { CarBox.set('car', car); }
+  function refreshHeadSprite() { UI.carSprite($('mcheadSprite')); }
+
+  /* collapse/expand with measured height */
+  var open = false;
+  function setOpen(next) {
+    open = next;
+    head.setAttribute('aria-expanded', String(open));
+    if (open) {
+      mycar.classList.add('open');
+      body.style.height = body.scrollHeight + 'px';
+      var done = function (e) {
+        if (e.propertyName !== 'height') return;
+        body.style.height = 'auto';
+        body.removeEventListener('transitionend', done);
+      };
+      body.addEventListener('transitionend', done);
+    } else {
+      body.style.height = body.scrollHeight + 'px';
+      void body.offsetHeight;
+      mycar.classList.remove('open');
+      body.style.height = '0px';
+    }
+  }
+  head.addEventListener('click', function () { setOpen(!open); });
+  if (location.hash === '#car') setOpen(true);
+
+  /* presets */
+  var presetRow = $('presetRow');
+  PRESETS.forEach(function (p) {
+    var tile = document.createElement('button');
+    tile.className = 'presettile' + (p.id === car.presetId ? ' sel' : '');
+    tile.setAttribute('aria-label', p.label);
+    var img = document.createElement('img');
+    img.src = 'assets/' + p.id + '.png';
+    img.alt = '';
+    tile.appendChild(img);
+    tile.addEventListener('click', function () {
+      car.presetId = p.id;
+      saveCar();
+      presetRow.querySelectorAll('.presettile').forEach(function (t) { t.classList.remove('sel'); });
+      tile.classList.add('sel');
+      tile.classList.remove('pop'); void tile.offsetWidth; tile.classList.add('pop');
+      loadBase(function () { drawPreview(); pulsePreview(); });
+      refreshHeadSprite();
+      if (open) requestAnimationFrame(function () { if (body.style.height !== 'auto') body.style.height = body.scrollHeight + 'px'; });
+    });
+    presetRow.appendChild(tile);
+  });
+
+  /* hue slider */
+  var slider = $('hueSlider'), knob = $('hueKnob');
+  function paintKnob() {
+    var h = car.hue === null || car.hue === undefined ? 0 : car.hue;
+    knob.style.left = (h / 360 * 100) + '%';
+    knob.classList.toggle('off', car.hue === null || car.hue === undefined);
+    slider.setAttribute('aria-valuenow', String(Math.round(h)));
+  }
+  var dragging = false, pendingHue = null, rafQueued = false;
+  function hueFromEvent(e) {
+    var r = slider.getBoundingClientRect();
+    var x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+    return Math.round(x / r.width * 360);
+  }
+  function applyHue(h, persist) {
+    car.hue = h;
+    paintKnob();
+    drawPreview();
+    if (persist) { saveCar(); refreshHeadSprite(); }
+  }
+  slider.addEventListener('pointerdown', function (e) {
+    dragging = true;
+    slider.setPointerCapture(e.pointerId);
+    applyHue(hueFromEvent(e), false);
+  });
+  slider.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    pendingHue = hueFromEvent(e);
+    if (!rafQueued) {
+      rafQueued = true;
+      requestAnimationFrame(function () {
+        rafQueued = false;
+        if (pendingHue !== null) applyHue(pendingHue, false);
+      });
+    }
+  });
+  slider.addEventListener('pointerup', function (e) {
+    if (!dragging) return;
+    dragging = false;
+    applyHue(hueFromEvent(e), true);
+    pulsePreview();
+  });
+  slider.addEventListener('keydown', function (e) {
+    var h = car.hue === null ? 0 : car.hue;
+    if (e.key === 'ArrowRight') { e.preventDefault(); applyHue(Math.min(360, h + 10), true); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); applyHue(Math.max(0, h - 10), true); }
+  });
+  $('greyChip').addEventListener('click', function () {
+    car.hue = null;
+    saveCar();
+    paintKnob();
+    drawPreview();
+    pulsePreview();
+    refreshHeadSprite();
+  });
+
+  /* vehicle fields */
+  function fillFields() {
+    var units = CarBox.get('units');
+    $('f-name').value = vehicle.name;
+    $('f-year').value = String(vehicle.year);
+    $('milesLab').textContent = 'Mileage (' + units + ')';
+    $('f-miles').value = String(CarBox.toUnits(vehicle.mileage));
+  }
+  $('f-name').addEventListener('change', function () {
+    vehicle.name = this.value.trim() || vehicle.name;
+    this.value = vehicle.name;
+    CarBox.set('vehicle', vehicle);
+    $('mcheadName').textContent = vehicle.name;
+  });
+  $('f-year').addEventListener('change', function () {
+    var y = parseInt(this.value.replace(/[^0-9]/g, ''), 10);
+    if (y) vehicle.year = y;
+    this.value = String(vehicle.year);
+    CarBox.set('vehicle', vehicle);
+  });
+  $('f-miles').addEventListener('change', function () {
+    var v = parseInt(this.value.replace(/[^0-9]/g, ''), 10);
+    if (!isNaN(v)) {
+      vehicle.mileage = CarBox.get('units') === 'km' ? Math.round(v / 1.60934) : v;
+    }
+    CarBox.set('vehicle', vehicle);
+    fillFields();
+  });
+
+  /* initial paint */
+  $('mcheadName').textContent = vehicle.name;
+  refreshHeadSprite();
+  loadBase(drawPreview);
+  paintKnob();
+  fillFields();
+
+  /* ════ APPEARANCE ════ */
+  var segTheme = $('segTheme');
+  var THEMES = ['light', 'dark', 'system'];
+  function paintTheme() {
+    segTheme.setAttribute('data-i', String(THEMES.indexOf(CarBox.get('theme') || 'system')));
+  }
+  paintTheme();
+  segTheme.querySelectorAll('button').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      CarBox.set('units', btn.getAttribute('data-u'));
-      paintUnits();
+      var t = btn.getAttribute('data-t');
+      CarBox.set('theme', t);
+      UI.applyTheme(t);
+      paintTheme();
     });
   });
 
-  /* toggles */
+  /* ════ PREFERENCES ════ */
   function bindSwitch(id, key) {
-    var el = document.getElementById(id);
+    var el = $(id);
     function paint() {
       var on = !!CarBox.get(key);
       el.classList.toggle('on', on);
@@ -146,12 +519,153 @@ document.addEventListener('DOMContentLoaded', function () {
   bindSwitch('sw-rem', 'reminders');
   bindSwitch('sw-notif', 'notifsOn');
 
-  /* inert Pro row */
-  var pro = document.getElementById('prorow');
-  function proToast() { UI.toast('Included in CarBox Pro — coming soon'); }
-  pro.addEventListener('click', proToast);
-  pro.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); proToast(); }
+  var segUnits = $('segUnits');
+  function paintUnits() { segUnits.classList.toggle('km', CarBox.get('units') === 'km'); }
+  paintUnits();
+  segUnits.querySelectorAll('button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      CarBox.set('units', btn.getAttribute('data-u'));
+      paintUnits();
+      fillFields();
+    });
+  });
+
+  var CURRENCIES = ['USD', 'EUR', 'GBP'];
+  $('currencyVal').textContent = CarBox.get('currency');
+  function currencySheet() {
+    UI.sheet({
+      title: 'Currency',
+      label: 'Currency',
+      build: function (bodyEl) {
+        CURRENCIES.forEach(function (c) {
+          var row = document.createElement('div');
+          row.className = 'sheetrow rowflex';
+          row.setAttribute('role', 'button');
+          row.setAttribute('tabindex', '0');
+          row.setAttribute('data-press', '');
+          row.style.cursor = 'pointer';
+          var tx = document.createElement('div');
+          tx.className = 'rowtop';
+          tx.textContent = c;
+          var chk = document.createElement('div');
+          chk.className = 'rowtx';
+          chk.textContent = CarBox.get('currency') === c ? '✓' : '';
+          row.appendChild(tx); row.appendChild(chk);
+          row.addEventListener('click', function () {
+            CarBox.set('currency', c);
+            $('currencyVal').textContent = c;
+            bodyEl.querySelectorAll('.rowtx').forEach(function (el) { el.textContent = ''; });
+            chk.textContent = '✓';
+          });
+          bodyEl.appendChild(row);
+        });
+        var note = document.createElement('div');
+        note.className = 'sheet-note';
+        note.textContent = 'Display formatting only for now.';
+        bodyEl.appendChild(note);
+      }
+    });
+  }
+  function bindRow(id, fn) {
+    var el = $(id);
+    el.addEventListener('click', fn);
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); }
+    });
+  }
+  bindRow('currencyRow', currencySheet);
+
+  /* ════ ACCOUNT ════ */
+  function paintProfile() {
+    var p = CarBox.get('profile');
+    $('profName').textContent = p.name;
+    $('profHandle').textContent = p.handle;
+  }
+  paintProfile();
+  bindRow('profileRow', function () {
+    var p = CarBox.get('profile');
+    UI.sheet({
+      title: 'Edit profile',
+      label: 'Edit profile',
+      build: function (bodyEl) {
+        function field(lab, val) {
+          var f = document.createElement('div'); f.className = 'field';
+          var l = document.createElement('div'); l.className = 'flab'; l.textContent = lab;
+          var inp = document.createElement('input'); inp.type = 'text'; inp.value = val;
+          f.appendChild(l); f.appendChild(inp);
+          bodyEl.appendChild(f);
+          return inp;
+        }
+        var nameInp = field('Name', p.name);
+        var handleInp = field('Handle', p.handle);
+        var save = document.createElement('button');
+        save.className = 'sheetbtn';
+        save.textContent = 'Save';
+        save.addEventListener('click', function () {
+          p.name = nameInp.value.trim() || p.name;
+          var h = handleInp.value.trim();
+          if (h) p.handle = h.charAt(0) === '@' ? h : '@' + h;
+          CarBox.set('profile', p);
+          paintProfile();
+          UI.toast('Profile updated');
+        });
+        bodyEl.appendChild(save);
+      }
+    });
+  });
+  bindRow('signout', function () { UI.toast('Available when accounts launch'); });
+  bindRow('delacct', function () { UI.toast('Available when accounts launch'); });
+
+  /* ════ CARBOX PRO ════ */
+  function proToast() { UI.toast('CarBox Pro — coming soon'); }
+  $('upgrade').addEventListener('click', proToast);
+  bindRow('restore', proToast);
+  bindRow('managesub', proToast);
+
+  /* ════ ABOUT & LEGAL ════ */
+  document.querySelectorAll('.legal').forEach(function (row) {
+    var fn = function () { UI.toast('Opens at launch'); };
+    row.addEventListener('click', fn);
+    row.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); }
+    });
+  });
+
+  /* version easter egg: 5 quick taps -> debug sheet */
+  var taps = 0, tapTimer = null;
+  $('versionRow').addEventListener('click', function () {
+    taps++;
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(function () { taps = 0; }, 1500);
+    if (taps >= 5) {
+      taps = 0;
+      var lsBytes = 0;
+      try { lsBytes = (localStorage.getItem('carbox.v1') || '').length; } catch (e) {}
+      UI.sheet({
+        title: 'Debug',
+        label: 'Debug info',
+        build: function (bodyEl) {
+          var lines = [
+            'entries: ' + CarBox.get('entries').length,
+            'plan items: ' + CarBox.get('planItems').length,
+            'likes: ' + CarBox.get('likes'),
+            'theme: ' + CarBox.get('theme') + ' · units: ' + CarBox.get('units') + ' · currency: ' + CarBox.get('currency'),
+            'car: ' + car.presetId + ' · hue: ' + (car.hue === null ? 'grey' : car.hue),
+            'state size: ' + lsBytes + ' bytes',
+            'images on page: ' + document.images.length
+          ];
+          lines.forEach(function (t) {
+            var row = document.createElement('div');
+            row.className = 'sheetrow';
+            var tx = document.createElement('div');
+            tx.className = 'rowtx';
+            tx.textContent = t;
+            row.appendChild(tx);
+            bodyEl.appendChild(row);
+          });
+        }
+      });
+    }
   });
 });
 </script>

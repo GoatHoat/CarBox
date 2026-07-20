@@ -6,6 +6,10 @@ window.CarBox = (function () {
 
   var DEFAULTS = {
     vehicle: { name: 'Bugatti Chiron', year: 2026, mileage: 82410 },
+    car: { presetId: 'sprite_chiron', hue: null }, /* hue null = original grey */
+    profile: { name: 'Vojtech13', handle: '@Vojtech.Arkes' },
+    currency: 'USD',
+    theme: 'system',
     specs: [
       '8.0L quad-turbo W16',
       '1,479 hp (1,500 PS); Super Sport: 1,578 hp',
@@ -86,8 +90,11 @@ window.CarBox = (function () {
   }
   function subscribe(fn) { subs.push(fn); }
 
-  /* ── formatting helpers (units-aware) ── */
-  function fmtMoney(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+  /* ── formatting helpers (units/currency-aware) ── */
+  var CUR_SYMBOL = { USD: '$', EUR: '€', GBP: '£' };
+  function fmtMoney(n) {
+    return (CUR_SYMBOL[state.currency] || '$') + Math.round(n).toLocaleString('en-US');
+  }
   function toUnits(mi) { return state.units === 'km' ? Math.round(mi * 1.60934) : mi; }
   function fmtMiles(mi) {
     return toUnits(mi).toLocaleString('en-US') + ' ' + state.units;

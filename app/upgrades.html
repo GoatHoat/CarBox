@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Upgrades</title>
 <style>html{background:#E9E9E9}</style>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,7 +21,7 @@
 <style>
 
   .upghead{display:block}
-  .upghead h1{font-size:38px;color:#141210;line-height:1}
+  .upghead h1{font-size:38px;color:var(--tx,#141210);line-height:1}
   .upghead .sub{font-size:15px;font-weight:500;color:var(--warmgray);margin-top:2px}
 
   .goalrow{display:flex;gap:9px;margin-top:10px}
@@ -33,7 +34,7 @@
   .goalpill img{width:11px}
   .changegoal{
     background:transparent;border:2.5px solid #C2B6AA;border-radius:999px;cursor:pointer;
-    padding:7px 16px;color:#8D8579;font-family:'League Spartan',sans-serif;font-weight:600;font-size:14.5px;
+    padding:7px 16px;color:var(--mut,#8D8579);font-family:'League Spartan',sans-serif;font-weight:600;font-size:14.5px;
   }
 
   .stages{position:relative;margin-top:10px}
@@ -47,7 +48,7 @@
     width:9px;height:9px;border-radius:50%;background:#6E5B4B;
   }
   .scard{
-    background:#F5F3F4;border-radius:16px;box-shadow:var(--shadow);
+    background:var(--surface,#F5F3F4);border-radius:16px;box-shadow:var(--shadow);
     padding:10px 13px;position:relative;
   }
   .schip{
@@ -55,7 +56,7 @@
     background:#7B6558;color:#FBF8F4;
     font-size:10.5px;font-weight:600;letter-spacing:.05em;
   }
-  .scard .stitle{font-size:17px;font-weight:600;color:#17130F;margin-top:5px;line-height:1.1}
+  .scard .stitle{font-size:17px;font-weight:600;color:var(--tx,#17130F);margin-top:5px;line-height:1.1}
   .scard .smeta{font-size:13.5px;font-weight:600;color:var(--meta);margin-top:2px}
   .addplan{
     position:absolute;right:13px;bottom:11px;
@@ -66,14 +67,14 @@
   .addplan.inplan{color:var(--brown-warm)}
 
   .mapcard{
-    background:#F5F3F4;border-radius:18px;box-shadow:var(--shadow);
+    background:var(--surface,#F5F3F4);border-radius:18px;box-shadow:var(--shadow);
     margin-top:10px;padding:12px 12px 11px;
   }
-  .mapcard h2{font-size:17px;font-weight:600;color:#17130F;font-family:'League Spartan',sans-serif}
+  .mapcard h2{font-size:17px;font-weight:600;color:var(--tx,#17130F);font-family:'League Spartan',sans-serif}
   .mapcard .msub{font-size:13px;font-weight:500;color:var(--warmgray);margin-top:1px}
   .mapimg{width:100%;border-radius:12px;margin-top:8px}
   .shoprow{display:flex;align-items:center;justify-content:space-between;margin-top:9px;gap:8px}
-  .shoprow .sname{font-size:15.5px;font-weight:600;color:#17130F;line-height:1.15}
+  .shoprow .sname{font-size:15.5px;font-weight:600;color:var(--tx,#17130F);line-height:1.15}
   .shoprow .srate{font-size:12.5px;font-weight:600;color:var(--meta);margin-top:1px}
   .directions{
     background:transparent;border:2.5px solid #A79A8C;border-radius:999px;cursor:pointer;
@@ -161,8 +162,9 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('.goalpill').addEventListener('click', goGoal);
   document.querySelector('.changegoal').addEventListener('click', goGoal);
 
-  /* goal pill reflects state */
+  /* goal pill + subtitle reflect state */
   document.querySelector('.goalpill span').textContent = 'Goal: ' + CarBox.get('goal');
+  document.querySelector('.upghead .sub').textContent = 'for your ' + CarBox.get('vehicle').name;
 
   /* ── stages: add-to-plan toggles + running total pill ── */
   var STAGES = [{ id: 's1', cost: 4500 }, { id: 's2', cost: 8200 }];

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Log</title>
 <style>html{background:#E9E9E9}</style>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,8 +23,8 @@
   .loghead{display:flex;align-items:center;gap:4px;min-height:60px}
   .loghead .minisprite{width:172px;flex:none;margin-left:2px}
   .loghead .titles{flex:1;text-align:center}
-  .loghead .car{font-size:28px;color:#0E0E0E;line-height:1.05}
-  .loghead .miles{font-size:14px;font-weight:500;color:#9A928B;margin-top:1px}
+  .loghead .car{font-size:28px;color:var(--tx,#0E0E0E);line-height:1.05}
+  .loghead .miles{font-size:14px;font-weight:500;color:var(--mut,#9A928B);margin-top:1px}
 
   .reminder{
     margin:10px auto 0;width:fit-content;
@@ -37,17 +38,17 @@
   .stats{display:flex;gap:8px;margin-top:9px}
   .stat{
     flex:1;display:flex;align-items:center;gap:11px;
-    background:#F5F4F4;border-radius:18px;box-shadow:var(--shadow);
+    background:var(--surface,#F5F4F4);border-radius:18px;box-shadow:var(--shadow);
     padding:6px 9px;
   }
   .stat .circ{
-    width:33px;height:33px;border-radius:50%;background:#ECE8E2;
+    width:33px;height:33px;border-radius:50%;background:var(--ctl,#ECE8E2);
     display:flex;align-items:center;justify-content:center;flex:none;
   }
   .i-cash{width:20px}
   .i-list{width:16px}
-  .stat .lab{font-size:9.5px;font-weight:600;letter-spacing:.06em;color:#9A928B;text-transform:uppercase}
-  .stat .val{font-size:15px;font-weight:600;color:#141311;line-height:1.15}
+  .stat .lab{font-size:9.5px;font-weight:600;letter-spacing:.06em;color:var(--mut,#9A928B);text-transform:uppercase}
+  .stat .val{font-size:15px;font-weight:600;color:var(--tx,#141311);line-height:1.15}
 
   .timeline{position:relative;margin-top:9px;padding-bottom:4px}
   .timeline .rail{
@@ -60,7 +61,7 @@
     width:9px;height:9px;border-radius:50%;background:#6E5B4B;
   }
   .card{
-    background:#F5F4F3;border-radius:16px;box-shadow:var(--shadow);
+    background:var(--surface,#F5F4F3);border-radius:16px;box-shadow:var(--shadow);
     padding:8px 12px;
   }
   .chip{
@@ -68,10 +69,10 @@
     font-size:10.5px;font-weight:600;letter-spacing:.04em;
   }
   .chip.mod{background:var(--brown-warm);color:#FBF8F4}
-  .chip.maint{background:#D9D4D0;color:#4A4038}
+  .chip.maint{background:var(--ctl,#D9D4D0);color:var(--meta)}
   .chip.repair{background:#656469;color:#F2F0EE}
-  .chip.cosmetic{background:#CFC8BF;color:#4A4038}
-  .entry .etitle{font-size:15px;font-weight:600;color:#17130F;margin-top:4px;line-height:1.15}
+  .chip.cosmetic{background:#CFC8BF;color:var(--meta)}
+  .entry .etitle{font-size:15px;font-weight:600;color:var(--tx,#17130F);margin-top:4px;line-height:1.15}
   .entry .meta{font-size:12px;font-weight:500;color:var(--meta);margin-top:1px}
 
   .fab{
@@ -93,7 +94,7 @@
   .sheet{
     position:fixed;left:50%;bottom:0;z-index:50;
     width:100%;max-width:375px;
-    background:#F7EEE7;border-radius:26px 26px 0 0;
+    background:var(--sheet-bg,#F7EEE7);border-radius:26px 26px 0 0;
     padding:10px 18px 16px;
     transform:translate(-50%,103%);
     transition:transform .45s cubic-bezier(.22,.9,.34,1);
@@ -102,30 +103,30 @@
   }
   .sheet::-webkit-scrollbar{display:none}
   .sheet.open{transform:translate(-50%,0)}
-  .sheet .handle{width:52px;height:5px;border-radius:3px;background:#BABABA;margin:2px auto 10px;cursor:grab}
-  .sheet h2{font-size:30px;color:#141210;text-align:center;line-height:1.05;margin-bottom:12px}
+  .sheet .handle{width:52px;height:5px;border-radius:3px;background:var(--handle,#BABABA);margin:2px auto 10px;cursor:grab}
+  .sheet h2{font-size:30px;color:var(--tx,#141210);text-align:center;line-height:1.05;margin-bottom:12px}
   .cats{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin:0 -18px;padding:2px 18px 4px}
   .cats::-webkit-scrollbar{display:none}
   .cat{
     flex:none;display:flex;align-items:center;gap:6px;
-    background:#D9D4D0;border:none;border-radius:999px;cursor:pointer;
+    background:var(--ctl,#D9D4D0);border:none;border-radius:999px;cursor:pointer;
     padding:7px 13px;
     font-family:'League Spartan',sans-serif;font-size:12.5px;font-weight:700;
-    letter-spacing:.04em;color:#3E3A36;
+    letter-spacing:.04em;color:var(--tx2,#3E3A36);
   }
   .cat img{width:17px}
   .cat.sel{background:var(--brown-warm);color:#FBF8F4}
   .field{
-    background:#F5F3F4;border-radius:20px;box-shadow:var(--shadow);
+    background:var(--surface,#F5F3F4);border-radius:20px;box-shadow:var(--shadow);
     padding:9px 15px 10px;margin-top:9px;
   }
-  .field .flab{font-size:12.5px;font-weight:600;color:#9B918F}
+  .field .flab{font-size:12.5px;font-weight:600;color:var(--mut,#9B918F)}
   .field input,.field textarea{
     width:100%;border:none;background:transparent;outline:none;resize:none;
-    font-family:'League Spartan',sans-serif;font-size:19px;font-weight:600;color:#141210;
+    font-family:'League Spartan',sans-serif;font-size:19px;font-weight:600;color:var(--tx,#141210);
     margin-top:2px;padding:0;
   }
-  .field ::placeholder{color:#AEA6A3;opacity:1}
+  .field ::placeholder{color:var(--mut,#AEA6A3);opacity:1}
   .field input[type=date]{
     -webkit-appearance:none;appearance:none;
     min-height:24px;text-align:left;
@@ -140,7 +141,7 @@
     padding:20px 0 16px;cursor:pointer;
   }
   .photobox img{width:42px}
-  .photobox span{font-size:14.5px;font-weight:600;color:#9B918F}
+  .photobox span{font-size:14.5px;font-weight:600;color:var(--mut,#9B918F)}
   .savebtn{
     width:100%;margin-top:12px;
     background:#7B695D;color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
@@ -399,7 +400,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* hydrate header + reminder from state */
   var vehicle = CarBox.get('vehicle');
+  document.querySelector('.loghead .car').textContent = vehicle.name;
   document.querySelector('.loghead .miles').textContent = CarBox.fmtMiles(vehicle.mileage);
+  UI.carSprite(document.querySelector('.minisprite'));
   var svc = CarBox.get('nextService');
   var remEl = document.querySelector('.reminder');
   remEl.querySelector('span').textContent = 'Next: ' + svc.title + ' @ ' + CarBox.fmtMiles(svc.due);
