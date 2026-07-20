@@ -61,7 +61,9 @@
     position:absolute;right:13px;bottom:11px;
     background:none;border:none;cursor:pointer;
     color:#776357;font-family:'League Spartan',sans-serif;font-weight:600;font-size:13.5px;
+    min-height:24px;
   }
+  .addplan.inplan{color:var(--brown-warm)}
 
   .mapcard{
     background:#F5F3F4;border-radius:18px;box-shadow:var(--shadow);
@@ -131,7 +133,10 @@
   <div class="mapcard">
     <h2>Where to get it done</h2>
     <div class="msub">ECU tune &middot; 4 shops near you</div>
-    <img class="mapimg" src="assets/map_shops.png" alt="Map of nearby shops">
+    <div class="mapwrap">
+      <img class="mapimg" src="assets/map_shops.png" alt="Map of nearby shops">
+      <span class="pinpulse" style="left:47%;top:42%" aria-hidden="true"></span>
+    </div>
     <div class="shoprow">
       <div>
         <div class="sname">Apex Performance Tuning</div>
@@ -152,11 +157,100 @@
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('.goalpill').addEventListener('click', function () {
-    location.href = 'goal-picker.html';
+  function goGoal() { location.href = 'goal-picker.html'; }
+  document.querySelector('.goalpill').addEventListener('click', goGoal);
+  document.querySelector('.changegoal').addEventListener('click', goGoal);
+
+  /* goal pill reflects state */
+  document.querySelector('.goalpill span').textContent = 'Goal: ' + CarBox.get('goal');
+
+  /* ── stages: add-to-plan toggles + running total pill ── */
+  var STAGES = [{ id: 's1', cost: 4500 }, { id: 's2', cost: 8200 }];
+  var plan = CarBox.get('planItems');
+  var btns = Array.prototype.slice.call(document.querySelectorAll('.addplan'));
+  var totalPill = document.createElement('div');
+  totalPill.className = 'plantotal';
+  document.querySelector('.stages').insertAdjacentElement('afterend', totalPill);
+  var shownTotal = 0;
+
+  function planTotal() {
+    var t = 0;
+    STAGES.forEach(function (s) { if (plan.indexOf(s.id) !== -1) t += s.cost; });
+    return t;
+  }
+  function paintPlan(animate) {
+    btns.forEach(function (btn, i) {
+      var inPlan = plan.indexOf(STAGES[i].id) !== -1;
+      btn.textContent = inPlan ? 'In plan ✓' : 'Add to plan';
+      btn.classList.toggle('inplan', inPlan);
+    });
+    var t = planTotal();
+    if (t > 0) {
+      totalPill.classList.add('show');
+      if (animate) {
+        UI.countUp(totalPill, shownTotal, t, function (n) { return 'Plan total: ~' + CarBox.fmtMoney(n); });
+      } else {
+        totalPill.textContent = 'Plan total: ~' + CarBox.fmtMoney(t);
+      }
+    } else {
+      totalPill.classList.remove('show');
+    }
+    shownTotal = t;
+  }
+  paintPlan(false);
+  btns.forEach(function (btn, i) {
+    btn.addEventListener('click', function () {
+      var id = STAGES[i].id;
+      var idx = plan.indexOf(id);
+      if (idx === -1) plan.push(id); else plan.splice(idx, 1);
+      CarBox.set('planItems', plan);
+      btn.classList.remove('pop');
+      void btn.offsetWidth;
+      btn.classList.add('pop');
+      paintPlan(true);
+    });
   });
-  document.querySelector('.changegoal').addEventListener('click', function () {
-    location.href = 'goal-picker.html';
+
+  /* ── shops ── */
+  var SHOPS = [
+    { name: 'Apex Performance Tuning', rate: 4.8, dist: 2.1, from: 3900 },
+    { name: 'Redline Dyno Works', rate: 4.7, dist: 3.4, from: 4200 },
+    { name: 'Precision Motorsport Lab', rate: 4.9, dist: 5.0, from: 4800 },
+    { name: 'Velocity Garage', rate: 4.6, dist: 6.2, from: 3650 }
+  ];
+  function fmtDist(mi) {
+    return CarBox.get('units') === 'km'
+      ? (mi * 1.60934).toFixed(1) + ' km'
+      : mi + ' mi';
+  }
+  function shopMeta(s) { return s.rate + ' ★ · ' + fmtDist(s.dist) + ' · from ' + CarBox.fmtMoney(s.from); }
+  function dirToast() { UI.toast('Opens in Maps at launch'); }
+
+  document.querySelector('.shoprow .srate').textContent = shopMeta(SHOPS[0]);
+  document.querySelector('.shoprow .directions').addEventListener('click', dirToast);
+
+  document.querySelector('.seeall').addEventListener('click', function () {
+    UI.sheet({
+      title: 'Shops near you',
+      label: 'Shops near you',
+      build: function (body) {
+        SHOPS.forEach(function (s) {
+          var row = document.createElement('div');
+          row.className = 'sheetrow rowflex';
+          var left = document.createElement('div');
+          var nm = document.createElement('div'); nm.className = 'rowtop'; nm.textContent = s.name;
+          var mt = document.createElement('div'); mt.className = 'rowtx'; mt.textContent = shopMeta(s);
+          left.appendChild(nm); left.appendChild(mt);
+          var btn = document.createElement('button');
+          btn.className = 'directions';
+          btn.textContent = 'Directions';
+          btn.setAttribute('aria-label', 'Directions to ' + s.name);
+          btn.addEventListener('click', dirToast);
+          row.appendChild(left); row.appendChild(btn);
+          body.appendChild(row);
+        });
+      }
+    });
   });
 });
 </script>
