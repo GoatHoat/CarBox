@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CarBox — Settings</title>
+<style>html{background:#E9E9E9}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script defer src="state.js"></script>
+<script defer src="ui.js"></script>
+<script defer src="nav.js"></script>
+<link rel="prefetch" href="index.html">
+<style>
+
+  .backbtn{
+    background:none;border:none;cursor:pointer;padding:6px 8px 6px 0;
+    display:flex;align-items:center;min-height:44px;
+  }
+  .backbtn img{width:32px}
+  .sethead h1{font-size:34px;color:#141210;line-height:1;margin-top:2px}
+
+  .setprofile{display:flex;align-items:center;gap:16px;margin-top:16px}
+
+  .setcard{
+    background:var(--card);border-radius:18px;box-shadow:var(--shadow);
+    margin-top:14px;padding:3px 16px;
+  }
+  .setrow{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:12px 0;border-bottom:1px solid var(--hairline);min-height:44px;
+  }
+  .setrow:last-child{border-bottom:none}
+  .setrow .stx{font-size:15px;font-weight:600;color:#141311}
+  .setrow .ssub{font-size:12.5px;font-weight:500;color:var(--warmgray);margin-top:1px}
+  .setrow .sval{font-size:14px;font-weight:600;color:var(--warmgray)}
+
+  .prorow-set{opacity:.55;cursor:pointer}
+  .prorow-set .left{display:flex;align-items:center;gap:10px}
+  .prorow-set .left img.lk{width:15px}
+  .prorow-set img.pb{width:44px}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="sethead">
+    <button class="backbtn" id="back" aria-label="Back to garage">
+      <img src="assets/icon_back.png" alt="">
+    </button>
+    <h1 class="serif">Settings</h1>
+  </div>
+
+  <div class="setprofile">
+    <div class="avatar"></div>
+    <div>
+      <div class="pname" style="font-size:24px">Vojtech13</div>
+      <div class="phandle" style="font-size:15px">@Vojtech.Arkes</div>
+    </div>
+  </div>
+
+  <div class="setcard">
+    <div class="setrow">
+      <div>
+        <div class="stx">Units</div>
+        <div class="ssub">Applies to every mileage in the app</div>
+      </div>
+      <div class="seg" id="seg-units" role="group" aria-label="Units">
+        <span class="segpill" aria-hidden="true"></span>
+        <button data-u="mi" aria-label="Miles">mi</button>
+        <button data-u="km" aria-label="Kilometers">km</button>
+      </div>
+    </div>
+    <div class="setrow">
+      <div>
+        <div class="stx">Service reminders</div>
+        <div class="ssub">Oil, tires and inspection alerts</div>
+      </div>
+      <button class="switch" id="sw-rem" role="switch" aria-checked="true" aria-label="Service reminders"></button>
+    </div>
+    <div class="setrow">
+      <div>
+        <div class="stx">Notifications</div>
+        <div class="ssub">Likes, comments and follows</div>
+      </div>
+      <button class="switch" id="sw-notif" role="switch" aria-checked="true" aria-label="Notifications"></button>
+    </div>
+  </div>
+
+  <div class="setcard">
+    <div class="setrow prorow-set" id="prorow" role="button" tabindex="0" aria-label="CarBox Pro — coming soon">
+      <div class="left">
+        <img class="lk" src="assets/badge_lock.png" alt="">
+        <div class="stx">CarBox Pro</div>
+      </div>
+      <img class="pb" src="assets/badge_pro.png" alt="">
+    </div>
+    <div class="setrow">
+      <div class="stx">About</div>
+      <div class="sval">CarBox 0.1.0 — early build</div>
+    </div>
+  </div>
+
+  <nav class="nav" data-active="0">
+    <span class="navpill" aria-hidden="true"></span>
+    <a class="tab active" href="index.html"><img class="i-navtire" src="assets/nav_tire_v2.png" alt=""><span class="lbl">Garage</span></a>
+    <a class="tab" href="log.html"><img class="i-navwrench" src="assets/nav_wrench.png" alt=""><span class="lbl">log</span></a>
+    <a class="tab" href="upgrades.html"><img class="i-navgear" src="assets/nav_gear.png" alt=""><span class="lbl">upgrades</span></a>
+  </nav>
+
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('back').addEventListener('click', function () {
+    if (document.referrer && document.referrer.indexOf(location.origin) === 0) history.back();
+    else location.href = 'index.html';
+  });
+
+  /* units segmented control */
+  var seg = document.getElementById('seg-units');
+  function paintUnits() { seg.classList.toggle('km', CarBox.get('units') === 'km'); }
+  paintUnits();
+  seg.querySelectorAll('button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      CarBox.set('units', btn.getAttribute('data-u'));
+      paintUnits();
+    });
+  });
+
+  /* toggles */
+  function bindSwitch(id, key) {
+    var el = document.getElementById(id);
+    function paint() {
+      var on = !!CarBox.get(key);
+      el.classList.toggle('on', on);
+      el.setAttribute('aria-checked', String(on));
+    }
+    paint();
+    el.addEventListener('click', function () {
+      CarBox.set(key, !CarBox.get(key));
+      paint();
+    });
+  }
+  bindSwitch('sw-rem', 'reminders');
+  bindSwitch('sw-notif', 'notifsOn');
+
+  /* inert Pro row */
+  var pro = document.getElementById('prorow');
+  function proToast() { UI.toast('Included in CarBox Pro — coming soon'); }
+  pro.addEventListener('click', proToast);
+  pro.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); proToast(); }
+  });
+});
+</script>
+</body>
+</html>
