@@ -254,13 +254,12 @@
 
 </div>
 <script>
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
   var $ = function (id) { return document.getElementById(id); };
   var sheet = $('sheet'), backdrop = $('backdrop'), fab = document.querySelector('.fab');
   var timeline = document.querySelector('.timeline'), rail = document.querySelector('.timeline .rail');
   var type = 'mod';
   var CHIP_LABEL = { mod: 'MOD', maint: 'MAINTENANCE', repair: 'REPAIR', cosmetic: 'COSMETIC' };
-  var BASE_TOTAL = 48200, BASE_COUNT = 31;
 
   function todayISO() {
     var d = new Date();
@@ -284,7 +283,8 @@
     sheet.classList.remove('open');
     document.documentElement.style.overflow = '';
   }
-  fab.addEventListener('click', openSheet);
+  /* Add Entry ships later — the FAB teases it; the sheet stays reachable via #add */
+  fab.addEventListener('click', function () { UI.toast('Coming soon'); });
   backdrop.addEventListener('click', closeSheet);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
 
@@ -318,11 +318,6 @@
     });
   });
 
-  /* entries: stored newest-first in localStorage */
-  function loadEntries() {
-    try { return JSON.parse(localStorage.getItem('carbox_entries')) || []; }
-    catch (e) { return []; }
-  }
   function makeCard(entry) {
     var wrap = document.createElement('div'); wrap.className = 'entry';
     var dot = document.createElement('span'); dot.className = 'dot';
@@ -333,26 +328,50 @@
     title.textContent = entry.title;
     var meta = document.createElement('div'); meta.className = 'meta';
     var parts = [];
-    if (entry.cost > 0) parts.push('$' + entry.cost.toLocaleString('en-US'));
-    if (entry.miles > 0) parts.push(entry.miles.toLocaleString('en-US') + ' mi');
+    if (entry.cost > 0) parts.push(CarBox.fmtMoney(entry.cost));
+    if (entry.miles > 0) parts.push(CarBox.fmtMiles(entry.miles));
     if (entry.date) parts.push(entry.date);
     meta.textContent = parts.join(' · ');
     card.appendChild(chip); card.appendChild(title); card.appendChild(meta);
+    card.setAttribute('data-press', '');
+    card.setAttribute('data-id', entry.id);
+    card.setAttribute('role', 'link');
+    card.setAttribute('tabindex', '0');
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function () { openEntry(entry.id, card); });
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') openEntry(entry.id, card);
+    });
     wrap.appendChild(dot); wrap.appendChild(card);
     return wrap;
   }
-  function updateStats(entries) {
-    var total = BASE_TOTAL, i;
-    for (i = 0; i < entries.length; i++) total += entries[i].cost || 0;
-    $('stat-total').textContent = '$' + total.toLocaleString('en-US');
-    $('stat-count').textContent = String(BASE_COUNT + entries.length);
+  function updateStats(animate) {
+    var t = CarBox.totals();
+    if (animate) {
+      UI.countUp($('stat-total'), 0, t.invested, CarBox.fmtMoney);
+      UI.countUp($('stat-count'), 0, t.count, String);
+    } else {
+      $('stat-total').textContent = CarBox.fmtMoney(t.invested);
+      $('stat-count').textContent = String(t.count);
+    }
   }
-  var entries = loadEntries();
-  /* oldest stored first into the DOM so the newest ends up on top */
+  function openEntry(id, card) {
+    if (card) card.style.viewTransitionName = 'entry-hero';
+    location.href = 'entry.html?id=' + encodeURIComponent(id);
+  }
+
+  /* the timeline renders entirely from state */
+  var entries = CarBox.get('entries');
+  timeline.querySelectorAll('.entry').forEach(function (el) { el.remove(); });
   entries.slice().reverse().forEach(function (entry) {
     rail.insertAdjacentElement('afterend', makeCard(entry));
   });
-  updateStats(entries);
+
+  /* stats count up only on the first visit this session */
+  var animated = false;
+  try { animated = sessionStorage.getItem('carbox.statsUp') === '1'; } catch (e) {}
+  updateStats(!animated);
+  try { sessionStorage.setItem('carbox.statsUp', '1'); } catch (e) {}
 
   function num(v) { var n = parseInt(String(v).replace(/[^0-9]/g, ''), 10); return isNaN(n) ? 0 : n; }
   /* desktop browsers need a nudge to open the picker; iOS opens its wheel on focus */
@@ -369,16 +388,50 @@
       date: formatISO($('f-date').value || todayISO()),
       notes: $('f-notes').value.trim()
     };
+    entry.id = 'u' + Date.now().toString(36);
     entries.unshift(entry);
-    localStorage.setItem('carbox_entries', JSON.stringify(entries));
+    CarBox.set('entries', entries);
     rail.insertAdjacentElement('afterend', makeCard(entry));
-    updateStats(entries);
+    updateStats(false);
     ['f-title', 'f-cost', 'f-miles', 'f-date', 'f-notes'].forEach(function (id) { $(id).value = ''; });
     closeSheet();
   });
 
+  /* hydrate header + reminder from state */
+  var vehicle = CarBox.get('vehicle');
+  document.querySelector('.loghead .miles').textContent = CarBox.fmtMiles(vehicle.mileage);
+  var svc = CarBox.get('nextService');
+  var remEl = document.querySelector('.reminder');
+  remEl.querySelector('span').textContent = 'Next: ' + svc.title + ' @ ' + CarBox.fmtMiles(svc.due);
+  remEl.setAttribute('data-press', '');
+  remEl.setAttribute('role', 'button');
+  remEl.setAttribute('tabindex', '0');
+  remEl.style.cursor = 'pointer';
+  remEl.addEventListener('click', function () {
+    UI.toast(svc.title + ' at ' + CarBox.fmtMiles(svc.due) + ' — in ' + CarBox.fmtMiles(svc.due - vehicle.mileage));
+  });
+
+  /* reverse view-transition target for the card we came back from */
+  try {
+    var last = sessionStorage.getItem('carbox.lastEntry');
+    if (last) {
+      var lastCard = timeline.querySelector('[data-id="' + last + '"]');
+      if (lastCard) lastCard.style.viewTransitionName = 'entry-hero';
+      sessionStorage.removeItem('carbox.lastEntry');
+    }
+  } catch (e) {}
+
+  /* rail draws in top-to-bottom, dots pop in sequence */
+  if (!UI.reduced()) {
+    rail.classList.add('rail-draw');
+    timeline.querySelectorAll('.entry .dot').forEach(function (dot, i) {
+      dot.style.animationDelay = (120 + i * 70) + 'ms';
+      dot.classList.add('dotpop');
+    });
+  }
+
   if (location.hash === '#add') openSheet();
-})();
+});
 </script>
 </body>
 </html>
