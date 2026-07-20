@@ -164,34 +164,118 @@ window.UI = (function () {
     setTimeout(function () { el.classList.remove('wiggle'); }, 320);
   }
 
-  /* ── sprite tinting: grey pixel art -> any hue, outlines + alpha preserved ──
-     "color" composite keeps the sprite's luminosity (dark outlines stay dark),
-     then destination-in restores the original alpha. Rendered at natural size
-     so the pixel art stays crisp. */
-  var tintCache = {};
+  /* ── sprite tinting ──
+     Each sprite ships with a precomputed body mask (assets/mask_<name>.png,
+     opaque = paintable). Only masked pixels are recolored; wheels, windows,
+     headlights and dark outlines are untouched. Each pixel keeps its own
+     luminance so panel shading survives, via a 256-entry hue LUT. */
+  function hslToRgb(h, s, l) {
+    h /= 360;
+    function f(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    }
+    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    var p = 2 * l - q;
+    return [Math.round(f(p, q, h + 1 / 3) * 255), Math.round(f(p, q, h) * 255), Math.round(f(p, q, h - 1 / 3) * 255)];
+  }
+  var TINT_SAT = 0.62;
+  var painterCache = {};   /* src -> painter (or pending callbacks) */
+  var tintCache = {};      /* src|hue -> data URL */
+
+  function spritePainter(src, cb) {
+    var entry = painterCache[src];
+    if (entry && entry.painter) { cb(entry.painter); return; }
+    if (entry) { entry.waiting.push(cb); return; }
+    entry = painterCache[src] = { painter: null, waiting: [cb] };
+    var img = new Image(), maskImg = new Image();
+    var left = 2, failed = false;
+    function fail() {
+      if (failed) return;
+      failed = true;
+      /* no mask -> paint the original, never hue-rotate everything */
+      entry.painter = {
+        paint: function (canvas, hue) {
+          if (!img.naturalWidth) return;
+          canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+          canvas.getContext('2d').drawImage(img, 0, 0);
+        }
+      };
+      entry.waiting.forEach(function (fn) { fn(entry.painter); });
+      entry.waiting = [];
+    }
+    function done() {
+      if (failed || --left > 0) return;
+      try {
+        var w = img.naturalWidth, h = img.naturalHeight;
+        var c = document.createElement('canvas'); c.width = w; c.height = h;
+        var x = c.getContext('2d');
+        x.drawImage(img, 0, 0);
+        var base = x.getImageData(0, 0, w, h);
+        x.clearRect(0, 0, w, h);
+        x.drawImage(maskImg, 0, 0);
+        var maskData = x.getImageData(0, 0, w, h).data;
+        var n = w * h;
+        var masked = new Uint8Array(n), lumArr = new Uint8Array(n);
+        var d = base.data;
+        for (var i = 0; i < n; i++) {
+          var o = i * 4;
+          if (maskData[o + 3] > 128) {
+            masked[i] = 1;
+            var mx = Math.max(d[o], d[o + 1], d[o + 2]);
+            var mn = Math.min(d[o], d[o + 1], d[o + 2]);
+            lumArr[i] = (mx + mn) >> 1;
+          }
+        }
+        entry.painter = {
+          width: w, height: h,
+          paint: function (canvas, hue) {
+            canvas.width = w; canvas.height = h;
+            var ctx = canvas.getContext('2d');
+            var out = new ImageData(new Uint8ClampedArray(d), w, h);
+            if (hue !== null && hue !== undefined && hue !== '') {
+              var lut = new Uint8Array(256 * 3);
+              for (var L = 0; L < 256; L++) {
+                var rgb = hslToRgb(hue, TINT_SAT, L / 255);
+                lut[L * 3] = rgb[0]; lut[L * 3 + 1] = rgb[1]; lut[L * 3 + 2] = rgb[2];
+              }
+              var od = out.data;
+              for (var i = 0; i < n; i++) {
+                if (!masked[i]) continue;
+                var o = i * 4, li = lumArr[i] * 3;
+                od[o] = lut[li]; od[o + 1] = lut[li + 1]; od[o + 2] = lut[li + 2];
+              }
+            }
+            ctx.putImageData(out, 0, 0);
+          }
+        };
+      } catch (e) { fail(); return; }
+      entry.waiting.forEach(function (fn) { fn(entry.painter); });
+      entry.waiting = [];
+    }
+    img.onload = done; maskImg.onload = done;
+    img.onerror = fail; maskImg.onerror = fail;
+    img.src = src;
+    maskImg.src = src.replace(/([^\/]+)\.png$/, 'mask_$1.png');
+  }
+
   function tintSprite(src, hue, cb) {
     if (hue === null || hue === undefined || hue === '') { cb(src); return; }
     var key = src + '|' + hue;
     if (tintCache[key]) { cb(tintCache[key]); return; }
-    var img = new Image();
-    img.onload = function () {
+    spritePainter(src, function (painter) {
       try {
         var c = document.createElement('canvas');
-        c.width = img.naturalWidth; c.height = img.naturalHeight;
-        var x = c.getContext('2d');
-        x.drawImage(img, 0, 0);
-        x.globalCompositeOperation = 'color';
-        x.fillStyle = 'hsl(' + hue + ',75%,50%)';
-        x.fillRect(0, 0, c.width, c.height);
-        x.globalCompositeOperation = 'destination-in';
-        x.drawImage(img, 0, 0);
+        painter.paint(c, hue);
         var url = c.toDataURL('image/png');
         tintCache[key] = url;
         cb(url);
       } catch (e) { cb(src); }
-    };
-    img.onerror = function () { cb(src); };
-    img.src = src;
+    });
   }
   /* apply the saved {presetId, hue} to any <img> that shows the car */
   function carSprite(imgEl) {
@@ -220,5 +304,6 @@ window.UI = (function () {
   });
 
   return { toast: toast, sheet: sheet, countUp: countUp, wiggle: wiggle, reduced: reduced,
-           tintSprite: tintSprite, carSprite: carSprite, applyTheme: applyTheme, SPRING: SPRING };
+           tintSprite: tintSprite, carSprite: carSprite, spritePainter: spritePainter,
+           applyTheme: applyTheme, SPRING: SPRING };
 })();

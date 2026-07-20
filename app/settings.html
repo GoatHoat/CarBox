@@ -186,7 +186,7 @@
         <div class="field"><div class="flab">Car name</div><input id="f-name" type="text" autocomplete="off"></div>
         <div class="fieldrow">
           <div class="field"><div class="flab">Year</div><input id="f-year" inputmode="numeric" autocomplete="off"></div>
-          <div class="field"><div class="flab" id="milesLab">Mileage (mi)</div><input id="f-miles" inputmode="numeric" autocomplete="off"></div>
+          <div class="field"><div class="flab" id="milesLab">Mileage (mi)</div><input id="f-miles" readonly tabindex="-1" aria-readonly="true" style="pointer-events:none"></div>
         </div>
       </div>
     </div>
@@ -315,34 +315,23 @@ document.addEventListener('DOMContentLoaded', function () {
   var vehicle = CarBox.get('vehicle');
 
   var mycar = $('mycar'), head = $('mycarHead'), body = $('mycarBody');
-  var preview = $('mcPreview'), ctx = preview.getContext('2d');
-  var baseImg = null;
+  var preview = $('mcPreview');
+  var painter = null;
 
   function pulsePreview() {
     preview.classList.remove('pulse');
     void preview.offsetWidth;
     preview.classList.add('pulse');
   }
-  /* live tint straight onto the canvas — no toDataURL per frame, stays 60fps */
+  /* mask-based painter from ui.js: only body pixels recolor, shading kept */
   function drawPreview() {
-    if (!baseImg) return;
-    preview.width = baseImg.naturalWidth;
-    preview.height = baseImg.naturalHeight;
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.clearRect(0, 0, preview.width, preview.height);
-    ctx.drawImage(baseImg, 0, 0);
-    if (car.hue !== null && car.hue !== undefined) {
-      ctx.globalCompositeOperation = 'color';
-      ctx.fillStyle = 'hsl(' + car.hue + ',75%,50%)';
-      ctx.fillRect(0, 0, preview.width, preview.height);
-      ctx.globalCompositeOperation = 'destination-in';
-      ctx.drawImage(baseImg, 0, 0);
-    }
+    if (painter) painter.paint(preview, car.hue);
   }
   function loadBase(cb) {
-    var img = new Image();
-    img.onload = function () { baseImg = img; if (cb) cb(); };
-    img.src = 'assets/' + car.presetId + '.png';
+    UI.spritePainter('assets/' + car.presetId + '.png', function (p) {
+      painter = p;
+      if (cb) cb();
+    });
   }
   function saveCar() { CarBox.set('car', car); }
   function refreshHeadSprite() { UI.carSprite($('mcheadSprite')); }
@@ -470,14 +459,7 @@ document.addEventListener('DOMContentLoaded', function () {
     this.value = String(vehicle.year);
     CarBox.set('vehicle', vehicle);
   });
-  $('f-miles').addEventListener('change', function () {
-    var v = parseInt(this.value.replace(/[^0-9]/g, ''), 10);
-    if (!isNaN(v)) {
-      vehicle.mileage = CarBox.get('units') === 'km' ? Math.round(v / 1.60934) : v;
-    }
-    CarBox.set('vehicle', vehicle);
-    fillFields();
-  });
+  /* mileage is read-only — it comes from logged entries, not manual edits */
 
   /* initial paint */
   $('mcheadName').textContent = vehicle.name;
