@@ -22,16 +22,16 @@
 <div class="phone">
 
   <div class="toprow">
-    <div class="notif">
-      <span>Oil change due in 400 mi</span>
+    <div class="notif" id="notifpill" role="button" tabindex="0" data-press>
+      <span id="notiftext">Oil change due in 400 mi</span>
       <img src="assets/icon_warning.png" alt="">
     </div>
     <div class="iconstack">
-      <button class="roundbtn" aria-label="Notifications">
+      <button class="roundbtn" id="bellbtn" aria-label="Notifications">
         <img class="i-bell" src="assets/icon_bell.png" alt="">
-        <span class="badge">1</span>
+        <span class="badge" id="badge">1</span>
       </button>
-      <button class="roundbtn" aria-label="Settings"><img class="i-settings" src="assets/icon_settings.png" alt=""></button>
+      <button class="roundbtn" id="gearbtn" aria-label="Settings"><img class="i-settings" src="assets/icon_settings.png" alt=""></button>
     </div>
   </div>
 
@@ -57,8 +57,8 @@
   </div>
 
   <div class="actions">
-    <button class="actbtn" aria-label="Like"><img class="i-thumb" src="assets/icon_thumb.png" alt=""></button>
-    <button class="actbtn" aria-label="Comments"><img class="i-comment" src="assets/icon_comment.png" alt=""></button>
+    <button class="actbtn" id="likebtn" aria-label="Like"><img class="i-thumb" src="assets/icon_thumb.png" alt=""><span class="likecount" id="likecount">412</span></button>
+    <button class="actbtn" id="commentbtn" aria-label="Comments"><img class="i-comment" src="assets/icon_comment.png" alt=""></button>
   </div>
 
   <nav class="nav" data-active="0">
@@ -69,5 +69,113 @@
   </nav>
 
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  /* ── hydrate from state ── */
+  var notifs = CarBox.get('notifications');
+  var badge = document.getElementById('badge');
+  function unread() {
+    return CarBox.get('notifications').filter(function (n) { return n.unread; }).length;
+  }
+  function paintBadge() {
+    var n = unread();
+    badge.textContent = String(n);
+    if (n === 0) badge.classList.add('gone');
+  }
+  if (notifs[0]) document.getElementById('notiftext').textContent = notifs[0].text;
+  paintBadge();
+
+  var likeState = { count: CarBox.get('likes'), liked: CarBox.get('liked') };
+  var countEl = document.getElementById('likecount');
+  countEl.textContent = likeState.count.toLocaleString('en-US');
+
+  /* ── like: toggle with pop on the count ── */
+  document.getElementById('likebtn').addEventListener('click', function () {
+    likeState.liked = !likeState.liked;
+    likeState.count += likeState.liked ? 1 : -1;
+    CarBox.set('likes', likeState.count);
+    CarBox.set('liked', likeState.liked);
+    countEl.textContent = likeState.count.toLocaleString('en-US');
+    countEl.classList.remove('pop');
+    void countEl.offsetWidth;
+    countEl.classList.add('pop');
+  });
+
+  /* ── comments sheet ── */
+  document.getElementById('commentbtn').addEventListener('click', function () {
+    UI.sheet({
+      title: 'Comments',
+      label: 'Comments',
+      build: function (body) {
+        CarBox.get('comments').forEach(function (c) {
+          var row = document.createElement('div');
+          row.className = 'sheetrow';
+          var top = document.createElement('div');
+          top.className = 'rowtop';
+          top.textContent = c.user;
+          var tx = document.createElement('div');
+          tx.className = 'rowtx';
+          tx.textContent = c.text;
+          row.appendChild(top); row.appendChild(tx);
+          body.appendChild(row);
+        });
+        var input = document.createElement('input');
+        input.className = 'sheet-input';
+        input.disabled = true;
+        input.placeholder = 'Comments open at launch';
+        input.setAttribute('aria-label', 'Comments open at launch');
+        body.appendChild(input);
+      }
+    });
+  });
+
+  /* ── notifications sheet: opening clears the badge ── */
+  document.getElementById('bellbtn').addEventListener('click', function () {
+    UI.sheet({
+      title: 'Notifications',
+      label: 'Notifications',
+      build: function (body) {
+        var list = CarBox.get('notifications');
+        if (!list.length) {
+          var empty = document.createElement('div');
+          empty.className = 'sheet-note';
+          empty.textContent = 'You’re all caught up.';
+          body.appendChild(empty);
+        }
+        list.forEach(function (n) {
+          var row = document.createElement('div');
+          row.className = 'sheetrow';
+          row.setAttribute('data-press', '');
+          row.setAttribute('role', 'button');
+          row.setAttribute('tabindex', '0');
+          var tx = document.createElement('div');
+          tx.className = 'rowtx';
+          tx.textContent = n.text;
+          row.appendChild(tx);
+          if (n.id === 'oil') {
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', function () { location.href = 'log.html'; });
+          }
+          body.appendChild(row);
+        });
+        var read = CarBox.get('notifications').map(function (n) { n.unread = false; return n; });
+        CarBox.set('notifications', read);
+        badge.classList.add('gone');
+      }
+    });
+  });
+
+  /* ── shortcuts ── */
+  var pill = document.getElementById('notifpill');
+  pill.style.cursor = 'pointer';
+  pill.addEventListener('click', function () { location.href = 'log.html'; });
+  pill.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); location.href = 'log.html'; }
+  });
+  document.getElementById('gearbtn').addEventListener('click', function () {
+    location.href = 'settings.html';
+  });
+});
+</script>
 </body>
 </html>
