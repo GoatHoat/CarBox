@@ -4,10 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Garage</title>
+<style>html{background:#E9E9E9}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script defer src="nav.js"></script>
+<link rel="prefetch" href="log.html">
+<link rel="prefetch" href="upgrades.html">
+<script type="speculationrules">
+{"prerender":[{"urls":["log.html","upgrades.html"]}]}
+</script>
 </head>
 <body>
 <div class="phone">
@@ -52,7 +59,8 @@
     <button class="actbtn" aria-label="Comments"><img class="i-comment" src="assets/icon_comment.png" alt=""></button>
   </div>
 
-  <nav class="nav">
+  <nav class="nav" data-active="0">
+    <span class="navpill" aria-hidden="true"></span>
     <a class="tab active" href="index.html"><img class="i-navtire" src="assets/nav_tire_v2.png" alt=""><span class="lbl">Garage</span></a>
     <a class="tab" href="log.html"><img class="i-navwrench" src="assets/nav_wrench.png" alt=""><span class="lbl">log</span></a>
     <a class="tab" href="upgrades.html"><img class="i-navgear" src="assets/nav_gear.png" alt=""><span class="lbl">upgrades</span></a>

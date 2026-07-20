@@ -4,77 +4,82 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Upgrades</title>
+<style>html{background:#E9E9E9}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script defer src="nav.js"></script>
+<link rel="prefetch" href="index.html">
+<link rel="prefetch" href="log.html">
+<script type="speculationrules">
+{"prerender":[{"urls":["index.html","log.html"]}]}
+</script>
 <style>
-  /* Upgrades page — bg and cards per its mockup */
-  .phone{background:#F7EEE5}
 
-  .upghead{display:flex;align-items:flex-start;justify-content:space-between}
-  .upghead h1{font-size:44px;color:#141210;line-height:1}
-  .upghead .sub{font-size:18px;font-weight:500;color:var(--warmgray);margin-top:4px}
+  .upghead{display:block}
+  .upghead h1{font-size:38px;color:#141210;line-height:1}
+  .upghead .sub{font-size:15px;font-weight:500;color:var(--warmgray);margin-top:2px}
 
-  .goalrow{display:flex;gap:11px;margin-top:18px}
+  .goalrow{display:flex;gap:9px;margin-top:10px}
   .goalpill{
     display:flex;align-items:center;gap:10px;
     background:#796457;border-radius:999px;border:none;cursor:pointer;
-    padding:11px 18px;box-shadow:var(--shadow);
+    padding:8px 15px;box-shadow:var(--shadow);
   }
-  .goalpill span{color:#FBF8F4;font-weight:600;font-size:16px;white-space:nowrap}
-  .goalpill img{width:13px}
+  .goalpill span{color:#FBF8F4;font-weight:600;font-size:14.5px;white-space:nowrap}
+  .goalpill img{width:11px}
   .changegoal{
     background:transparent;border:2.5px solid #C2B6AA;border-radius:999px;cursor:pointer;
-    padding:9px 20px;color:#8D8579;font-family:'Fredoka',sans-serif;font-weight:600;font-size:16px;
+    padding:7px 16px;color:#8D8579;font-family:'League Spartan',sans-serif;font-weight:600;font-size:14.5px;
   }
 
-  .stages{position:relative;margin-top:18px}
+  .stages{position:relative;margin-top:10px}
   .stages .rail{
-    position:absolute;left:9px;top:44px;bottom:44px;width:3px;
+    position:absolute;right:9px;top:30px;bottom:30px;width:3px;
     background:#6E5B4B;border-radius:2px;
   }
-  .stage{position:relative;margin-left:30px;margin-bottom:14px}
+  .stage{position:relative;margin-right:26px;margin-bottom:8px}
   .stage .dot{
-    position:absolute;left:-27px;top:50%;transform:translateY(-50%);
-    width:13px;height:13px;border-radius:50%;background:#6E5B4B;
+    position:absolute;right:-20px;top:50%;transform:translateY(-50%);
+    width:9px;height:9px;border-radius:50%;background:#6E5B4B;
   }
   .scard{
-    background:#F5F3F4;border-radius:20px;box-shadow:var(--shadow);
-    padding:14px 16px;position:relative;
+    background:#F5F3F4;border-radius:16px;box-shadow:var(--shadow);
+    padding:10px 13px;position:relative;
   }
   .schip{
-    display:inline-block;border-radius:999px;padding:4px 13px;
+    display:inline-block;border-radius:999px;padding:3px 11px;
     background:#7B6558;color:#FBF8F4;
-    font-size:11.5px;font-weight:600;letter-spacing:.05em;
+    font-size:10.5px;font-weight:600;letter-spacing:.05em;
   }
-  .scard .stitle{font-size:21px;font-weight:600;color:#17130F;margin-top:7px;line-height:1.1}
-  .scard .smeta{font-size:15px;font-weight:600;color:var(--meta);margin-top:3px}
+  .scard .stitle{font-size:17px;font-weight:600;color:#17130F;margin-top:5px;line-height:1.1}
+  .scard .smeta{font-size:13.5px;font-weight:600;color:var(--meta);margin-top:2px}
   .addplan{
-    position:absolute;right:16px;bottom:14px;
+    position:absolute;right:13px;bottom:11px;
     background:none;border:none;cursor:pointer;
-    color:#776357;font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;
+    color:#776357;font-family:'League Spartan',sans-serif;font-weight:600;font-size:13.5px;
   }
 
   .mapcard{
-    background:#F5F3F4;border-radius:22px;box-shadow:var(--shadow);
-    margin-top:16px;padding:16px 16px 14px;
+    background:#F5F3F4;border-radius:18px;box-shadow:var(--shadow);
+    margin-top:10px;padding:12px 12px 11px;
   }
-  .mapcard h2{font-size:21px;font-weight:600;color:#17130F;font-family:'Fredoka',sans-serif}
-  .mapcard .msub{font-size:15px;font-weight:500;color:var(--warmgray);margin-top:2px}
-  .mapimg{width:100%;border-radius:14px;margin-top:11px}
-  .shoprow{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:10px}
-  .shoprow .sname{font-size:19px;font-weight:600;color:#17130F;line-height:1.15}
-  .shoprow .srate{font-size:14.5px;font-weight:600;color:var(--meta);margin-top:2px}
+  .mapcard h2{font-size:17px;font-weight:600;color:#17130F;font-family:'League Spartan',sans-serif}
+  .mapcard .msub{font-size:13px;font-weight:500;color:var(--warmgray);margin-top:1px}
+  .mapimg{width:100%;border-radius:12px;margin-top:8px}
+  .shoprow{display:flex;align-items:center;justify-content:space-between;margin-top:9px;gap:8px}
+  .shoprow .sname{font-size:15.5px;font-weight:600;color:#17130F;line-height:1.15}
+  .shoprow .srate{font-size:12.5px;font-weight:600;color:var(--meta);margin-top:1px}
   .directions{
     background:transparent;border:2.5px solid #A79A8C;border-radius:999px;cursor:pointer;
-    padding:8px 16px;color:#776357;font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;
+    padding:6px 13px;color:#776357;font-family:'League Spartan',sans-serif;font-weight:600;font-size:13.5px;
     flex:none;
   }
   .seeall{
-    width:100%;margin-top:13px;
+    width:100%;margin-top:10px;
     background:#786557;color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
-    padding:12px 0;font-family:'Fredoka',sans-serif;font-weight:600;font-size:16px;
+    padding:9px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:14.5px;
     box-shadow:var(--shadow);
   }
 </style>
@@ -87,10 +92,6 @@
       <h1 class="serif">Upgrades</h1>
       <div class="sub">for your Bugatti Chiron</div>
     </div>
-    <button class="roundbtn" aria-label="Notifications">
-      <img class="i-bell" src="assets/icon_bell.png" alt="">
-      <span class="badge">1</span>
-    </button>
   </div>
 
   <div class="goalrow">
@@ -139,7 +140,8 @@
     <button class="seeall">See all 4 shops</button>
   </div>
 
-  <nav class="nav">
+  <nav class="nav" data-active="2">
+    <span class="navpill" aria-hidden="true"></span>
     <a class="tab" href="index.html"><img class="i-navtire" src="assets/nav_tire_v2.png" alt=""><span class="lbl">Garage</span></a>
     <a class="tab" href="log.html"><img class="i-navwrench" src="assets/nav_wrench.png" alt=""><span class="lbl">log</span></a>
     <a class="tab active" href="upgrades.html"><img class="i-navgear" src="assets/nav_gear.png" alt=""><span class="lbl">upgrades</span></a>

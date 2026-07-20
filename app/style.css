@@ -18,9 +18,11 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
+html{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;display:none}
 body{
   background:#E9E9E9;
-  font-family:'Fredoka',system-ui,sans-serif;
+  font-family:'League Spartan',system-ui,sans-serif;
   color:var(--text-body);
   display:flex;justify-content:center;
 }
@@ -54,27 +56,37 @@ img{display:block}
 /* bottom nav */
 .nav{
   position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
-  width:224px;height:46px;
-  background:var(--pill);border-radius:23px;box-shadow:0 12px 30px rgba(0,0,0,.12);
+  width:270px;height:56px;
+  background:var(--pill);border-radius:28px;box-shadow:0 12px 30px rgba(0,0,0,.12);
   display:flex;align-items:stretch;
-  padding:2px;
+  padding:3px;
+  touch-action:none;user-select:none;-webkit-user-select:none;
 }
+.navpill{
+  position:absolute;top:3px;left:3px;
+  width:calc((100% - 6px)/3);height:calc(100% - 6px);
+  background:#C9C2BA;border-radius:999px;
+  transform:translateX(0);
+  transition:transform .5s cubic-bezier(.3,1.4,.4,1);
+  will-change:transform;
+}
+.nav[data-active="1"] .navpill{transform:translateX(100%)}
+.nav[data-active="2"] .navpill{transform:translateX(200%)}
 .tab{
   position:relative;flex:1;
-  border:none;background:transparent;cursor:pointer;border-radius:21px;
+  border:none;background:transparent;cursor:pointer;border-radius:25px;
   display:flex;align-items:flex-start;justify-content:center;
   padding:0;text-decoration:none;
 }
-.tab img{margin-top:4px}
-.i-navtire{width:22px}
-.i-navwrench{width:24px}
-.i-navgear{width:23px}
+.tab img{margin-top:6px;pointer-events:none}
+.i-navtire{width:26px}
+.i-navwrench{width:28px}
+.i-navgear{width:27px}
 .tab .lbl{
-  position:absolute;bottom:1px;left:0;right:0;
-  font-family:'DM Serif Display',serif;font-size:12px;color:#2A2521;
+  position:absolute;bottom:3px;left:0;right:0;
+  font-family:'DM Serif Display',serif;font-size:13.5px;color:#2A2521;
   text-align:center;pointer-events:none;
 }
-.tab.active{background:#C9C2BA}
 
 /* ── Garage page ─────────────────────────────────────────────── */
 .toprow{position:relative;min-height:104px}

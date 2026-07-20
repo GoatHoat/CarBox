@@ -16,10 +16,11 @@ CarBox is a mobile-first car enthusiast app: build/maintenance logbook + goal-ba
 
 ## Design system (sampled from mockups — do not invent new values)
 - Brown accent `#615142`, soft brown `#7F7269`, active-tab pill `#C9C2BA`
-- Garage page bg `#F4F4F4`; Log/Upgrades/Goal pages bg warm cream `#F5F0E9`
+- ALL pages share the Garage background: `#F4F4F4` with a `#F9F9F9` band behind the nav (the shared `.phone` style in `app/style.css`). Owner decision — do NOT use the mockups' warm cream backgrounds.
 - Card surface `#F7F7F7`, white pill `#FDFDFC`, hairline `rgba(0,0,0,.10)`
 - Shadow `0 10px 26px rgba(0,0,0,.07)`; cards radius 18–22px; pills fully rounded
-- Fonts: 'DM Serif Display' for display titles/nav labels ONLY; 'Fredoka' (500–700) for everything else (Google Fonts, already linked in index.html)
+- Fonts: 'DM Serif Display' for display titles/nav labels ONLY; 'League Spartan' (400–700) for everything else (Google Fonts). Owner decision 2026-07-20: League Spartan REPLACED Fredoka everywhere — do not reintroduce Fredoka.
+- Bottom nav (owner decision 2026-07-20): 270×56px pill bar with a sliding `.navpill` highlight (`#C9C2BA`), spring-animated and draggable via the shared `app/nav.js`; each page sets `data-active` on `.nav`. Page scrollbars are hidden (scrolling still works).
 - Phone shell: max-width 375px centered; fixed bottom nav (copy the nav from index.html verbatim onto every tab screen)
 
 ## Working rules
