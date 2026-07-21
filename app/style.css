@@ -19,8 +19,8 @@
 /* dark theme: overrides only — light mode never defines these vars, so the
    per-use fallbacks (today's exact values) keep light pixel-identical */
 html[data-theme="dark"]{
-  background:#141414;
-  --page-bg:#141414;
+  background:#191919;
+  --page-bg:#191919;
   --bg:#191919;--bg-bottom:#1E1E1E;--card:#232323;--pill:#282828;
   --text:#F3F2F0;--text-body:#E6E4E1;--gray:#9C9995;--warmgray:#A19D98;
   --meta:#CFCBC5;--hairline:rgba(255,255,255,.1);
@@ -50,6 +50,12 @@ body{
   background:linear-gradient(to bottom, var(--bg) 0 87%, var(--bg-bottom) 87% 100%);
   overflow-x:hidden;
   padding:16px 18px 110px;
+}
+/* on phones the shell is the whole screen: one clean background, no gutters */
+@media (max-width:520px){
+  .phone{max-width:none}
+  body{background:var(--bg,#F4F4F4)}
+  html{background:var(--bg,#F4F4F4)}
 }
 .serif{font-family:'DM Serif Display',serif;font-weight:400}
 img{display:block}

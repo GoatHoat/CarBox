@@ -8,7 +8,7 @@ import { WebView } from 'react-native-webview';
 // Phone must be on the same Wi-Fi network as this machine.
 const CARBOX_URL = 'http://10.0.0.19:8000/index.html';
 const LIGHT = '#F4F4F4';
-const DARK = '#141414';
+const DARK = '#191919';
 
 export default function App() {
   // the page posts { theme } whenever the CarBox theme changes,
