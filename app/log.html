@@ -82,6 +82,36 @@
     font-family:'League Spartan',sans-serif;font-size:30px;font-weight:400;line-height:1;
     box-shadow:0 12px 26px rgba(0,0,0,.22);
     display:flex;align-items:center;justify-content:center;
+    transition:transform .35s cubic-bezier(.3,1.4,.4,1),opacity .25s ease-out;
+    animation:fabbreathe 4s ease-in-out infinite;
+  }
+  @keyframes fabbreathe{
+    0%,100%{box-shadow:0 12px 26px rgba(0,0,0,.22)}
+    50%{box-shadow:0 16px 34px rgba(0,0,0,.30)}
+  }
+  .fab.morph{transform:scale(2.3);opacity:0;pointer-events:none}
+
+  /* FLIP insert: new card drops in with a soft highlight pulse */
+  .newcard{opacity:0;transform:translateY(-14px) scale(.96)}
+  .newcard.in{
+    opacity:1;transform:none;
+    transition:transform .45s cubic-bezier(.3,1.4,.4,1),opacity .3s ease-out;
+  }
+  @keyframes cardflash{
+    0%{box-shadow:var(--shadow),inset 0 0 0 999px rgba(148,128,111,.20)}
+    100%{box-shadow:var(--shadow),inset 0 0 0 999px rgba(148,128,111,0)}
+  }
+  .flash{animation:cardflash 1.2s ease-out .25s both}
+
+  .photothumbs{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+  .photothumbs img{
+    width:56px;height:56px;object-fit:cover;border-radius:12px;
+    animation:pop .3s cubic-bezier(.3,1.4,.4,1);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .newcard{opacity:1;transform:none}
+    .flash,.fab,.photothumbs img{animation:none}
+    .fab.morph{transform:none;opacity:0}
   }
 
   /* ── Add Entry bottom sheet (mockup hf_...153400) ── */
@@ -105,8 +135,9 @@
   .sheet.open{transform:translate(-50%,0)}
   .sheet .handle{width:52px;height:5px;border-radius:3px;background:var(--handle,#BABABA);margin:2px auto 10px;cursor:grab}
   .sheet h2{font-size:30px;color:var(--tx,#141210);text-align:center;line-height:1.05;margin-bottom:12px}
-  .cats{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin:0 -18px;padding:2px 18px 4px}
+  .cats{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin:0 -18px;padding:2px 18px 4px;scroll-snap-type:x proximity}
   .cats::-webkit-scrollbar{display:none}
+  .cat{scroll-snap-align:start}
   .cat{
     flex:none;display:flex;align-items:center;gap:6px;
     background:var(--ctl,#D9D4D0);border:none;border-radius:999px;cursor:pointer;
@@ -249,7 +280,12 @@
     </div>
     <div class="field"><div class="flab">Date</div><input id="f-date" type="date"></div>
     <div class="field"><div class="flab">Notes</div><textarea id="f-notes" rows="2" placeholder="Torque specs, part numbers..."></textarea></div>
-    <div class="photobox"><img src="assets/icon_camera.png" alt=""><span>Add photos</span></div>
+    <div class="photobox" id="photobox" role="button" tabindex="0" aria-label="Add photos">
+      <img src="assets/icon_camera.png" alt="">
+      <span id="photolabel">Add photos</span>
+      <input type="file" id="photoinput" accept="image/*" multiple hidden>
+    </div>
+    <div class="photothumbs" id="photothumbs"></div>
     <button class="savebtn" id="savebtn">Save entry</button>
   </div>
 
@@ -275,11 +311,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   function openSheet() {
     if (!$('f-date').value) $('f-date').value = todayISO();
+    fab.classList.add('morph');                 /* FAB morphs into the sheet */
     backdrop.classList.add('show');
     sheet.classList.add('open');
     document.documentElement.style.overflow = 'hidden';
   }
   function closeSheet() {
+    fab.classList.remove('morph');
     backdrop.classList.remove('show');
     sheet.classList.remove('open');
     document.documentElement.style.overflow = '';
@@ -309,13 +347,34 @@ document.addEventListener('DOMContentLoaded', function () {
     if (dy > 110) closeSheet();
   });
 
-  /* category chips */
+  /* category chips: select springs the chip */
   Array.prototype.forEach.call($('cats').children, function (btn) {
     btn.addEventListener('click', function () {
       $('cats').querySelector('.sel').classList.remove('sel');
       btn.classList.add('sel');
+      btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
       type = btn.getAttribute('data-type');
     });
+  });
+
+  /* photos: picker -> thumbnails pop in (previews only, not persisted) */
+  var photoInput = $('photoinput');
+  function pickPhotos() { photoInput.click(); }
+  $('photobox').addEventListener('click', pickPhotos);
+  $('photobox').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickPhotos(); }
+  });
+  photoInput.addEventListener('change', function () {
+    var thumbs = $('photothumbs');
+    Array.prototype.forEach.call(photoInput.files, function (file) {
+      if (thumbs.children.length >= 6) return;
+      var img = document.createElement('img');
+      img.alt = '';
+      img.src = URL.createObjectURL(file);
+      thumbs.appendChild(img);
+    });
+    var n = thumbs.children.length;
+    $('photolabel').textContent = n ? n + ' photo' + (n > 1 ? 's' : '') + ' added' : 'Add photos';
   });
 
   function makeCard(entry) {
@@ -348,8 +407,11 @@ document.addEventListener('DOMContentLoaded', function () {
   function updateStats(animate) {
     var t = CarBox.totals();
     if (animate) {
-      UI.countUp($('stat-total'), 0, t.invested, CarBox.fmtMoney);
-      UI.countUp($('stat-count'), 0, t.count, String);
+      /* count from what's currently on screen, not from zero */
+      var fromTotal = parseInt($('stat-total').textContent.replace(/[^0-9]/g, ''), 10) || 0;
+      var fromCount = parseInt($('stat-count').textContent.replace(/[^0-9]/g, ''), 10) || 0;
+      UI.countUp($('stat-total'), fromTotal, t.invested, CarBox.fmtMoney);
+      UI.countUp($('stat-count'), fromCount, t.count, String);
     } else {
       $('stat-total').textContent = CarBox.fmtMoney(t.invested);
       $('stat-count').textContent = String(t.count);
@@ -380,9 +442,17 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   $('savebtn').addEventListener('click', function () {
+    /* validation: a title is required — shake the field */
+    if (!$('f-title').value.trim()) {
+      var field = $('f-title').closest('.field');
+      UI.wiggle(field);
+      UI.toast('Give your entry a title');
+      $('f-title').focus();
+      return;
+    }
     var entry = {
       type: type,
-      title: $('f-title').value.trim() || 'Untitled entry',
+      title: $('f-title').value.trim(),
       cost: num($('f-cost').value),
       miles: num($('f-miles').value),
       date: formatISO($('f-date').value || todayISO()),
@@ -391,10 +461,47 @@ document.addEventListener('DOMContentLoaded', function () {
     entry.id = 'u' + Date.now().toString(36);
     entries.unshift(entry);
     CarBox.set('entries', entries);
-    rail.insertAdjacentElement('afterend', makeCard(entry));
-    updateStats(false);
+
+    /* mileage sanity: a newer, higher odometer updates the vehicle */
+    if (entry.miles > vehicle.mileage) {
+      vehicle.mileage = entry.miles;
+      CarBox.set('vehicle', vehicle);
+      document.querySelector('.loghead .miles').textContent = CarBox.fmtMiles(vehicle.mileage);
+    }
+
     ['f-title', 'f-cost', 'f-miles', 'f-date', 'f-notes'].forEach(function (id) { $(id).value = ''; });
+    $('photothumbs').innerHTML = '';
+    $('photolabel').textContent = 'Add photos';
     closeSheet();
+
+    /* FLIP: existing cards slide down, the new card drops in on top */
+    setTimeout(function () {
+      var olds = Array.prototype.slice.call(timeline.querySelectorAll('.entry'));
+      var firsts = olds.map(function (el) { return el.getBoundingClientRect().top; });
+      var fresh = makeCard(entry);
+      fresh.classList.add('newcard');
+      fresh.querySelector('.card').classList.add('flash');
+      rail.insertAdjacentElement('afterend', fresh);
+      olds.forEach(function (el, i) {
+        var d = firsts[i] - el.getBoundingClientRect().top;
+        if (d) { el.style.transition = 'none'; el.style.transform = 'translateY(' + d + 'px)'; }
+      });
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          olds.forEach(function (el) {
+            el.style.transition = 'transform .45s cubic-bezier(.3,1.4,.4,1)';
+            el.style.transform = '';
+          });
+          fresh.classList.add('in');
+          setTimeout(function () {
+            olds.forEach(function (el) { el.style.transition = ''; });
+            fresh.classList.remove('newcard', 'in');
+            fresh.querySelector('.card').classList.remove('flash');
+          }, 1700);
+        });
+      });
+      updateStats(true);
+    }, 220);
   });
 
   /* hydrate header + reminder from state */
