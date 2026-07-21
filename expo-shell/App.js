@@ -21,6 +21,7 @@ export default function App() {
       <WebView
         source={{ uri: CARBOX_URL }}
         style={{ flex: 1, backgroundColor: bg }}
+        cacheEnabled={false}
         originWhitelist={['*']}
         allowsBackForwardNavigationGestures
         setSupportMultipleWindows={false}
