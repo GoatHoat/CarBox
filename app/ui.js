@@ -303,16 +303,32 @@ window.UI = (function () {
       t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     document.documentElement.setAttribute('data-theme', t);
+    /* tell the native Expo shell so the safe areas match */
+    if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+      try { window.ReactNativeWebView.postMessage(JSON.stringify({ theme: t })); } catch (e) {}
+    }
+  }
+  function syncTheme() {
+    if (!window.CarBox) return;
+    CarBox.reload();
+    applyTheme(CarBox.get('theme'));
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     initPressable();
     initEnter();
+    if (window.CarBox) applyTheme(CarBox.get('theme'));
     if (window.matchMedia && window.CarBox) {
       matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
         if ((CarBox.get('theme') || 'system') === 'system') applyTheme('system');
       });
     }
+    /* prerendered/bfcached copies re-check the saved theme when shown */
+    window.addEventListener('pageshow', function (e) { if (e.persisted) syncTheme(); });
+    document.addEventListener('prerenderingchange', syncTheme);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) syncTheme();
+    });
   });
 
   return { toast: toast, sheet: sheet, countUp: countUp, wiggle: wiggle, reduced: reduced,

@@ -1,30 +1,38 @@
+import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 // LAN address of the static server started with:
 //   cd app; python -m http.server 8000 --bind 0.0.0.0
 // Phone must be on the same Wi-Fi network as this machine.
 const CARBOX_URL = 'http://10.0.0.19:8000/index.html';
+const LIGHT = '#F4F4F4';
+const DARK = '#141414';
 
 export default function App() {
+  // the page posts { theme } whenever the CarBox theme changes,
+  // so the native safe areas always match the web content
+  const [bg, setBg] = useState(LIGHT);
+  const dark = bg === DARK;
   return (
-    <SafeAreaView style={styles.root}>
-      <StatusBar style="dark" backgroundColor="#F4F4F4" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
+      <StatusBar style={dark ? 'light' : 'dark'} backgroundColor={bg} />
       <WebView
         source={{ uri: CARBOX_URL }}
-        style={styles.web}
+        style={{ flex: 1, backgroundColor: bg }}
         originWhitelist={['*']}
         allowsBackForwardNavigationGestures
         setSupportMultipleWindows={false}
         overScrollMode="never"
         bounces={false}
+        onMessage={(e) => {
+          try {
+            const d = JSON.parse(e.nativeEvent.data);
+            if (d.theme) setBg(d.theme === 'dark' ? DARK : LIGHT);
+          } catch (err) {}
+        }}
       />
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F4F4F4' },
-  web: { flex: 1, backgroundColor: '#F4F4F4' },
-});
