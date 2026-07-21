@@ -19,24 +19,44 @@
 /* dark theme: overrides only — light mode never defines these vars, so the
    per-use fallbacks (today's exact values) keep light pixel-identical */
 html[data-theme="dark"]{
-  background:#191919;
-  --page-bg:#191919;
-  --bg:#191919;--bg-bottom:#1E1E1E;--card:#232323;--pill:#282828;
-  --text:#F3F2F0;--text-body:#E6E4E1;--gray:#9C9995;--warmgray:#A19D98;
-  --meta:#CFCBC5;--hairline:rgba(255,255,255,.1);
+  background:#1D1C1C;
+  --page-bg:#1D1C1C;
+  --bg:#1D1C1C;--bg-bottom:#211F20;--card:#292827;--pill:#211F1F;
+  --text:#F2EEE9;--text-body:#E8E4DF;--gray:#A29A93;--warmgray:#A29A93;
+  --meta:#A49B94;--hairline:rgba(255,255,255,.08);
   --shadow:0 10px 26px rgba(0,0,0,.5);
-  --tx:#F3F2F0;--tx2:#DAD7D2;--mut:#A19D98;
-  --surface:#232323;--sheet-bg:#222222;--ctl:#3D3D3D;--input-bg:#2E2E2E;--handle:#5C5C5C;
-  --brown-warm:#94806F;      /* accents run a step lighter on dark */
-  --accent:#94806F;
-  --accent-tx:#BCA893;
+  --tx:#F2EEE9;--tx2:#D9D3CC;--mut:#A29A93;
+  --surface:#292827;--sheet-bg:#252322;--ctl:#3D3B39;--input-bg:#312E2D;--handle:#5F5B57;
+  --brown-warm:#9D8573;      /* warm clay accent sampled from the approved dark renders */
+  --accent:#9D8573;
+  --accent-tx:#B49C86;
 }
+/* dark-render parity: elements with hardcoded light-mode colors */
+html[data-theme="dark"] .timeline .rail,html[data-theme="dark"] .stages .rail{background:#9B8372}
+html[data-theme="dark"] .entry .dot,html[data-theme="dark"] .stage .dot{background:#9B8372}
+html[data-theme="dark"] .navpill{background:#958274}
+html[data-theme="dark"] .tab.active{background:transparent}
+html[data-theme="dark"] .chip.maint{background:#8A8683;color:#2E2B29}
+html[data-theme="dark"] .chip.repair{background:#646467;color:#EDECEF}
+html[data-theme="dark"] .stat .circ{background:#565350}
+html[data-theme="dark"] .avatar{border-color:#A08B77}
+html[data-theme="dark"] .i-cash,html[data-theme="dark"] .i-list{filter:invert(.85)}
+html[data-theme="dark"] .spec .ic img{filter:invert(.92)}
+html[data-theme="dark"] .i-bell,html[data-theme="dark"] .i-settings{filter:brightness(1.75)}
+html[data-theme="dark"] .i-thumb{content:url("assets/icon_thumb_dark.png")}
+html[data-theme="dark"] .i-comment{content:url("assets/icon_comment_dark.png")}
+html[data-theme="dark"] .i-share{content:url("assets/icon_share_dark.png")}
+html[data-theme="dark"] .notif img{filter:brightness(1.6)}
+html[data-theme="dark"] .fab{background:#9D8471}
+html[data-theme="dark"] .changegoal{border-color:#77726E}
+html[data-theme="dark"] .directions{border-color:#77726E}
+html[data-theme="dark"] .badge{background:#D9D3CD;color:#2A2521}
 html[data-theme="dark"] .tab.active .lbl{color:#2A2521}   /* label sits on the light pill */
-html[data-theme="dark"] .mapimg{filter:brightness(.8) contrast(1.05)}
+html[data-theme="dark"] .mapimg{content:url("assets/map_shops_dark.png")}
 html[data-theme="dark"] .tab:not(.active) .i-navgear{filter:invert(.82)}
-html[data-theme="dark"] .goalcard.sel{box-shadow:var(--shadow),inset 0 0 0 3.5px #96826F}
-html[data-theme="dark"] .presettile.sel{box-shadow:var(--shadow),inset 0 0 0 2.5px #96826F}
-html[data-theme="dark"] .monoswatch.sel{box-shadow:var(--shadow),0 0 0 2.5px #96826F}
+html[data-theme="dark"] .goalcard.sel{box-shadow:var(--shadow),inset 0 0 0 3.5px #9D8573}
+html[data-theme="dark"] .presettile.sel{box-shadow:var(--shadow),inset 0 0 0 2.5px #9D8573}
+html[data-theme="dark"] .monoswatch.sel{box-shadow:var(--shadow),0 0 0 2.5px #9D8573}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 html{scrollbar-width:none;-ms-overflow-style:none}
