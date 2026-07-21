@@ -38,12 +38,15 @@ window.CarBox = (function () {
     goal: 'More power',
     planItems: [],
     notifications: [
-      { id: 'oil', text: 'Oil change due in 400 mi', unread: true }
+      { id: 'oil', type: 'service', text: 'Oil change due in 400 mi', unread: true },
+      { id: 'n-c1', type: 'comment', ref: 'c1', user: '@TurboTom', text: 'That exhaust note must be insane.', unread: false },
+      { id: 'n-c2', type: 'comment', ref: 'c2', user: '@LinaDrives', text: 'Cleanest Chiron build on here, easily.', unread: false },
+      { id: 'n-c3', type: 'comment', ref: 'c3', user: '@BoostedBen', text: 'What tune are you running for stage 1?', unread: false }
     ],
     comments: [
-      { user: '@TurboTom', text: 'That exhaust note must be insane.' },
-      { user: '@LinaDrives', text: 'Cleanest Chiron build on here, easily.' },
-      { user: '@BoostedBen', text: 'What tune are you running for stage 1?' }
+      { id: 'c1', user: '@TurboTom', text: 'That exhaust note must be insane.', reply: null },
+      { id: 'c2', user: '@LinaDrives', text: 'Cleanest Chiron build on here, easily.', reply: null },
+      { id: 'c3', user: '@BoostedBen', text: 'What tune are you running for stage 1?', reply: null }
     ],
     nextService: { title: 'Oil change', due: 82800 },
     units: 'mi',
@@ -72,6 +75,11 @@ window.CarBox = (function () {
         localStorage.removeItem('carbox_entries');
       }
     } catch (e) { /* ignore */ }
+    /* migrate pre-thread comment/notification shapes */
+    if (!state.comments || !state.comments[0] || !state.comments[0].id) {
+      state.comments = clone(DEFAULTS.comments);
+      state.notifications = clone(DEFAULTS.notifications);
+    }
     return state;
   }
 
@@ -111,6 +119,7 @@ window.CarBox = (function () {
 
   return {
     get: get, set: set, subscribe: subscribe,
+    reload: function () { state = load(); },
     fmtMoney: fmtMoney, fmtMiles: fmtMiles, toUnits: toUnits,
     totals: totals, isSeed: isSeed
   };

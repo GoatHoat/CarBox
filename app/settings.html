@@ -195,6 +195,7 @@
           <div class="field"><div class="flab">Year</div><input id="f-year" inputmode="numeric" autocomplete="off"></div>
           <div class="field"><div class="flab" id="milesLab">Mileage (mi)</div><input id="f-miles" readonly tabindex="-1" aria-readonly="true" style="pointer-events:none"></div>
         </div>
+        <button class="sheetbtn" id="mcSave">Save</button>
       </div>
     </div>
   </div>
@@ -500,6 +501,15 @@ document.addEventListener('DOMContentLoaded', function () {
     CarBox.set('vehicle', vehicle);
   });
   /* mileage is read-only — it comes from logged entries, not manual edits */
+
+  /* save: everything already persists live — this confirms and closes up */
+  $('mcSave').addEventListener('click', function () {
+    saveCar();
+    CarBox.set('vehicle', vehicle);
+    refreshHeadSprite();
+    UI.toast('Saved — your garage is updated');
+    setOpen(false);
+  });
 
   /* initial paint */
   $('mcheadName').textContent = vehicle.name;

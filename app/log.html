@@ -71,14 +71,14 @@
   .chip.mod{background:var(--brown-warm);color:#FBF8F4}
   .chip.maint{background:var(--ctl,#D9D4D0);color:var(--meta)}
   .chip.repair{background:#656469;color:#F2F0EE}
-  .chip.cosmetic{background:#CFC8BF;color:var(--meta)}
+  .chip.cosmetic{background:#CFC8BF;color:#4A4038}
   .entry .etitle{font-size:15px;font-weight:600;color:var(--tx,#17130F);margin-top:4px;line-height:1.15}
   .entry .meta{font-size:12px;font-weight:500;color:var(--meta);margin-top:1px}
 
   .fab{
     position:fixed;bottom:80px;left:50%;margin-left:117px;
     width:52px;height:52px;border-radius:50%;
-    background:#7A6758;color:#FBF8F4;border:none;cursor:pointer;
+    background:var(--accent,#7A6758);color:#FBF8F4;border:none;cursor:pointer;
     font-family:'League Spartan',sans-serif;font-size:30px;font-weight:400;line-height:1;
     box-shadow:0 12px 26px rgba(0,0,0,.22);
     display:flex;align-items:center;justify-content:center;
@@ -144,7 +144,7 @@
   .photobox span{font-size:14.5px;font-weight:600;color:var(--mut,#9B918F)}
   .savebtn{
     width:100%;margin-top:12px;
-    background:#7B695D;color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    background:var(--accent,#7B695D);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
     padding:11px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:17px;
     box-shadow:var(--shadow);
   }
@@ -400,9 +400,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* hydrate header + reminder from state */
   var vehicle = CarBox.get('vehicle');
-  document.querySelector('.loghead .car').textContent = vehicle.name;
-  document.querySelector('.loghead .miles').textContent = CarBox.fmtMiles(vehicle.mileage);
-  UI.carSprite(document.querySelector('.minisprite'));
+  function hydrateHead() {
+    var v = CarBox.get('vehicle');
+    document.querySelector('.loghead .car').textContent = v.name;
+    document.querySelector('.loghead .miles').textContent = CarBox.fmtMiles(v.mileage);
+    UI.carSprite(document.querySelector('.minisprite'));
+  }
+  hydrateHead();
+  window.addEventListener('pageshow', function (e) { if (e.persisted) { CarBox.reload(); hydrateHead(); } });
+  document.addEventListener('prerenderingchange', function () { CarBox.reload(); hydrateHead(); });
   var svc = CarBox.get('nextService');
   var remEl = document.querySelector('.reminder');
   remEl.querySelector('span').textContent = 'Next: ' + svc.title + ' @ ' + CarBox.fmtMiles(svc.due);
