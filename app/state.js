@@ -10,6 +10,7 @@ window.CarBox = (function () {
     profile: { name: 'Vojtech13', handle: '@Vojtech.Arkes' },
     currency: 'USD',
     theme: 'system',
+    isPro: false,
     specs: [
       '8.0L quad-turbo W16',
       '1,479 hp (1,500 PS); Super Sport: 1,578 hp',

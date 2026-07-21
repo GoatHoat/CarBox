@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
 <script defer src="ui.js"></script>
+<script defer src="pro.js"></script>
 <link rel="prefetch" href="upgrades.html">
 <style>
 
@@ -110,11 +111,29 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   refresh();
 
+  /* Pro unlocks every goal — padlocks drop away */
+  function unlockAll(animated) {
+    cards.forEach(function (card) {
+      if (!card.classList.contains('locked')) return;
+      var lock = card.querySelector('.lock');
+      if (lock) {
+        if (animated) {
+          lock.classList.add('unlock');
+          setTimeout(function () { lock.remove(); }, 450);
+        } else lock.remove();
+      }
+      card.classList.remove('locked');
+    });
+    document.querySelector('.protx').innerHTML = 'All goals unlocked.<br>Thanks for going Pro';
+  }
+  if (CarBox.get('isPro')) unlockAll(false);
+  document.addEventListener('carbox-pro', function () { unlockAll(true); });
+
   cards.forEach(function (card) {
     card.addEventListener('click', function () {
       if (card.classList.contains('locked')) {
         UI.wiggle(card);
-        UI.toast('Included in CarBox Pro — coming soon');
+        Pro.open();
         return;
       }
       selected = card.getAttribute('data-goal');
@@ -123,13 +142,16 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   document.querySelector('.probadge').addEventListener('click', function () {
-    UI.toast('Included in CarBox Pro — coming soon');
+    if (CarBox.get('isPro')) UI.toast('You’re on CarBox Pro');
+    else Pro.open();
   });
 
   document.getElementById('continue').addEventListener('click', function () {
     CarBox.set('goal', selected);
     location.href = 'upgrades.html';
   });
+
+  if (location.hash === '#pro') Pro.open();
 });
 </script>
 </body>

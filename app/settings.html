@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
 <script defer src="ui.js"></script>
+<script defer src="pro.js"></script>
 <link rel="prefetch" href="index.html">
 <style>
 
@@ -650,10 +651,19 @@ document.addEventListener('DOMContentLoaded', function () {
   bindRow('delacct', function () { UI.toast('Available when accounts launch'); });
 
   /* ════ CARBOX PRO ════ */
-  function proToast() { UI.toast('CarBox Pro — coming soon'); }
-  $('upgrade').addEventListener('click', proToast);
-  bindRow('restore', proToast);
-  bindRow('managesub', proToast);
+  function paintPlan() {
+    var pro = CarBox.get('isPro');
+    $('upgrade').parentElement.querySelector('.ssub').textContent = pro ? 'CarBox Pro' : 'Free';
+    $('upgrade').textContent = pro ? 'Active' : 'Upgrade';
+  }
+  paintPlan();
+  document.addEventListener('carbox-pro', paintPlan);
+  $('upgrade').addEventListener('click', function () {
+    if (CarBox.get('isPro')) UI.toast('You’re on CarBox Pro');
+    else Pro.open();
+  });
+  bindRow('restore', function () { UI.toast('CarBox Pro — coming soon'); });
+  bindRow('managesub', function () { UI.toast('CarBox Pro — coming soon'); });
 
   /* ════ ABOUT & LEGAL ════ */
   document.querySelectorAll('.legal').forEach(function (row) {

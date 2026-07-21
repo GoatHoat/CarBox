@@ -331,6 +331,82 @@ button,.tab,[data-press]{transition:transform 90ms ease-out}
 @keyframes dotpop{0%{transform:translateY(-50%) scale(0)}70%{transform:translateY(-50%) scale(1.4)}100%{transform:translateY(-50%) scale(1)}}
 .dotpop{animation:dotpop .3s cubic-bezier(.3,1.4,.4,1) both}
 
+/* ── CarBox Pro paywall (centered modal) ── */
+.pro-scrim{
+  position:fixed;inset:0;z-index:100;background:rgba(24,20,17,.5);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  opacity:0;transition:opacity .2s ease-out;
+}
+.pro-scrim.show{opacity:1}
+.pro-card{
+  position:fixed;z-index:110;left:50%;top:50%;
+  width:min(92vw,342px);max-height:88vh;overflow-y:auto;scrollbar-width:none;
+  transform:translate(-50%,-50%) scale(.92);opacity:0;
+  background:var(--card);border-radius:26px;
+  box-shadow:0 30px 80px rgba(0,0,0,.35);
+  padding:18px 18px 16px;
+  transition:transform .3s cubic-bezier(.3,1.4,.4,1),opacity .2s ease-out;
+}
+.pro-card::-webkit-scrollbar{display:none}
+.pro-card.show{transform:translate(-50%,-50%) scale(1);opacity:1}
+.pro-card.out{transform:translate(-50%,-50%) scale(.95);opacity:0}
+.pro-x{
+  position:absolute;top:8px;right:10px;width:38px;height:38px;
+  border:none;background:none;cursor:pointer;
+  font-size:26px;line-height:1;color:var(--mut,#9B918F);
+  font-family:'League Spartan',sans-serif;
+}
+.pro-hero{position:relative;width:230px;margin:8px auto 0}
+.pro-sprite{width:100%}
+.pro-spark{position:absolute;width:10px;opacity:0;animation:sparkle 2s ease-in-out infinite;pointer-events:none}
+.pro-spark.s1{top:-6px;left:8%;width:8px}
+.pro-spark.s2{top:-13px;right:15%;animation-delay:.4s}
+.pro-spark.s3{top:38%;left:-13px;animation-delay:.9s;width:7px}
+.pro-spark.s4{top:30%;right:-11px;animation-delay:1.3s}
+.pro-spark.s5{bottom:-4px;left:22%;animation-delay:.6s;width:7px}
+.pro-spark.s6{bottom:-9px;right:27%;animation-delay:1.7s;width:9px}
+@keyframes sparkle{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.9;transform:scale(1)}}
+.pro-title{font-size:34px;text-align:center;color:var(--tx,#2A2119);margin:8px 0 14px;letter-spacing:-.3px}
+.pro-benefit{
+  display:flex;align-items:center;gap:13px;margin:0 2px 12px;
+  opacity:0;transform:translateY(8px);
+  transition:transform .4s cubic-bezier(.3,1.4,.4,1),opacity .3s ease-out;
+}
+.pro-card.show .pro-benefit{opacity:1;transform:none}
+.pro-benefit img{width:30px;flex:none}
+.pb-top{font-size:15.5px;font-weight:700;color:var(--tx,#141311);line-height:1.15}
+.pb-sub{font-size:12.5px;font-weight:500;color:var(--mut,#8D8D8B);margin-top:1px}
+.pro-prices{display:flex;gap:10px;margin:14px 0 12px}
+.pro-price{
+  position:relative;flex:1;min-height:64px;
+  background:var(--surface,#F5F3F4);border:2.5px solid var(--hairline);
+  border-radius:16px;cursor:pointer;padding:13px 6px 11px;
+  font-family:'League Spartan',sans-serif;
+  transition:border-color .25s ease-out,transform .25s cubic-bezier(.3,1.4,.4,1);
+}
+.pro-price.sel{border-color:var(--brown-warm)}
+.pp-name{font-size:15px;font-weight:700;color:var(--mut,#8D8D8B)}
+.pro-price.sel .pp-name{color:var(--tx,#141311)}
+.pp-amt{font-size:16.5px;font-weight:700;color:var(--tx,#141311);margin-top:2px;font-variant-numeric:tabular-nums}
+.pp-save{
+  position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  background:var(--brown-warm);color:#FBF8F4;border-radius:999px;padding:3px 10px 2px;
+  font-size:10.5px;font-weight:700;letter-spacing:.04em;white-space:nowrap;
+}
+.pro-cta{
+  width:100%;min-height:48px;
+  background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+  padding:13px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:17.5px;
+  box-shadow:var(--shadow);
+  display:flex;align-items:center;justify-content:center;
+}
+.pro-micro{font-size:12px;font-weight:600;color:var(--mut,#9B918F);text-align:center;margin-top:9px}
+.checkdraw path{stroke-dasharray:30;stroke-dashoffset:30;animation:checkdraw .3s ease-out .05s forwards}
+@keyframes checkdraw{to{stroke-dashoffset:0}}
+/* padlocks dropping off on unlock */
+.lock{transition:transform .4s cubic-bezier(.3,1.4,.4,1),opacity .3s ease-out}
+.lock.unlock{transform:translateY(8px) rotate(12deg);opacity:0}
+
 /* accessibility */
 :focus-visible{outline:2.5px solid var(--brown-soft);outline-offset:2px;border-radius:8px}
 .tab:focus-visible,.roundbtn:focus-visible,.switch:focus-visible{outline-offset:1px}
@@ -338,7 +414,7 @@ button,.tab,[data-press]{transition:transform 90ms ease-out}
 @media (prefers-reduced-motion: reduce){
   .anim-in{transform:none}
   .anim-go{transition:opacity .3s ease-out}
-  .toast,.ui-sheet,.switch::after,.seg .segpill,.plantotal{transition-duration:.01ms}
-  .wiggle,.pop,.pinpulse,.rail-draw,.dotpop{animation:none}
+  .toast,.ui-sheet,.switch::after,.seg .segpill,.plantotal,.pro-card,.pro-benefit,.lock{transition-duration:.01ms}
+  .wiggle,.pop,.pinpulse,.rail-draw,.dotpop,.pro-spark{animation:none}
   .pressed{transform:none}
 }
