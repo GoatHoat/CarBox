@@ -26,6 +26,7 @@ export default function App() {
         setSupportMultipleWindows={false}
         overScrollMode="never"
         bounces={false}
+        injectedJavaScript={`(function(){try{var t=document.documentElement.getAttribute('data-theme')||'light';window.ReactNativeWebView.postMessage(JSON.stringify({theme:t}))}catch(e){}})(); true;`}
         onMessage={(e) => {
           try {
             const d = JSON.parse(e.nativeEvent.data);
