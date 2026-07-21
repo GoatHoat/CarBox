@@ -37,6 +37,6 @@ CarBox is a mobile-first car enthusiast app: build/maintenance logbook + goal-ba
 
 ## Status (2026-07-20)
 - Built + interactive: Garage, Log, Upgrades, Goal picker, Entry detail, Settings. Shared infra: `app/state.js` (store, localStorage "carbox.v1"), `app/ui.js` (toast/sheet/pressable/stagger/count-up), `app/nav.js` (draggable spring nav pill).
-- Deferred by owner: the Pro paywall (everything Pro-gated is visible but inert → toast) and the Add Entry flow (FAB toasts "Coming soon"; the finished sheet in log.html stays dormant, reachable via `log.html#add` — re-enable by pointing the FAB back at `openSheet`).
+- Deferred by owner: the Pro paywall (everything Pro-gated is visible but inert → toast). The Add Entry sheet is LIVE again (owner decision 2026-07-20): FAB opens it, entries persist via the store.
 - Motion rules: one easing family `cubic-bezier(.3,1.4,.4,1)`, fades ease-out, 180–450ms, transform/opacity only, `prefers-reduced-motion` → fades.
 - Settings (rebuilt, no nav): collapsible My Car customizer — body-style presets (`assets/preset_*.png`, owner-supplied, background-removed only) + hue tint via `UI.tintSprite` (canvas `color` composite; `{presetId, hue}` in state; every car render goes through `UI.carSprite`). Theme system: Light/Dark/System, `html[data-theme="dark"]` var overrides in style.css; light mode uses per-use `var(--x, <original hex>)` fallbacks and MUST stay pixel-identical; every page head has the pre-paint theme snippet. Currency (USD/EUR/GBP symbol-only) via `CarBox.fmtMoney`.

@@ -284,8 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
     sheet.classList.remove('open');
     document.documentElement.style.overflow = '';
   }
-  /* Add Entry ships later — the FAB teases it; the sheet stays reachable via #add */
-  fab.addEventListener('click', function () { UI.toast('Coming soon'); });
+  fab.addEventListener('click', openSheet);
   backdrop.addEventListener('click', closeSheet);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
 
