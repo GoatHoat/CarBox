@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Log</title>
 <style>html{background:#E9E9E9}</style>
-<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -103,6 +103,16 @@
   }
   .flash{animation:cardflash 1.2s ease-out .25s both}
 
+  .logempty{text-align:center;padding:26px 0 10px}
+  .logempty img{width:230px;margin:0 auto 6px}
+  .le-tx{font-size:17px;font-weight:700;color:var(--tx,#141311)}
+  .le-sub{font-size:13px;font-weight:500;color:var(--mut,#9A928B);margin-top:2px}
+  .le-arrow{
+    font-size:22px;color:var(--accent-tx,#776357);margin-top:10px;
+    animation:lebounce 1.2s ease-in-out infinite;
+  }
+  @keyframes lebounce{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+
   .photothumbs{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
   .photothumbs img{
     width:56px;height:56px;object-fit:cover;border-radius:12px;
@@ -110,7 +120,7 @@
   }
   @media (prefers-reduced-motion: reduce){
     .newcard{opacity:1;transform:none}
-    .flash,.fab,.photothumbs img{animation:none}
+    .flash,.fab,.photothumbs img,.le-arrow{animation:none}
     .fab.morph{transform:none;opacity:0}
   }
 
@@ -428,6 +438,16 @@ document.addEventListener('DOMContentLoaded', function () {
   entries.slice().reverse().forEach(function (entry) {
     rail.insertAdjacentElement('afterend', makeCard(entry));
   });
+  /* designed empty state: sprite + nudge toward the FAB */
+  if (!entries.length) {
+    rail.style.display = 'none';
+    var empty = document.createElement('div');
+    empty.className = 'logempty';
+    empty.innerHTML = '<img alt=""><div class="le-tx">No entries yet</div>' +
+      '<div class="le-sub">Log your first mod or service</div><div class="le-arrow">↓</div>';
+    timeline.appendChild(empty);
+    UI.carSprite(empty.querySelector('img'));
+  }
 
   /* stats count up only on the first visit this session */
   var animated = false;
@@ -536,14 +556,29 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   } catch (e) {}
 
-  /* rail draws in top-to-bottom, dots pop in sequence */
+  /* rail draws in; dots pop as their cards cross into view (once/session) */
   if (!UI.reduced()) {
     rail.classList.add('rail-draw');
-    timeline.querySelectorAll('.entry .dot').forEach(function (dot, i) {
-      dot.style.animationDelay = (120 + i * 70) + 'ms';
-      dot.classList.add('dotpop');
-    });
+    var popped = false;
+    try { popped = sessionStorage.getItem('carbox.dots') === '1'; } catch (e) {}
+    var dots = timeline.querySelectorAll('.entry .dot');
+    if (!popped && 'IntersectionObserver' in window) {
+      var seq = 0;
+      var io = new IntersectionObserver(function (ents) {
+        ents.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          en.target.style.animationDelay = (seq++ % 4) * 70 + 'ms';
+          en.target.classList.add('dotpop');
+          io.unobserve(en.target);
+        });
+      }, { rootMargin: '0px 0px -30% 0px' });
+      dots.forEach(function (d) { io.observe(d); });
+      try { sessionStorage.setItem('carbox.dots', '1'); } catch (e) {}
+    }
   }
+
+  /* condensing header once the timeline scrolls */
+  UI.condense(vehicle.name);
 
   if (location.hash === '#add') openSheet();
 });

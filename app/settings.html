@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Settings</title>
 <style>html{background:#E9E9E9}</style>
-<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -67,7 +67,7 @@
     background:none;border:none;cursor:pointer;text-align:left;
     padding:9px 0;min-height:64px;
   }
-  .mchead-sprite{width:90px;flex:none}
+  .mchead-sprite{width:90px;flex:none;view-transition-name:carbox-car}
   .mchead-name{font-size:17px;font-weight:700;color:var(--tx,#141311)}
   .mchead-sub{font-size:12.5px;font-weight:500;color:var(--mut,#9A928B);margin-top:1px}
   .mchead-chev{
@@ -112,7 +112,9 @@
     position:absolute;top:50%;left:0;width:26px;height:26px;border-radius:50%;
     background:#FDFDFC;box-shadow:0 2px 8px rgba(0,0,0,.35);
     transform:translate(-50%,-50%);pointer-events:none;
+    transition:transform .2s cubic-bezier(.3,1.4,.4,1);
   }
+  .hueknob.drag{transform:translate(-50%,-50%) scale(1.25)}
   .hueknob.off{opacity:.45}
   .greychip{
     flex:none;background:var(--ctl,#D9D4D0);border:none;border-radius:999px;cursor:pointer;
@@ -368,6 +370,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   head.addEventListener('click', function () { setOpen(!open); });
   if (location.hash === '#car') setOpen(true);
+  UI.condense('Settings');
 
   /* presets */
   var presetRow = $('presetRow');
@@ -444,8 +447,10 @@ document.addEventListener('DOMContentLoaded', function () {
     drawPreview();
     if (persist) { saveCar(); refreshHeadSprite(); }
   }
+  var lastHapticStep = -1;
   slider.addEventListener('pointerdown', function (e) {
     dragging = true;
+    knob.classList.add('drag');
     slider.setPointerCapture(e.pointerId);
     applyHue(hueFromEvent(e), false);
   });
@@ -456,13 +461,22 @@ document.addEventListener('DOMContentLoaded', function () {
       rafQueued = true;
       requestAnimationFrame(function () {
         rafQueued = false;
-        if (pendingHue !== null) applyHue(pendingHue, false);
+        if (pendingHue !== null) {
+          applyHue(pendingHue, false);
+          /* tick haptic every 30 degrees where supported */
+          var step = Math.floor(pendingHue / 30);
+          if (step !== lastHapticStep) {
+            lastHapticStep = step;
+            if (navigator.vibrate) { try { navigator.vibrate(4); } catch (e) {} }
+          }
+        }
       });
     }
   });
   slider.addEventListener('pointerup', function (e) {
     if (!dragging) return;
     dragging = false;
+    knob.classList.remove('drag');
     applyHue(hueFromEvent(e), true);
     pulsePreview();
   });
@@ -531,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function () {
     btn.addEventListener('click', function () {
       var t = btn.getAttribute('data-t');
       CarBox.set('theme', t);
-      UI.applyTheme(t);
+      UI.applyThemeAnimated(t);   /* whole page crossfades, no snap */
       paintTheme();
     });
   });
@@ -546,7 +560,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     paint();
     el.addEventListener('click', function () {
-      CarBox.set(key, !CarBox.get(key));
+      var next = !CarBox.get(key);
+      CarBox.set(key, next);
+      /* knob squashes mid-travel, iOS style */
+      el.classList.remove('anim-on', 'anim-off');
+      void el.offsetWidth;
+      el.classList.add(next ? 'anim-on' : 'anim-off');
+      setTimeout(function () { el.classList.remove('anim-on', 'anim-off'); }, 330);
       paint();
     });
   }

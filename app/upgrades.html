@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Upgrades</title>
 <style>html{background:#E9E9E9}</style>
-<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -180,10 +180,22 @@ document.addEventListener('DOMContentLoaded', function () {
     STAGES.forEach(function (s) { if (plan.indexOf(s.id) !== -1) t += s.cost; });
     return t;
   }
+  var CHECK_SVG = '<svg class="checkdraw" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" ' +
+    'style="display:inline-block;vertical-align:-1px"><path d="M4 12.5 L10 18.5 L20 6.5" fill="none" ' +
+    'stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   function paintPlan(animate) {
     btns.forEach(function (btn, i) {
       var inPlan = plan.indexOf(STAGES[i].id) !== -1;
-      btn.textContent = inPlan ? 'In plan ✓' : 'Add to plan';
+      var was = btn.classList.contains('inplan');
+      if (inPlan) {
+        btn.innerHTML = 'In plan ' + CHECK_SVG;   /* checkmark draws itself */
+        if (!animate || was) {
+          var p = btn.querySelector('path');
+          if (p) p.style.strokeDashoffset = '0';
+        }
+      } else {
+        btn.textContent = 'Add to plan';
+      }
       btn.classList.toggle('inplan', inPlan);
     });
     var t = planTotal();
@@ -230,6 +242,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.querySelector('.shoprow .srate').textContent = shopMeta(SHOPS[0]);
   document.querySelector('.shoprow .directions').addEventListener('click', dirToast);
+
+  /* pin drops in with a bounce when the map card scrolls into view */
+  var pin = document.querySelector('.pinpulse');
+  if (pin && !UI.reduced() && 'IntersectionObserver' in window) {
+    pin.style.opacity = '0';
+    var pinIO = new IntersectionObserver(function (ents) {
+      ents.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        pin.style.opacity = '';
+        pin.classList.add('pindrop');
+        pinIO.disconnect();
+      });
+    }, { threshold: 0.4 });
+    pinIO.observe(document.querySelector('.mapcard'));
+  }
+
+  /* condensing header */
+  UI.condense('Upgrades');
 
   document.querySelector('.seeall').addEventListener('click', function () {
     UI.sheet({

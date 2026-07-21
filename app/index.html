@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Garage</title>
 <style>html{background:#E9E9E9}</style>
-<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -82,6 +82,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var n = unread();
     badge.textContent = String(n);
     badge.classList.toggle('gone', n === 0);
+    /* bell swings gently while something is unread */
+    document.querySelector('.i-bell').classList.toggle('bell-live', n > 0 && !UI.reduced());
   }
   function hydrate() {
     var vehicle = CarBox.get('vehicle');
@@ -99,7 +101,29 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('pageshow', function (e) { if (e.persisted) { CarBox.reload(); hydrate(); } });
   document.addEventListener('prerenderingchange', function () { CarBox.reload(); hydrate(); });
 
-  /* ── like: toggle, icon pops ── */
+  /* ── like: springs the thumb, particles burst outward ── */
+  var sparkPool = [];
+  function burst(btn) {
+    if (UI.reduced() || !btn.animate) return;
+    var r = btn.getBoundingClientRect();
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    for (var i = 0; i < 6; i++) {
+      var s = sparkPool.pop() || document.createElement('span');
+      s.className = 'spark';
+      s.style.left = cx + 'px';
+      s.style.top = cy + 'px';
+      document.body.appendChild(s);
+      var ang = (Math.PI * 2) * (i / 6) + Math.random() * 0.7;
+      var dist = 26 + Math.random() * 16;
+      (function (el) {
+        var anim = el.animate([
+          { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+          { transform: 'translate(calc(-50% + ' + (Math.cos(ang) * dist).toFixed(1) + 'px), calc(-50% + ' + (Math.sin(ang) * dist).toFixed(1) + 'px)) scale(.35)', opacity: 0 }
+        ], { duration: 500, easing: 'cubic-bezier(.2,.7,.4,1)' });
+        anim.onfinish = function () { el.remove(); sparkPool.push(el); };
+      })(s);
+    }
+  }
   var likeState = { count: CarBox.get('likes'), liked: CarBox.get('liked') };
   document.getElementById('likebtn').addEventListener('click', function () {
     likeState.liked = !likeState.liked;
@@ -110,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ic.classList.remove('pop');
     void ic.offsetWidth;
     ic.classList.add('pop');
+    if (likeState.liked) burst(this);
   });
 
   /* ── share ── */
@@ -277,6 +302,20 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('gearbtn').addEventListener('click', function () {
     location.href = 'settings.html';
   });
+
+  /* subtle parallax on the hero sprite */
+  if (!UI.reduced()) {
+    var hero = document.querySelector('.i-sprite');
+    var pTick = false;
+    window.addEventListener('scroll', function () {
+      if (pTick) return;
+      pTick = true;
+      requestAnimationFrame(function () {
+        pTick = false;
+        hero.style.transform = 'translateY(' + (window.scrollY * 0.15).toFixed(1) + 'px)';
+      });
+    }, { passive: true });
+  }
 });
 </script>
 </body>

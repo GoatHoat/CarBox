@@ -32,6 +32,7 @@ html[data-theme="dark"]{
   --accent-tx:#BCA893;
 }
 html[data-theme="dark"] .tab.active .lbl{color:#2A2521}   /* label sits on the light pill */
+html[data-theme="dark"] .mapimg{filter:brightness(.8) contrast(1.05)}
 html[data-theme="dark"] .tab:not(.active) .i-navgear{filter:invert(.82)}
 html[data-theme="dark"] .goalcard.sel{box-shadow:var(--shadow),inset 0 0 0 3.5px #96826F}
 html[data-theme="dark"] .presettile.sel{box-shadow:var(--shadow),inset 0 0 0 2.5px #96826F}
@@ -170,6 +171,34 @@ img{display:block}
 /* cross-page transitions: same-document feel where supported */
 @view-transition{navigation:auto}
 .nav{view-transition-name:carbox-nav}
+/* the car morphs between its positions across pages */
+.i-sprite{view-transition-name:carbox-car}
+.minisprite{view-transition-name:carbox-car}
+/* directional content slide by tab order (nav.js sets carbox.navdir) */
+html[data-navdir]::view-transition-old(root),
+html[data-navdir]::view-transition-new(root){animation-duration:.28s;animation-timing-function:ease-out}
+html[data-navdir="left"]::view-transition-old(root){animation-name:vt-out-left}
+html[data-navdir="left"]::view-transition-new(root){animation-name:vt-in-left}
+html[data-navdir="right"]::view-transition-old(root){animation-name:vt-out-right}
+html[data-navdir="right"]::view-transition-new(root){animation-name:vt-in-right}
+@keyframes vt-out-left{to{opacity:0;transform:translateX(-12px)}}
+@keyframes vt-in-left{from{opacity:0;transform:translateX(12px)}}
+@keyframes vt-out-right{to{opacity:0;transform:translateX(12px)}}
+@keyframes vt-in-right{from{opacity:0;transform:translateX(-12px)}}
+
+/* condensing header: pinned blurred bar past 40px of scroll */
+.condense{
+  position:fixed;top:0;left:0;right:0;z-index:30;height:44px;
+  display:flex;align-items:center;justify-content:center;
+  background:color-mix(in srgb, var(--bg,#F4F4F4) 82%, transparent);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--hairline);
+  transform:translateY(-100%);
+  transition:transform .3s cubic-bezier(.3,1.4,.4,1);
+  padding-top:env(safe-area-inset-top);
+}
+.condense.show{transform:translateY(0)}
+.condense span{font-size:16px;color:var(--tx,#141311)}
 
 /* press feedback */
 button,.tab,[data-press]{transition:transform 90ms ease-out}
@@ -213,6 +242,8 @@ button,.tab,[data-press]{transition:transform 90ms ease-out}
 }
 .ui-sheet::-webkit-scrollbar{display:none}
 .ui-sheet.open{transform:translate(-50%,0)}
+/* iOS card-stack: a sheet under another slides back and dims */
+.ui-sheet.open.stacked{transform:translate(-50%,-8px) scale(.97);filter:brightness(.92)}
 .ui-handle{width:52px;height:5px;border-radius:3px;background:var(--handle,#BABABA);margin:2px auto 10px;cursor:grab;touch-action:none}
 .ui-sheet-title{font-size:26px;color:var(--tx,#141210);text-align:center;line-height:1.05;margin-bottom:10px}
 
@@ -259,10 +290,22 @@ button,.tab,[data-press]{transition:transform 90ms ease-out}
 }
 .wiggle{animation:wiggle .28s ease-in-out}
 
-/* iOS-style toggle: 44x26 pill, knob springs across */
+/* iOS-style toggle: 44x26 pill, knob springs across with a mid-travel squash */
 .switch{
   position:relative;width:44px;height:26px;border-radius:999px;border:none;cursor:pointer;
   background:var(--ctl,#D9D4D0);transition:background .2s ease-out;flex:none;padding:0;
+}
+.switch.anim-on::after{animation:knobon .3s cubic-bezier(.3,1.4,.4,1) both}
+.switch.anim-off::after{animation:knoboff .3s cubic-bezier(.3,1.4,.4,1) both}
+@keyframes knobon{
+  0%{transform:translateX(0) scaleX(1)}
+  45%{transform:translateX(9px) scaleX(1.18) scaleY(.92)}
+  100%{transform:translateX(18px) scaleX(1)}
+}
+@keyframes knoboff{
+  0%{transform:translateX(18px) scaleX(1)}
+  45%{transform:translateX(9px) scaleX(1.18) scaleY(.92)}
+  100%{transform:translateX(0) scaleX(1)}
 }
 .switch::after{
   content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
@@ -296,6 +339,30 @@ button,.tab,[data-press]{transition:transform 90ms ease-out}
 }
 @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.35)}100%{transform:scale(1)}}
 .pop{display:inline-block;animation:pop .3s cubic-bezier(.3,1.4,.4,1)}
+
+/* like burst particles (pooled spans, WAAPI-driven) */
+.spark{
+  position:fixed;width:6px;height:6px;border-radius:2px;
+  background:var(--brown-warm);pointer-events:none;z-index:95;
+}
+/* bell pendulum while notifications are unread */
+@keyframes bellswing{
+  0%,8%,100%{transform:rotate(0)}
+  2%{transform:rotate(14deg)}4%{transform:rotate(-10deg)}6%{transform:rotate(5deg)}
+}
+.bell-live{transform-origin:top center;animation:bellswing 6s ease-in-out infinite}
+/* checkmark that draws itself (add-to-plan, paywall success) */
+.checkdraw path{stroke-dasharray:30;stroke-dashoffset:30;animation:checkdraw .3s ease-out .05s forwards}
+/* map pin drops in with a bounce when the card scrolls into view */
+@keyframes pindrop{
+  0%{transform:translate(-50%,-240%);opacity:0}
+  55%{transform:translate(-50%,-38%);opacity:1}
+  75%{transform:translate(-50%,-58%)}
+  100%{transform:translate(-50%,-50%)}
+}
+.pindrop{animation:pindrop .5s cubic-bezier(.3,1.4,.4,1) both, pinpulse 2s ease-out .6s infinite}
+/* numbers hold their width while counting */
+.stat .val,.plantotal,.likecount,.pp-amt,.smeta,.emeta{font-variant-numeric:tabular-nums}
 
 /* badge clear animation */
 .badge{transition:transform .25s cubic-bezier(.3,1.4,.4,1),opacity .2s ease-out}
@@ -414,7 +481,11 @@ button,.tab,[data-press]{transition:transform 90ms ease-out}
 @media (prefers-reduced-motion: reduce){
   .anim-in{transform:none}
   .anim-go{transition:opacity .3s ease-out}
-  .toast,.ui-sheet,.switch::after,.seg .segpill,.plantotal,.pro-card,.pro-benefit,.lock{transition-duration:.01ms}
-  .wiggle,.pop,.pinpulse,.rail-draw,.dotpop,.pro-spark{animation:none}
+  .toast,.ui-sheet,.switch::after,.seg .segpill,.plantotal,.pro-card,.pro-benefit,.lock,.condense{transition-duration:.01ms}
+  .wiggle,.pop,.pinpulse,.rail-draw,.dotpop,.pro-spark,.bell-live,.pindrop,
+  .switch.anim-on::after,.switch.anim-off::after,.checkdraw path{animation:none}
+  .checkdraw path{stroke-dashoffset:0}
   .pressed{transform:none}
+  html[data-navdir]::view-transition-old(root),
+  html[data-navdir]::view-transition-new(root){animation:none}
 }
