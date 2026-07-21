@@ -82,7 +82,7 @@ img{display:block}
 
 /* bottom nav */
 .nav{
-  position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
+  position:fixed;bottom:calc(14px + env(safe-area-inset-bottom, 0px));left:50%;transform:translateX(-50%);
   width:270px;height:56px;
   background:var(--pill);border-radius:28px;box-shadow:0 12px 30px rgba(0,0,0,.12);
   display:flex;align-items:stretch;
@@ -200,8 +200,9 @@ html[data-navdir="right"]::view-transition-new(root){animation-name:vt-in-right}
 .condense.show{transform:translateY(0)}
 .condense span{font-size:16px;color:var(--tx,#141311)}
 
-/* press feedback */
+/* press feedback + no double-tap zoom on controls */
 button,.tab,[data-press]{transition:transform 90ms ease-out}
+button,.tab,[data-press],input,textarea,.switch,.seg{touch-action:manipulation}
 .pressed{transform:scale(.965)}
 .tab.pressed{transform:scale(.965)}
 
@@ -214,7 +215,7 @@ button,.tab,[data-press]{transition:transform 90ms ease-out}
 
 /* toast */
 .toast{
-  position:fixed;bottom:76px;left:50%;z-index:90;
+  position:fixed;bottom:calc(76px + env(safe-area-inset-bottom, 0px));left:50%;z-index:90;
   transform:translate(-50%,16px);opacity:0;pointer-events:none;
   background:var(--pill);border-radius:999px;box-shadow:0 12px 30px rgba(0,0,0,.16);
   padding:10px 18px;max-width:320px;
@@ -234,11 +235,12 @@ button,.tab,[data-press]{transition:transform 90ms ease-out}
   position:fixed;left:50%;bottom:0;z-index:70;
   width:100%;max-width:375px;
   background:var(--sheet-bg,#F7EEE7);border-radius:26px 26px 0 0;
-  padding:10px 18px 18px;
+  padding:10px 18px calc(18px + env(safe-area-inset-bottom, 0px));
   transform:translate(-50%,103%);
   transition:transform .45s cubic-bezier(.3,1.4,.4,1);
   box-shadow:0 -18px 50px rgba(0,0,0,.25);
   max-height:88vh;overflow-y:auto;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
 }
 .ui-sheet::-webkit-scrollbar{display:none}
 .ui-sheet.open{transform:translate(-50%,0)}
@@ -415,6 +417,7 @@ button,.tab,[data-press]{transition:transform 90ms ease-out}
   transition:transform .3s cubic-bezier(.3,1.4,.4,1),opacity .2s ease-out;
 }
 .pro-card::-webkit-scrollbar{display:none}
+.pro-card{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .pro-card.show{transform:translate(-50%,-50%) scale(1);opacity:1}
 .pro-card.out{transform:translate(-50%,-50%) scale(.95);opacity:0}
 .pro-x{

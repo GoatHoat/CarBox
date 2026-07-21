@@ -76,7 +76,7 @@
   .entry .meta{font-size:12px;font-weight:500;color:var(--meta);margin-top:1px}
 
   .fab{
-    position:fixed;bottom:80px;left:50%;margin-left:117px;
+    position:fixed;bottom:calc(80px + env(safe-area-inset-bottom, 0px));left:50%;margin-left:117px;
     width:52px;height:52px;border-radius:50%;
     background:var(--accent,#7A6758);color:#FBF8F4;border:none;cursor:pointer;
     font-family:'League Spartan',sans-serif;font-size:30px;font-weight:400;line-height:1;
@@ -135,11 +135,12 @@
     position:fixed;left:50%;bottom:0;z-index:50;
     width:100%;max-width:375px;
     background:var(--sheet-bg,#F7EEE7);border-radius:26px 26px 0 0;
-    padding:10px 18px 16px;
+    padding:10px 18px calc(16px + env(safe-area-inset-bottom, 0px));
     transform:translate(-50%,103%);
     transition:transform .45s cubic-bezier(.22,.9,.34,1);
     box-shadow:0 -18px 50px rgba(0,0,0,.25);
     max-height:92vh;overflow-y:auto;scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
   }
   .sheet::-webkit-scrollbar{display:none}
   .sheet.open{transform:translate(-50%,0)}
