@@ -48,6 +48,15 @@
   .setrow.rowbtn{cursor:pointer}
   .setrow.danger .stx{color:#B3402F}
 
+  /* temporary/dev row — a testing shortcut, not a shipping feature */
+  .devrow{border-top:1.5px dashed var(--hairline)}
+  .devrow .stx{color:var(--accent-tx,#776357)}
+  .devtag{
+    font-size:9.5px;font-weight:800;letter-spacing:.1em;
+    background:var(--ctl,#D9D4D0);color:var(--meta,#6E6864);
+    border-radius:999px;padding:3px 8px;flex:none;
+  }
+
   .chev-r{width:12px;flex:none;transform:rotate(-90deg);filter:brightness(.35)}
   html[data-theme="dark"] .chev-r{filter:none}
   .avatar-sm{
@@ -271,6 +280,10 @@
     </div>
     <div class="setrow rowbtn danger" id="delacct" role="button" tabindex="0">
       <div class="stx">Delete account</div>
+    </div>
+    <div class="setrow rowbtn devrow" id="redoOnboarding" role="button" tabindex="0" aria-label="Redo onboarding">
+      <div class="stx">Redo onboarding</div>
+      <span class="devtag">TEMP</span>
     </div>
   </div>
 
@@ -715,6 +728,21 @@ document.addEventListener('DOMContentLoaded', function () {
       onConfirm: function () {
         try { localStorage.removeItem('carbox.v1'); } catch (e) {}
         try { localStorage.removeItem('carbox_entries'); } catch (e) {}
+        location.replace('onboarding.html');
+      }
+    });
+  });
+
+  /* TEMP dev shortcut: re-run the sign-up flow. Finishing onboarding rewrites
+     the car + specs + appearance and resets the garage to a fresh account, so
+     the whole app reflects the new choices. Remove before ship. */
+  bindRow('redoOnboarding', function () {
+    confirmSheet({
+      title: 'Redo onboarding',
+      message: 'Restart the sign-up flow. When you finish, your garage resets to the new car — new specs, name, and appearance, with an empty log. App preferences (theme, units, currency) are kept.',
+      confirmLabel: 'Restart sign-up',
+      onConfirm: function () {
+        CarBox.set('onboardingComplete', false);
         location.replace('onboarding.html');
       }
     });

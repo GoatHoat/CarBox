@@ -393,6 +393,21 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     /* the appearance choices from the customizer */
     CarBox.set('car', { presetId: A.presetId, hue: A.hue });
+
+    /* fresh account: a real new signup starts with an empty garage — clear the
+       Bugatti demo activity so the whole app reflects THIS car, not the seeds.
+       (App preferences like theme/currency/units are intentionally kept.) */
+    CarBox.set('entries', []);
+    CarBox.set('stats', { baseInvested: 0, baseCount: 0 });
+    CarBox.set('likes', 0);
+    CarBox.set('liked', false);
+    CarBox.set('planItems', []);
+    CarBox.set('comments', []);
+    CarBox.set('notifications', [
+      { id: 'welcome', type: 'service', text: 'Add your first entry to start your build log', unread: false }
+    ]);
+    CarBox.set('nextService', { title: 'First service', due: 5000 });
+
     CarBox.set('onboardingComplete', true);
     show(7, 'fwd');
     var delay = reduced ? 700 : 1500;
