@@ -1,0 +1,451 @@
+{
+  "brand": "Jeep",
+  "entryCount": 24,
+  "unverifiedFields": 2,
+  "models": [
+    "Wrangler",
+    "Grand Cherokee",
+    "Cherokee",
+    "Gladiator",
+    "Compass",
+    "Renegade"
+  ],
+  "sources": [
+    "0-60specs.com"
+  ],
+  "note": "Core + enthusiast verified via 0-60specs.com (incl. Wrangler 392/4xe, GC SRT/Trackhawk/4xe). 2 nulls = JL Wrangler 3.6 & 2.0T 0-60 not individually stated on source. Wagoneer/Grand Wagoneer, Patriot, Liberty, Commander to add later.",
+  "entries": [
+    {
+      "make": "Jeep",
+      "model": "Wrangler",
+      "generation": "JK",
+      "yearStart": 2012,
+      "yearEnd": 2018,
+      "trim": "3.6 Pentastar V6",
+      "specs": {
+        "engine": "3.6L V6",
+        "horsepower": "285 hp",
+        "torque": "260 lb-ft",
+        "transmission": "6-speed manual / 5-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "6.1-6.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/wrangler-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Wrangler",
+      "generation": "JL",
+      "yearStart": 2018,
+      "yearEnd": 2025,
+      "trim": "3.6 V6",
+      "specs": {
+        "engine": "3.6L V6",
+        "horsepower": "285 hp",
+        "torque": "260 lb-ft",
+        "transmission": "6-speed manual / 8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": null
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/wrangler-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Wrangler",
+      "generation": "JL",
+      "yearStart": 2018,
+      "yearEnd": 2025,
+      "trim": "2.0T",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "270 hp",
+        "torque": "295 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": null
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/wrangler-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Wrangler",
+      "generation": "JL EcoDiesel",
+      "yearStart": 2020,
+      "yearEnd": 2023,
+      "trim": "Sahara EcoDiesel",
+      "specs": {
+        "engine": "3.0L turbo diesel V6",
+        "horsepower": "260 hp",
+        "torque": "442 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "6.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/wrangler-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Wrangler",
+      "generation": "JL 392",
+      "yearStart": 2021,
+      "yearEnd": 2024,
+      "trim": "Rubicon 392",
+      "specs": {
+        "engine": "6.4L V8",
+        "horsepower": "470 hp",
+        "torque": "470 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "4.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/wrangler-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Wrangler",
+      "generation": "JL 4xe",
+      "yearStart": 2021,
+      "yearEnd": 2025,
+      "trim": "4xe PHEV",
+      "specs": {
+        "engine": "2.0L turbo I4 plug-in hybrid",
+        "horsepower": "375 hp",
+        "torque": "470 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "5.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/wrangler-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Grand Cherokee",
+      "generation": "WK2",
+      "yearStart": 2011,
+      "yearEnd": 2021,
+      "trim": "Laredo/Limited (3.6 V6)",
+      "specs": {
+        "engine": "3.6L V6",
+        "horsepower": "290-295 hp",
+        "torque": "257-260 lb-ft",
+        "transmission": "5/8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "7.1-8.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/grand-cherokee-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Grand Cherokee",
+      "generation": "WK2",
+      "yearStart": 2011,
+      "yearEnd": 2021,
+      "trim": "5.7 HEMI V8",
+      "specs": {
+        "engine": "5.7L V8",
+        "horsepower": "357-360 hp",
+        "torque": "390 lb-ft",
+        "transmission": "5/8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "6.1-7.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/grand-cherokee-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Grand Cherokee",
+      "generation": "WK2 SRT",
+      "yearStart": 2012,
+      "yearEnd": 2021,
+      "trim": "SRT / SRT8",
+      "specs": {
+        "engine": "6.4L V8",
+        "horsepower": "470-475 hp",
+        "torque": "465-470 lb-ft",
+        "transmission": "5/8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "4.4-5.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/grand-cherokee-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Grand Cherokee",
+      "generation": "WK2 EcoDiesel",
+      "yearStart": 2014,
+      "yearEnd": 2019,
+      "trim": "EcoDiesel",
+      "specs": {
+        "engine": "3.0L turbo diesel V6",
+        "horsepower": "240 hp",
+        "torque": "420 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "7.8-8.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/grand-cherokee-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Grand Cherokee",
+      "generation": "WK2 Trackhawk",
+      "yearStart": 2018,
+      "yearEnd": 2021,
+      "trim": "Trackhawk",
+      "specs": {
+        "engine": "6.2L supercharged V8",
+        "horsepower": "707 hp",
+        "torque": "645 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "3.3-3.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/grand-cherokee-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Grand Cherokee",
+      "generation": "WL",
+      "yearStart": 2021,
+      "yearEnd": 2025,
+      "trim": "Laredo/Limited (3.6 V6)",
+      "specs": {
+        "engine": "3.6L V6",
+        "horsepower": "293 hp",
+        "torque": "260 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "7.3-7.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/grand-cherokee-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Grand Cherokee",
+      "generation": "WL 4xe",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "4xe PHEV",
+      "specs": {
+        "engine": "2.0L turbo I4 plug-in hybrid",
+        "horsepower": "375 hp",
+        "torque": "470 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "5.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/grand-cherokee-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Cherokee",
+      "generation": "KL",
+      "yearStart": 2014,
+      "yearEnd": 2023,
+      "trim": "2.4 (Latitude/Limited)",
+      "specs": {
+        "engine": "2.4L I4",
+        "horsepower": "180-184 hp",
+        "torque": "171-175 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "FWD/4x4",
+        "accel0to60": "9.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/cherokee-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Cherokee",
+      "generation": "KL",
+      "yearStart": 2014,
+      "yearEnd": 2021,
+      "trim": "3.2 V6",
+      "specs": {
+        "engine": "3.2L V6",
+        "horsepower": "271 hp",
+        "torque": "239 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "FWD/4x4",
+        "accel0to60": "6.8-7.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/cherokee-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Cherokee",
+      "generation": "KL",
+      "yearStart": 2019,
+      "yearEnd": 2023,
+      "trim": "2.0T",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "270 hp",
+        "torque": "295 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "FWD/4x4",
+        "accel0to60": "6.6-7.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/cherokee-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Gladiator",
+      "generation": "JT",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "3.6 V6",
+      "specs": {
+        "engine": "3.6L V6",
+        "horsepower": "285 hp",
+        "torque": "260 lb-ft",
+        "transmission": "6-speed manual / 8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "7.2-8.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/gladiator-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Gladiator",
+      "generation": "JT EcoDiesel",
+      "yearStart": 2021,
+      "yearEnd": 2023,
+      "trim": "EcoDiesel",
+      "specs": {
+        "engine": "3.0L turbo diesel V6",
+        "horsepower": "260 hp",
+        "torque": "442 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "7.3-7.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/gladiator-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Compass",
+      "generation": "MK",
+      "yearStart": 2010,
+      "yearEnd": 2016,
+      "trim": "2.4",
+      "specs": {
+        "engine": "2.4L I4",
+        "horsepower": "172-180 hp",
+        "torque": "165-175 lb-ft",
+        "transmission": "CVT / 5-speed manual / 6-speed automatic",
+        "drivetrain": "FWD/4x4",
+        "accel0to60": "8.3-9.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/compass-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Compass",
+      "generation": "MP",
+      "yearStart": 2017,
+      "yearEnd": 2022,
+      "trim": "2.4",
+      "specs": {
+        "engine": "2.4L I4",
+        "horsepower": "177-180 hp",
+        "torque": "172-175 lb-ft",
+        "transmission": "6-speed manual / 9-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.4-10.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/compass-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Compass",
+      "generation": "MP",
+      "yearStart": 2023,
+      "yearEnd": 2025,
+      "trim": "2.0T",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "200 hp",
+        "torque": "221 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "7.5-8.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/compass-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Renegade",
+      "generation": "BU",
+      "yearStart": 2015,
+      "yearEnd": 2021,
+      "trim": "2.4",
+      "specs": {
+        "engine": "2.4L I4",
+        "horsepower": "180 hp",
+        "torque": "175 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.6-9.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/renegade-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Renegade",
+      "generation": "BU",
+      "yearStart": 2015,
+      "yearEnd": 2018,
+      "trim": "1.4T",
+      "specs": {
+        "engine": "1.4L turbo I4",
+        "horsepower": "160 hp",
+        "torque": "184 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/renegade-0-60-times"
+    },
+    {
+      "make": "Jeep",
+      "model": "Renegade",
+      "generation": "BU",
+      "yearStart": 2019,
+      "yearEnd": 2023,
+      "trim": "1.3T",
+      "specs": {
+        "engine": "1.3L turbo I4",
+        "horsepower": "177 hp",
+        "torque": "210 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.9-9.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/jeep/renegade-0-60-times"
+    }
+  ]
+}

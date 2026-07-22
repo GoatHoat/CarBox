@@ -37,6 +37,13 @@
       "models": 5
     },
     {
+      "file": "jeep.json",
+      "brand": "Jeep",
+      "entries": 24,
+      "unverifiedCoreFields": 2,
+      "models": 6
+    },
+    {
       "file": "kia.json",
       "brand": "Kia",
       "entries": 23,
@@ -94,8 +101,8 @@
     }
   ],
   "totals": {
-    "brandsBuilt": 13,
-    "entries": 447,
-    "unverifiedCoreFields": 34
+    "brandsBuilt": 14,
+    "entries": 471,
+    "unverifiedCoreFields": 36
   }
 }
