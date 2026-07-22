@@ -1,0 +1,650 @@
+{
+  "brand": "BMW",
+  "entryCount": 35,
+  "unverifiedFields": 0,
+  "models": [
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "X3",
+    "X5",
+    "4 Series"
+  ],
+  "sources": [
+    "0-60specs.com"
+  ],
+  "note": "Enthusiast + SUV core verified via 0-60specs.com. The site's 3-series and 5-series (non-M) sedan pages 404'd this pass, so base 328i/335i/330i/340i and 528i/540i variants are NOT yet included \u2014 flagged for a follow-up from another source. All M-cars (M2/M3/M4/M5), X3, X5 and 440i are covered.",
+  "entries": [
+    {
+      "make": "BMW",
+      "model": "M3",
+      "generation": "E90/E92",
+      "yearStart": "2010",
+      "yearEnd": "2013",
+      "trim": "Coupe/Sedan",
+      "specs": {
+        "engine": "4.0L V8",
+        "horsepower": "414 hp",
+        "torque": "295 lb-ft",
+        "transmission": "7-speed dual-clutch / 6-speed manual",
+        "drivetrain": "RWD",
+        "accel0to60": "4.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M3",
+      "generation": "F80",
+      "yearStart": "2015",
+      "yearEnd": "2018",
+      "trim": "Sedan",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "425 hp",
+        "torque": "406 lb-ft",
+        "transmission": "7-speed dual-clutch / 6-speed manual",
+        "drivetrain": "RWD",
+        "accel0to60": "3.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M3",
+      "generation": "F80 Competition",
+      "yearStart": "2016",
+      "yearEnd": "2018",
+      "trim": "Competition",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "444 hp",
+        "torque": "406 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "4.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M3",
+      "generation": "G80",
+      "yearStart": "2021",
+      "yearEnd": "2025",
+      "trim": "Competition",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "503 hp",
+        "torque": "479 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "3.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M3",
+      "generation": "G80 CS",
+      "yearStart": "2024",
+      "yearEnd": "2024",
+      "trim": "CS",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "543 hp",
+        "torque": "479 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "2.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M4",
+      "generation": "F82/F83",
+      "yearStart": "2015",
+      "yearEnd": "2020",
+      "trim": "Coupe/Convertible",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "425 hp",
+        "torque": "406 lb-ft",
+        "transmission": "7-speed dual-clutch / 6-speed manual",
+        "drivetrain": "RWD",
+        "accel0to60": "3.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m4-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M4",
+      "generation": "F82 Competition",
+      "yearStart": "2016",
+      "yearEnd": "2020",
+      "trim": "Competition",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "444 hp",
+        "torque": "406 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "3.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m4-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M4",
+      "generation": "F82 GTS",
+      "yearStart": "2016",
+      "yearEnd": "2016",
+      "trim": "GTS",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "493 hp",
+        "torque": "442 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "3.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m4-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M4",
+      "generation": "G82/G83",
+      "yearStart": "2021",
+      "yearEnd": "2025",
+      "trim": "Coupe",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "473 hp",
+        "torque": "406 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "RWD",
+        "accel0to60": "4.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m4-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M4",
+      "generation": "G82 Competition",
+      "yearStart": "2022",
+      "yearEnd": "2025",
+      "trim": "Competition xDrive",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "503 hp",
+        "torque": "479 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "2.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m4-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M4",
+      "generation": "G82 CSL",
+      "yearStart": "2023",
+      "yearEnd": "2023",
+      "trim": "CSL",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "543 hp",
+        "torque": "479 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "3.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m4-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M2",
+      "generation": "F87",
+      "yearStart": "2016",
+      "yearEnd": "2018",
+      "trim": "Base",
+      "specs": {
+        "engine": "3.0L turbo I6",
+        "horsepower": "365 hp",
+        "torque": "343 lb-ft",
+        "transmission": "6-speed manual / 7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "4.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m2-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M2",
+      "generation": "F87 Competition",
+      "yearStart": "2019",
+      "yearEnd": "2021",
+      "trim": "Competition",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "405 hp",
+        "torque": "406 lb-ft",
+        "transmission": "6-speed manual / 7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "3.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m2-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M2",
+      "generation": "F87 CS",
+      "yearStart": "2020",
+      "yearEnd": "2021",
+      "trim": "CS",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "444 hp",
+        "torque": "406 lb-ft",
+        "transmission": "6-speed manual / 7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "3.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m2-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M2",
+      "generation": "G87",
+      "yearStart": "2023",
+      "yearEnd": "2025",
+      "trim": "Base",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "453-473 hp",
+        "torque": "406 lb-ft",
+        "transmission": "6-speed manual / 8-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "3.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m2-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M5",
+      "generation": "F10",
+      "yearStart": "2011",
+      "yearEnd": "2016",
+      "trim": "Sedan",
+      "specs": {
+        "engine": "4.4L twin-turbo V8",
+        "horsepower": "560 hp",
+        "torque": "500 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "3.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M5",
+      "generation": "F90",
+      "yearStart": "2018",
+      "yearEnd": "2023",
+      "trim": "Competition/CS",
+      "specs": {
+        "engine": "4.4L twin-turbo V8",
+        "horsepower": "600-627 hp",
+        "torque": "553 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "2.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "M5",
+      "generation": "G90",
+      "yearStart": "2024",
+      "yearEnd": "2025",
+      "trim": "Sedan",
+      "specs": {
+        "engine": "4.4L twin-turbo V8 plug-in hybrid",
+        "horsepower": "717 hp",
+        "torque": "738 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "3.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/m5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X3",
+      "generation": "F25",
+      "yearStart": 2011,
+      "yearEnd": 2017,
+      "trim": "xDrive28i",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "240 hp",
+        "torque": "260 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X3",
+      "generation": "F25",
+      "yearStart": 2011,
+      "yearEnd": 2017,
+      "trim": "xDrive35i",
+      "specs": {
+        "engine": "3.0L turbo I6",
+        "horsepower": "300 hp",
+        "torque": "300 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X3",
+      "generation": "G01",
+      "yearStart": 2018,
+      "yearEnd": 2024,
+      "trim": "xDrive30i",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "248 hp",
+        "torque": "258 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X3",
+      "generation": "G01 M40i",
+      "yearStart": 2018,
+      "yearEnd": 2024,
+      "trim": "M40i",
+      "specs": {
+        "engine": "3.0L turbo I6",
+        "horsepower": "355-382 hp",
+        "torque": "369 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "4.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X3",
+      "generation": "G01 xDrive30e",
+      "yearStart": 2020,
+      "yearEnd": 2024,
+      "trim": "xDrive30e PHEV",
+      "specs": {
+        "engine": "2.0L turbo I4 plug-in hybrid",
+        "horsepower": "288 hp",
+        "torque": "310 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X3",
+      "generation": "G01 X3 M",
+      "yearStart": 2020,
+      "yearEnd": 2024,
+      "trim": "M/M Competition",
+      "specs": {
+        "engine": "3.0L twin-turbo I6",
+        "horsepower": "473-503 hp",
+        "torque": "442-479 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "3.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x3-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "generation": "E70",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "xDrive35i",
+      "specs": {
+        "engine": "3.0L turbo I6",
+        "horsepower": "300 hp",
+        "torque": "300 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "generation": "E70 X5 M",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "X5 M",
+      "specs": {
+        "engine": "4.4L twin-turbo V8",
+        "horsepower": "555 hp",
+        "torque": "500 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "4.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "generation": "F15",
+      "yearStart": 2014,
+      "yearEnd": 2018,
+      "trim": "xDrive35i",
+      "specs": {
+        "engine": "3.0L turbo I6",
+        "horsepower": "300 hp",
+        "torque": "300 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "generation": "F15",
+      "yearStart": 2014,
+      "yearEnd": 2018,
+      "trim": "xDrive50i",
+      "specs": {
+        "engine": "4.4L twin-turbo V8",
+        "horsepower": "445 hp",
+        "torque": "480 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "4.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "generation": "F15 xDrive40e",
+      "yearStart": 2016,
+      "yearEnd": 2018,
+      "trim": "xDrive40e PHEV",
+      "specs": {
+        "engine": "2.0L turbo I4 plug-in hybrid",
+        "horsepower": "308 hp",
+        "torque": "332 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "generation": "F15 X5 M",
+      "yearStart": 2015,
+      "yearEnd": 2018,
+      "trim": "X5 M",
+      "specs": {
+        "engine": "4.4L twin-turbo V8",
+        "horsepower": "567 hp",
+        "torque": "553 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "3.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "generation": "G05",
+      "yearStart": 2019,
+      "yearEnd": 2025,
+      "trim": "xDrive40i",
+      "specs": {
+        "engine": "3.0L turbo I6",
+        "horsepower": "335-375 hp",
+        "torque": "330-398 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "4.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "generation": "G05 M60i/xDrive50i",
+      "yearStart": 2019,
+      "yearEnd": 2025,
+      "trim": "xDrive50i/M60i",
+      "specs": {
+        "engine": "4.4L twin-turbo V8",
+        "horsepower": "456-523 hp",
+        "torque": "479-553 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "4.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "generation": "G05 xDrive45e/50e",
+      "yearStart": 2021,
+      "yearEnd": 2025,
+      "trim": "xDrive45e/50e PHEV",
+      "specs": {
+        "engine": "3.0L turbo I6 plug-in hybrid",
+        "horsepower": "389-483 hp",
+        "torque": "443-516 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "4.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "X5",
+      "generation": "G05 X5 M",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "X5 M Competition",
+      "specs": {
+        "engine": "4.4L twin-turbo V8",
+        "horsepower": "600-617 hp",
+        "torque": "553 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "3.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/x5-0-60-times"
+    },
+    {
+      "make": "BMW",
+      "model": "4 Series",
+      "generation": "F32 440i",
+      "yearStart": 2014,
+      "yearEnd": 2020,
+      "trim": "440i",
+      "specs": {
+        "engine": "3.0L turbo I6",
+        "horsepower": "320 hp",
+        "torque": "330 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "4.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/bmw/440i-0-60-times"
+    }
+  ]
+}

@@ -2,6 +2,13 @@
   "generatedNote": "CarBox specs DB index. See SCHEMA.md.",
   "files": [
     {
+      "file": "bmw.json",
+      "brand": "BMW",
+      "entries": 35,
+      "unverifiedCoreFields": 0,
+      "models": 7
+    },
+    {
       "file": "honda.json",
       "brand": "Honda",
       "entries": 47,
@@ -38,8 +45,8 @@
     }
   ],
   "totals": {
-    "brandsBuilt": 5,
-    "entries": 209,
+    "brandsBuilt": 6,
+    "entries": 244,
     "unverifiedCoreFields": 19
   }
 }
