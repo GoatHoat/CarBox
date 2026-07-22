@@ -450,8 +450,23 @@ window.UI = (function () {
     });
   });
 
+  /* Opens the native OS share sheet when running inside the Expo shell
+     (real Messages/Mail/Instagram targets — something a WebView can't do
+     on its own since WKWebView doesn't implement navigator.share). Falls
+     back to clipboard-copy + toast in a plain browser. */
+  function share(url, message) {
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'share', url: url, message: message || '' }));
+      return;
+    }
+    function done() { toast('Link copied'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, done);
+    } else done();
+  }
+
   return { toast: toast, sheet: sheet, countUp: countUp, wiggle: wiggle, reduced: reduced,
            tintSprite: tintSprite, carSprite: carSprite, spritePainter: spritePainter,
            applyTheme: applyTheme, applyThemeAnimated: applyThemeAnimated,
-           spring: spring, condense: condense, SPRING: SPRING };
+           spring: spring, condense: condense, SPRING: SPRING, share: share };
 })();

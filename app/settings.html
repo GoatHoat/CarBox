@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
 <script defer src="ui.js"></script>
+<script defer src="legal.js"></script>
 <script defer src="pro.js"></script>
 <link rel="prefetch" href="index.html">
 <style>
@@ -307,10 +308,10 @@
 
   <div class="sec-label">About &amp; Legal</div>
   <div class="setcard">
-    <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Privacy Policy</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
-    <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Terms of Use</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
-    <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Contact support</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
-    <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Rate CarBox</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
+    <div class="setrow rowbtn legal" id="legal-privacy" role="button" tabindex="0"><div class="stx">Privacy Policy</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
+    <div class="setrow rowbtn legal" id="legal-terms" role="button" tabindex="0"><div class="stx">Terms of Use</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
+    <div class="setrow rowbtn legal" id="legal-support" role="button" tabindex="0"><div class="stx">Contact support</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
+    <div class="setrow rowbtn legal" id="legal-rate" role="button" tabindex="0"><div class="stx">Rate CarBox</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
     <div class="setrow" id="versionRow">
       <div class="stx">Version</div>
       <div class="sval">CarBox 1.0.0</div>
@@ -781,13 +782,10 @@ document.addEventListener('DOMContentLoaded', function () {
   bindRow('managesub', function () { UI.toast('CarBox Pro — coming soon'); });
 
   /* ════ ABOUT & LEGAL ════ */
-  document.querySelectorAll('.legal').forEach(function (row) {
-    var fn = function () { UI.toast('Opens at launch'); };
-    row.addEventListener('click', fn);
-    row.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); }
-    });
-  });
+  bindRow('legal-privacy', function () { location.href = 'legal.html?doc=privacy'; });
+  bindRow('legal-terms', function () { location.href = 'legal.html?doc=terms'; });
+  bindRow('legal-support', function () { location.href = 'mailto:' + CarBoxLegal.contact; });
+  bindRow('legal-rate', function () { UI.toast('Available once CarBox is live on the App Store'); });
 
   /* version easter egg: 5 quick taps -> debug sheet */
   var taps = 0, tapTimer = null;

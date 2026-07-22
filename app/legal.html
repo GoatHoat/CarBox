@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CarBox — Legal</title>
+<style>html{background:#E9E9E9}</style>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script defer src="state.js"></script>
+<script defer src="ui.js"></script>
+<script defer src="legal.js"></script>
+<style>
+  .backbtn{
+    background:none;border:none;cursor:pointer;padding:6px 8px 6px 0;
+    display:flex;align-items:center;min-height:44px;
+  }
+  .backbtn img{width:32px}
+  .legaldoc h1{font-family:'DM Serif Display',serif;font-size:24px;color:var(--tx,#141210);margin-top:8px}
+  .legaldoc .updated{font-size:13.5px;font-weight:600;color:var(--mut,#8D8579);margin-top:2px;margin-bottom:16px}
+  .legaldoc p{font-size:15.5px;font-weight:500;color:var(--tx2,#3E3630);line-height:1.5;margin-top:14px}
+  .legaldoc{padding-bottom:40px}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <button class="backbtn" id="back" aria-label="Back to Settings">
+    <img src="assets/icon_back.png" alt="">
+  </button>
+
+  <div class="legaldoc" id="doc"></div>
+
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var which = new URLSearchParams(location.search).get('doc') === 'terms' ? 'terms' : 'privacy';
+  var paras = window.CarBoxLegal[which];
+  var doc = document.getElementById('doc');
+  document.title = 'CarBox — ' + paras[0];
+  var h1 = document.createElement('h1'); h1.textContent = paras[0]; doc.appendChild(h1);
+  var upd = document.createElement('div'); upd.className = 'updated'; upd.textContent = paras[1]; doc.appendChild(upd);
+  paras.slice(2).forEach(function (t) {
+    var p = document.createElement('p'); p.textContent = t; doc.appendChild(p);
+  });
+
+  document.getElementById('back').addEventListener('click', function () {
+    if (document.referrer && document.referrer.indexOf(location.origin) === 0) history.back();
+    else location.href = 'settings.html';
+  });
+});
+</script>
+</body>
+</html>

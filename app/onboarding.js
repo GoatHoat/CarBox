@@ -353,21 +353,11 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ─── Step 6: Terms & Privacy ─── */
+  /* Real copy lives in legal.js (window.CarBoxLegal) — same source Settings
+     links to — joined into a single scrollable block for this step's box. */
   var LEGAL = {
-    terms: 'CarBox Terms of Service (placeholder)\n\n' +
-      'These are placeholder Terms of Service for the CarBox prototype. The owner will replace this copy with real, legally reviewed terms before launch.\n\n' +
-      '1. Your garage. You are responsible for the accuracy of the vehicle, build, and maintenance information you add to CarBox.\n\n' +
-      '2. Acceptable use. Do not misuse the service, attempt to disrupt it, or upload content you do not have the rights to share.\n\n' +
-      '3. Prototype status. CarBox is an early build. Features may change and data may be reset during development.\n\n' +
-      '4. No warranty. The service is provided “as is” without warranties of any kind to the extent permitted by law.\n\n' +
-      '5. Contact. Questions about these terms can be directed to the CarBox team once support channels are live.',
-    privacy: 'CarBox Privacy Policy (placeholder)\n\n' +
-      'This is placeholder Privacy Policy copy for the CarBox prototype. The owner will replace it with a real policy before launch.\n\n' +
-      '1. What we store. In this prototype, the details you enter during signup are stored locally on your device only.\n\n' +
-      '2. No server. There is currently no backend; your information is not transmitted to or held on CarBox servers.\n\n' +
-      '3. Your control. You can clear your data at any time by resetting the app’s local storage.\n\n' +
-      '4. Future changes. When accounts and cloud sync launch, this policy will be updated to describe exactly what is collected and why.\n\n' +
-      '5. Contact. Privacy questions can be directed to the CarBox team once support channels are live.'
+    terms: CarBoxLegal.terms.join('\n\n'),
+    privacy: CarBoxLegal.privacy.join('\n\n')
   };
   var legalBox = $('ob-legalbox'), legalSeg = $('ob-legalseg');
   var agreeTerms = $('ob-agree-terms'), agreePrivacy = $('ob-agree-privacy'), finish = $('ob-finish');
