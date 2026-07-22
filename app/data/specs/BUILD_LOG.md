@@ -25,3 +25,19 @@ Root cause: the per-agent prompts did not hard-prohibit further delegation, so a
 - Do NOT use nested delegation. Either (a) build brands sequentially in the main thread with WebSearch/WebFetch, committing each `<brand>.json` as it's finished, or (b) launch at most a few agents at once, each with an ironclad "do the research YOURSELF, never spawn any agents; if you cannot verify a figure, null it" rule and a smaller per-agent scope.
 - Throttle to stay under the WebSearch budget; one search per generation.
 - Save + git-commit each brand file immediately so progress survives.
+
+
+## Progress snapshot (2026-07-21, attempt 2, main-thread)
+| Brand | Models | Entries | Unverified core |
+|-------|--------|---------|-----------------|
+| BMW | 7 | 35 | 0 |
+| Honda | 14 | 47 | 0 |
+| Mazda | 5 | 19 | 0 |
+| Nissan | 15 | 43 | 5 |
+| Subaru | 9 | 32 | 0 |
+| Tesla | 4 | 14 | 7 |
+| Toyota | 21 | 68 | 14 |
+| **TOTAL** | | **258** | **26** |
+
+Of the 10 brands last requested (Nissan, BMW, Ford, Audi, Mercedes, Hyundai, Kia, Lexus, Jeep, Tesla): **Nissan, BMW, Tesla done**; Ford, Audi, Mercedes, Hyundai, Kia, Lexus, Jeep still to do (next session — capped by per-session web-fetch budget).
+Known gaps to revisit: BMW 3-/5-Series non-M sedans (site 404); extendedSpecs (curbWeight/tires/suspension) null across all brands; Nissan GT-R 0-60 and several hybrid/EV torque + Tesla dual-motor hp are honest nulls.
