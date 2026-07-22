@@ -8,7 +8,7 @@ Green pixels = the paintable body. For each car we emit:
                         cars don't show white dots.
 NEW filenames (body_*) so the WebView can't serve stale cached copies.
 """
-from PIL import Image, ImageFilter
+from PIL import Image
 import os
 
 ROOT = r"c:\Users\deeka\OneDrive\Desktop\CarBox"
@@ -25,30 +25,19 @@ CARS = {
 
 
 def is_green(r, g, b, a):
-    # Body = green paint: green beats blue, not clearly warm (excludes yellow/red
-    # lights and blue glass). Neutral greys (g==b) are excluded.
-    return a > 30 and (g - b) >= 3 and g >= r - 8
+    # Body = green paint, detected by an ABSOLUTE margin on BOTH channels:
+    #   green must exceed red AND blue by >= 18.
+    # Real green (even dark shadows: g-r,g-b ~ 40-150) passes; neutral grey
+    # glass/wheels and dark tire noise (gaps ~ 0-10) are firmly excluded, and
+    # blue glass / red+yellow lights fail g>b / g>r. No dilation anywhere, so
+    # nothing can bleed across the thin window/wheel borders.
+    return a > 30 and (g - r) >= 18 and (g - b) >= 18
 
 
 for n, (cid, label) in CARS.items():
     src = Image.open(os.path.join(ROOT, "Untitled design (%d).png" % n)).convert("RGBA")
     W, H = src.size
     sp = src.load()
-
-    # 1) raw green mask (L: 255 where green body)
-    gm = Image.new("L", (W, H), 0)
-    gp = gm.load()
-    for y in range(H):
-        for x in range(W):
-            r, g, b, a = sp[x, y]
-            if is_green(r, g, b, a):
-                gp[x, y] = 255
-
-    # 2) morphological CLOSE (dilate->erode) to fill 1-2px interior holes
-    #    (specular highlights) without swallowing the big window/wheel regions.
-    closed = gm.filter(ImageFilter.MaxFilter(3)).filter(ImageFilter.MaxFilter(3))
-    closed = closed.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.MinFilter(3))
-    cp = closed.load()
 
     base = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     mask = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -61,8 +50,7 @@ for n, (cid, label) in CARS.items():
             r, g, b, a = sp[x, y]
             if a == 0:
                 continue
-            # paintable = inside the closed body mask (green + filled specks)
-            if cp[x, y] > 128:
+            if is_green(r, g, b, a):
                 L = (max(r, g, b) + min(r, g, b)) // 2   # matches painter's lumArr
                 bp[x, y] = (L, L, L, a)                   # greyscale body, shading kept
                 mp[x, y] = (255, 255, 255, a)             # paintable
