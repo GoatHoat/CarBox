@@ -22,11 +22,15 @@ CARS = {
     31: ("preset_coupe2", "2-door coupe"),
 }
 
-MARGIN = 15  # green dominance needed; neutrals (windows/wheels) have ~0 and are excluded
-
-
 def is_green(r, g, b, a):
-    return a > 30 and g > r + MARGIN and g > b + MARGIN
+    # Body = green paint = green channel beats blue and isn't clearly warm.
+    #   g - b >= 3        : any green dominance over blue (catches pale/light
+    #                       highlights that a big margin would miss -> the
+    #                       "incomplete pixels" on light cars)
+    #   g >= r - 8        : excludes yellow/red lights (r > g) but keeps
+    #                       warm-green highlights
+    # Neutrals (windows/wheels: g==b) and blues (b>g) are excluded.
+    return a > 30 and (g - b) >= 3 and g >= r - 8
 
 
 for n, (cid, label) in CARS.items():

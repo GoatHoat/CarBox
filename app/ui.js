@@ -329,11 +329,15 @@ window.UI = (function () {
               for (var L = 0; L < 256; L++) {
                 var rgb;
                 if (mono) {
-                  /* levels remap toward the target grey M, contrast preserved */
+                  /* Target tone M (black..white); apply the sprite's shading as
+                     CONTRAST around it so even light/white cars keep deep
+                     shadows and bright highlights (base luminance centers ~0.42).
+                     The old formula squeezed white into 0.84–1.0 = nearly flat. */
                   var k = parseInt(hue.slice(5), 10) || 0;
                   var M = 0.08 + k * (0.92 - 0.08) / 7;
                   var l = L / 255;
-                  var v = M <= 0.5 ? l * (M / 0.5) : 1 - (1 - l) * ((1 - M) / 0.5);
+                  var v = M + (l - 0.42) * 1.15;
+                  if (v < 0) v = 0; else if (v > 1) v = 1;
                   v = Math.round(v * 255);
                   rgb = [v, v, v];
                 } else {
