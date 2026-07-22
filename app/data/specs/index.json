@@ -2,6 +2,13 @@
   "generatedNote": "CarBox specs DB index. See SCHEMA.md.",
   "files": [
     {
+      "file": "audi.json",
+      "brand": "Audi",
+      "entries": 29,
+      "unverifiedCoreFields": 0,
+      "models": 10
+    },
+    {
       "file": "bmw.json",
       "brand": "BMW",
       "entries": 35,
@@ -59,8 +66,8 @@
     }
   ],
   "totals": {
-    "brandsBuilt": 8,
-    "entries": 322,
+    "brandsBuilt": 9,
+    "entries": 351,
     "unverifiedCoreFields": 29
   }
 }
