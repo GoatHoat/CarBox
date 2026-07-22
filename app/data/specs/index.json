@@ -37,6 +37,13 @@
       "models": 5
     },
     {
+      "file": "kia.json",
+      "brand": "Kia",
+      "entries": 23,
+      "unverifiedCoreFields": 0,
+      "models": 5
+    },
+    {
       "file": "mazda.json",
       "brand": "Mazda",
       "entries": 19,
@@ -80,8 +87,8 @@
     }
   ],
   "totals": {
-    "brandsBuilt": 11,
-    "entries": 406,
+    "brandsBuilt": 12,
+    "entries": 429,
     "unverifiedCoreFields": 30
   }
 }

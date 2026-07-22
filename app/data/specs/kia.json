@@ -1,0 +1,432 @@
+{
+  "brand": "Kia",
+  "entryCount": 23,
+  "unverifiedFields": 0,
+  "models": [
+    "Stinger",
+    "Forte",
+    "Optima",
+    "Telluride",
+    "Sportage"
+  ],
+  "sources": [
+    "0-60specs.com"
+  ],
+  "note": "Enthusiast + core verified via 0-60specs.com (incl. Stinger GT). K5 GT 2.5T, Sorento, Soul, Seltos, Rio, Niro, EV6, Carnival to add later.",
+  "entries": [
+    {
+      "make": "Kia",
+      "model": "Stinger",
+      "generation": "CK",
+      "yearStart": 2018,
+      "yearEnd": 2021,
+      "trim": "2.0T (Premium)",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "255 hp",
+        "torque": "260 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "6.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/stinger-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Stinger",
+      "generation": "CK GT-Line",
+      "yearStart": 2022,
+      "yearEnd": 2023,
+      "trim": "GT-Line 2.5T",
+      "specs": {
+        "engine": "2.5L turbo I4",
+        "horsepower": "300 hp",
+        "torque": "311 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "5.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/stinger-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Stinger",
+      "generation": "CK GT",
+      "yearStart": 2018,
+      "yearEnd": 2023,
+      "trim": "GT (3.3TT V6)",
+      "specs": {
+        "engine": "3.3L twin-turbo V6",
+        "horsepower": "365-368 hp",
+        "torque": "376 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "4.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/stinger-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Forte",
+      "generation": "TD",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "2.0 (EX)",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "156 hp",
+        "torque": "144 lb-ft",
+        "transmission": "4-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "10.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/forte-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Forte",
+      "generation": "TD",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "2.4 (SX/Koup)",
+      "specs": {
+        "engine": "2.4L I4",
+        "horsepower": "173 hp",
+        "torque": "168 lb-ft",
+        "transmission": "6-speed manual / 5-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "7.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/forte-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Forte",
+      "generation": "YD",
+      "yearStart": 2014,
+      "yearEnd": 2018,
+      "trim": "2.0 (EX)",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "173 hp",
+        "torque": "154 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "7.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/forte-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Forte",
+      "generation": "YD",
+      "yearStart": 2014,
+      "yearEnd": 2018,
+      "trim": "1.6T (SX/Forte5)",
+      "specs": {
+        "engine": "1.6L turbo I4",
+        "horsepower": "201 hp",
+        "torque": "195 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "6.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/forte-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Forte",
+      "generation": "BD",
+      "yearStart": 2019,
+      "yearEnd": 2024,
+      "trim": "2.0 (LX/EX)",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "147 hp",
+        "torque": "132 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "8.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/forte-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Forte",
+      "generation": "BD GT",
+      "yearStart": 2019,
+      "yearEnd": 2024,
+      "trim": "GT",
+      "specs": {
+        "engine": "1.6L turbo I4",
+        "horsepower": "201 hp",
+        "torque": "195 lb-ft",
+        "transmission": "6-speed manual / 7-speed dual-clutch",
+        "drivetrain": "FWD",
+        "accel0to60": "6.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/forte-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Optima",
+      "generation": "TF",
+      "yearStart": 2011,
+      "yearEnd": 2015,
+      "trim": "2.4",
+      "specs": {
+        "engine": "2.4L I4",
+        "horsepower": "192-200 hp",
+        "torque": "181-186 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "7.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/optima-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Optima",
+      "generation": "TF",
+      "yearStart": 2011,
+      "yearEnd": 2015,
+      "trim": "2.0T (SX)",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "274 hp",
+        "torque": "269 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "6.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/optima-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Optima",
+      "generation": "TF Hybrid",
+      "yearStart": 2011,
+      "yearEnd": 2014,
+      "trim": "Hybrid",
+      "specs": {
+        "engine": "2.4L I4 hybrid",
+        "horsepower": "206 hp",
+        "torque": "195 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "8.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/optima-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Optima",
+      "generation": "JF",
+      "yearStart": 2016,
+      "yearEnd": 2020,
+      "trim": "2.4",
+      "specs": {
+        "engine": "2.4L I4",
+        "horsepower": "185 hp",
+        "torque": "178 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "7.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/optima-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Optima",
+      "generation": "JF",
+      "yearStart": 2016,
+      "yearEnd": 2020,
+      "trim": "1.6T (LX)",
+      "specs": {
+        "engine": "1.6L turbo I4",
+        "horsepower": "178 hp",
+        "torque": "195 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "FWD",
+        "accel0to60": "7.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/optima-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Optima",
+      "generation": "JF",
+      "yearStart": 2016,
+      "yearEnd": 2020,
+      "trim": "2.0T (SX)",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "245 hp",
+        "torque": "260 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "6.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/optima-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Telluride",
+      "generation": "ON",
+      "yearStart": 2020,
+      "yearEnd": 2024,
+      "trim": "S/SX (V6)",
+      "specs": {
+        "engine": "3.8L V6",
+        "horsepower": "291 hp",
+        "torque": "262 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/telluride-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Sportage",
+      "generation": "SL",
+      "yearStart": 2011,
+      "yearEnd": 2015,
+      "trim": "2.4",
+      "specs": {
+        "engine": "2.4L I4",
+        "horsepower": "176 hp",
+        "torque": "168 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/sportage-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Sportage",
+      "generation": "SL",
+      "yearStart": 2011,
+      "yearEnd": 2015,
+      "trim": "2.0T (SX)",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "260 hp",
+        "torque": "269 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "6.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/sportage-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Sportage",
+      "generation": "QL",
+      "yearStart": 2016,
+      "yearEnd": 2021,
+      "trim": "2.4",
+      "specs": {
+        "engine": "2.4L I4",
+        "horsepower": "181 hp",
+        "torque": "175 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/sportage-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Sportage",
+      "generation": "QL",
+      "yearStart": 2016,
+      "yearEnd": 2021,
+      "trim": "2.0T (SX)",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "240 hp",
+        "torque": "260 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "6.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/sportage-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Sportage",
+      "generation": "NQ5",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "2.5",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "187 hp",
+        "torque": "178 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/sportage-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Sportage",
+      "generation": "NQ5 Hybrid",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "Hybrid",
+      "specs": {
+        "engine": "1.6L turbo I4 hybrid",
+        "horsepower": "227-231 hp",
+        "torque": "258-271 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "7.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/sportage-0-60-times"
+    },
+    {
+      "make": "Kia",
+      "model": "Sportage",
+      "generation": "NQ5 PHEV",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "Plug-in Hybrid",
+      "specs": {
+        "engine": "1.6L turbo I4 plug-in hybrid",
+        "horsepower": "261 hp",
+        "torque": "258 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "7.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/kia/sportage-0-60-times"
+    }
+  ]
+}
