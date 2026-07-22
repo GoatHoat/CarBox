@@ -16,6 +16,13 @@
       "models": 5
     },
     {
+      "file": "nissan.json",
+      "brand": "Nissan",
+      "entries": 43,
+      "unverifiedCoreFields": 5,
+      "models": 15
+    },
+    {
       "file": "subaru.json",
       "brand": "Subaru",
       "entries": 32,
@@ -31,8 +38,8 @@
     }
   ],
   "totals": {
-    "brandsBuilt": 4,
-    "entries": 166,
-    "unverifiedCoreFields": 14
+    "brandsBuilt": 5,
+    "entries": 209,
+    "unverifiedCoreFields": 19
   }
 }

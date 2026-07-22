@@ -1,0 +1,802 @@
+{
+  "brand": "Nissan",
+  "entryCount": 43,
+  "unverifiedFields": 5,
+  "models": [
+    "370Z",
+    "Z",
+    "GT-R",
+    "Altima",
+    "Maxima",
+    "Sentra",
+    "Rogue",
+    "Pathfinder",
+    "Frontier",
+    "Titan",
+    "Murano",
+    "Kicks",
+    "Versa",
+    "Leaf",
+    "Armada"
+  ],
+  "sources": [
+    "0-60specs.com"
+  ],
+  "note": "Core 6 verified via 0-60specs.com. GT-R 0-60 nulled (the source page's tested times were not extracted this pass) rather than guessed; hp/torque/drivetrain verified. Ariya (EV) to add later.",
+  "entries": [
+    {
+      "make": "Nissan",
+      "model": "370Z",
+      "generation": "Z34",
+      "yearStart": 2010,
+      "yearEnd": 2020,
+      "trim": "Base/Sport/Touring",
+      "specs": {
+        "engine": "3.7L V6",
+        "horsepower": "332 hp",
+        "torque": "270 lb-ft",
+        "transmission": "6-speed manual / 7-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "5.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/370z-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "370Z",
+      "generation": "Z34 Nismo",
+      "yearStart": 2014,
+      "yearEnd": 2020,
+      "trim": "Nismo",
+      "specs": {
+        "engine": "3.7L V6",
+        "horsepower": "350 hp",
+        "torque": "276 lb-ft",
+        "transmission": "6-speed manual / 7-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "5.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/370z-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Z",
+      "generation": "RZ34",
+      "yearStart": 2023,
+      "yearEnd": 2025,
+      "trim": "Sport/Performance",
+      "specs": {
+        "engine": "3.0L twin-turbo V6",
+        "horsepower": "400 hp",
+        "torque": "350 lb-ft",
+        "transmission": "6-speed manual / 9-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "4.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/z-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Z",
+      "generation": "RZ34 Nismo",
+      "yearStart": 2024,
+      "yearEnd": 2025,
+      "trim": "Nismo",
+      "specs": {
+        "engine": "3.0L twin-turbo V6",
+        "horsepower": "420 hp",
+        "torque": "384 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "4.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/z-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "GT-R",
+      "generation": "R35",
+      "yearStart": 2010,
+      "yearEnd": 2011,
+      "trim": "Premium",
+      "specs": {
+        "engine": "3.8L twin-turbo V6",
+        "horsepower": "485-530 hp",
+        "torque": "434-448 lb-ft",
+        "transmission": "6-speed dual-clutch",
+        "drivetrain": "AWD",
+        "accel0to60": null
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/gt-r-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "GT-R",
+      "generation": "R35",
+      "yearStart": 2012,
+      "yearEnd": 2016,
+      "trim": "Premium/Black/Track",
+      "specs": {
+        "engine": "3.8L twin-turbo V6",
+        "horsepower": "545-565 hp",
+        "torque": "463-467 lb-ft",
+        "transmission": "6-speed dual-clutch",
+        "drivetrain": "AWD",
+        "accel0to60": null
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/gt-r-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "GT-R",
+      "generation": "R35",
+      "yearStart": 2017,
+      "yearEnd": 2020,
+      "trim": "Premium/Track",
+      "specs": {
+        "engine": "3.8L twin-turbo V6",
+        "horsepower": "565 hp",
+        "torque": "467 lb-ft",
+        "transmission": "6-speed dual-clutch",
+        "drivetrain": "AWD",
+        "accel0to60": null
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/gt-r-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "GT-R",
+      "generation": "R35 Nismo",
+      "yearStart": 2015,
+      "yearEnd": 2020,
+      "trim": "Nismo",
+      "specs": {
+        "engine": "3.8L twin-turbo V6",
+        "horsepower": "600 hp",
+        "torque": "481 lb-ft",
+        "transmission": "6-speed dual-clutch",
+        "drivetrain": "AWD",
+        "accel0to60": null
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/gt-r-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Altima",
+      "generation": "L32",
+      "yearStart": 2010,
+      "yearEnd": 2012,
+      "trim": "2.5",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "175 hp",
+        "torque": "180 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "8.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/altima-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Altima",
+      "generation": "L33",
+      "yearStart": 2013,
+      "yearEnd": 2018,
+      "trim": "2.5",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "182 hp",
+        "torque": "180 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "7.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/altima-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Altima",
+      "generation": "L33",
+      "yearStart": 2013,
+      "yearEnd": 2018,
+      "trim": "3.5 V6",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "270 hp",
+        "torque": "258 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "6.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/altima-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Altima",
+      "generation": "L34",
+      "yearStart": 2019,
+      "yearEnd": 2025,
+      "trim": "2.5",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "182 hp",
+        "torque": "178 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/altima-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Altima",
+      "generation": "L34 VC-Turbo",
+      "yearStart": 2019,
+      "yearEnd": 2025,
+      "trim": "SR/Platinum VC-Turbo",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "248 hp",
+        "torque": "273 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "5.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/altima-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Maxima",
+      "generation": "A35",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "SV/SR",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "290 hp",
+        "torque": "261 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "5.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/maxima-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Maxima",
+      "generation": "A36",
+      "yearStart": 2016,
+      "yearEnd": 2023,
+      "trim": "SR/Platinum",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "300 hp",
+        "torque": "261 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "5.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/maxima-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Sentra",
+      "generation": "B16",
+      "yearStart": 2010,
+      "yearEnd": 2012,
+      "trim": "2.0 S",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "140 hp",
+        "torque": "147 lb-ft",
+        "transmission": "6-speed manual / CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "8.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/sentra-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Sentra",
+      "generation": "B16 SE-R Spec V",
+      "yearStart": 2010,
+      "yearEnd": 2012,
+      "trim": "SE-R Spec V",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "200 hp",
+        "torque": "180 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "FWD",
+        "accel0to60": "6.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/sentra-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Sentra",
+      "generation": "B17",
+      "yearStart": 2013,
+      "yearEnd": 2019,
+      "trim": "S/SV/SL",
+      "specs": {
+        "engine": "1.8L I4",
+        "horsepower": "130 hp",
+        "torque": "128 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "9.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/sentra-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Sentra",
+      "generation": "B17 Turbo",
+      "yearStart": 2017,
+      "yearEnd": 2019,
+      "trim": "SR Turbo/Nismo",
+      "specs": {
+        "engine": "1.6L turbo I4",
+        "horsepower": "188 hp",
+        "torque": "177 lb-ft",
+        "transmission": "6-speed manual / CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "7.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/sentra-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Sentra",
+      "generation": "B18",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "S/SV/SR",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "149 hp",
+        "torque": "146 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "8.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/sentra-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Rogue",
+      "generation": "S35",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "S/SL",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "170 hp",
+        "torque": "175 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/rogue-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Rogue",
+      "generation": "T32",
+      "yearStart": 2014,
+      "yearEnd": 2020,
+      "trim": "S/SV/SL",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "170 hp",
+        "torque": "175 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "9.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/rogue-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Rogue",
+      "generation": "T32 Hybrid",
+      "yearStart": 2017,
+      "yearEnd": 2019,
+      "trim": "Hybrid",
+      "specs": {
+        "engine": "2.0L I4 hybrid",
+        "horsepower": "176 hp",
+        "torque": "152 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/rogue-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Rogue",
+      "generation": "T33",
+      "yearStart": 2021,
+      "yearEnd": 2021,
+      "trim": "S/SV/SL/Platinum (2.5L)",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "181 hp",
+        "torque": "181 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/rogue-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Rogue",
+      "generation": "T33 VC-Turbo",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "1.5 VC-Turbo",
+      "specs": {
+        "engine": "1.5L turbo I3",
+        "horsepower": "201 hp",
+        "torque": "225 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/rogue-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Pathfinder",
+      "generation": "R51",
+      "yearStart": 2010,
+      "yearEnd": 2012,
+      "trim": "SE/LE",
+      "specs": {
+        "engine": "4.0L V6",
+        "horsepower": "266 hp",
+        "torque": "288 lb-ft",
+        "transmission": "5-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "7.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/pathfinder-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Pathfinder",
+      "generation": "R52",
+      "yearStart": 2013,
+      "yearEnd": 2020,
+      "trim": "S/SV/SL/Platinum",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "260-284 hp",
+        "torque": "240-259 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/pathfinder-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Pathfinder",
+      "generation": "R52 Hybrid",
+      "yearStart": 2014,
+      "yearEnd": 2015,
+      "trim": "Hybrid",
+      "specs": {
+        "engine": "2.5L supercharged I4 hybrid",
+        "horsepower": "250 hp",
+        "torque": null,
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/pathfinder-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Pathfinder",
+      "generation": "R53",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "SV/SL/Platinum/Rock Creek",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "284 hp",
+        "torque": "259 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/pathfinder-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Frontier",
+      "generation": "D40",
+      "yearStart": 2010,
+      "yearEnd": 2019,
+      "trim": "SV/PRO-4X V6",
+      "specs": {
+        "engine": "4.0L V6",
+        "horsepower": "261 hp",
+        "torque": "281 lb-ft",
+        "transmission": "5-speed automatic / 6-speed manual",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "7.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/frontier-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Frontier",
+      "generation": "D41",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "SV/PRO-4X",
+      "specs": {
+        "engine": "3.8L V6",
+        "horsepower": "310 hp",
+        "torque": "281 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "7.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/frontier-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Titan",
+      "generation": "A60",
+      "yearStart": 2010,
+      "yearEnd": 2015,
+      "trim": "SV/PRO-4X",
+      "specs": {
+        "engine": "5.6L V8",
+        "horsepower": "317 hp",
+        "torque": "385 lb-ft",
+        "transmission": "5-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "6.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/titan-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Titan",
+      "generation": "A61",
+      "yearStart": 2016,
+      "yearEnd": 2024,
+      "trim": "SV/PRO-4X/Platinum",
+      "specs": {
+        "engine": "5.6L V8",
+        "horsepower": "390-400 hp",
+        "torque": "394-413 lb-ft",
+        "transmission": "7-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "6.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/titan-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Murano",
+      "generation": "Z51",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "SL/Platinum",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "265 hp",
+        "torque": "248 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/murano-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Murano",
+      "generation": "Z52",
+      "yearStart": 2015,
+      "yearEnd": 2024,
+      "trim": "SL/Platinum",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "260 hp",
+        "torque": "240 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/murano-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Kicks",
+      "generation": "P15",
+      "yearStart": 2018,
+      "yearEnd": 2024,
+      "trim": "S/SV/SR",
+      "specs": {
+        "engine": "1.6L I4",
+        "horsepower": "122-125 hp",
+        "torque": "114-115 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "9.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/kicks-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Versa",
+      "generation": "N17",
+      "yearStart": 2012,
+      "yearEnd": 2019,
+      "trim": "S/SV/SL",
+      "specs": {
+        "engine": "1.6L I4",
+        "horsepower": "109 hp",
+        "torque": "107 lb-ft",
+        "transmission": "CVT / 5-speed manual",
+        "drivetrain": "FWD",
+        "accel0to60": "9.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/versa-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Versa",
+      "generation": "N18",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "S/SV/SR",
+      "specs": {
+        "engine": "1.6L I4",
+        "horsepower": "122 hp",
+        "torque": "114 lb-ft",
+        "transmission": "CVT / 5-speed manual",
+        "drivetrain": "FWD",
+        "accel0to60": "10.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/versa-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Leaf",
+      "generation": "ZE0/AZE0",
+      "yearStart": 2011,
+      "yearEnd": 2017,
+      "trim": "S/SV/SL",
+      "specs": {
+        "engine": "electric (24-30 kWh)",
+        "horsepower": "107 hp",
+        "torque": "187-207 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "FWD",
+        "accel0to60": "9.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/leaf-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Leaf",
+      "generation": "ZE1",
+      "yearStart": 2018,
+      "yearEnd": 2024,
+      "trim": "S/SV (40 kWh)",
+      "specs": {
+        "engine": "electric (40 kWh)",
+        "horsepower": "147 hp",
+        "torque": "236 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "FWD",
+        "accel0to60": "7.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/leaf-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Leaf",
+      "generation": "ZE1 Plus",
+      "yearStart": 2019,
+      "yearEnd": 2024,
+      "trim": "SV/SL Plus (62 kWh)",
+      "specs": {
+        "engine": "electric (62 kWh)",
+        "horsepower": "214 hp",
+        "torque": "250 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "FWD",
+        "accel0to60": "6.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/leaf-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Armada",
+      "generation": "WA60",
+      "yearStart": 2010,
+      "yearEnd": 2015,
+      "trim": "SV/Platinum",
+      "specs": {
+        "engine": "5.6L V8",
+        "horsepower": "317 hp",
+        "torque": "385 lb-ft",
+        "transmission": "5-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "7.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/armada-0-60-times"
+    },
+    {
+      "make": "Nissan",
+      "model": "Armada",
+      "generation": "Y62",
+      "yearStart": 2017,
+      "yearEnd": 2024,
+      "trim": "SV/SL/Platinum",
+      "specs": {
+        "engine": "5.6L V8",
+        "horsepower": "390-400 hp",
+        "torque": "394-413 lb-ft",
+        "transmission": "7-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "6.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/nissan/armada-0-60-times"
+    }
+  ]
+}
