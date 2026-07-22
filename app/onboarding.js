@@ -50,19 +50,26 @@ document.addEventListener('DOMContentLoaded', function () {
   var $ = function (id) { return document.getElementById(id); };
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var steps = Array.prototype.slice.call(document.querySelectorAll('.ostep'));
-  var head = $('ob-head'), back = $('ob-back'), dotsWrap = $('ob-dots');
+  var head = $('ob-head'), back = $('ob-back'), fill = $('ob-fill');
   var current = 1;
 
-  /* progress dots: one per step 2..7 */
-  var dots = [];
-  for (var d = 2; d <= 7; d++) {
-    var dot = document.createElement('span');
-    dot.className = 'ob-dot';
-    dotsWrap.appendChild(dot);
-    dots.push(dot);
+  /* ── theme: onboarding opens in LIGHT; moon/sun toggles it locally
+     (does NOT persist to the store — that's set from Settings post-signup) ── */
+  var themeBtn = $('ob-theme'), obTheme = 'light';
+  function applyOb(t) {
+    obTheme = t;
+    if (window.UI && UI.applyTheme) UI.applyTheme(t);         /* also syncs native shell */
+    else document.documentElement.setAttribute('data-theme', t);
+    themeBtn.classList.toggle('is-dark', t === 'dark');
+    themeBtn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
   }
-  function paintDots() {
-    dots.forEach(function (el, i) { el.classList.toggle('on', (i + 2) <= current); });
+  applyOb('light');                                            /* re-assert after ui.js init */
+  themeBtn.addEventListener('click', function () { applyOb(obTheme === 'dark' ? 'light' : 'dark'); });
+
+  /* progress bar fills across steps 2..7 */
+  function paintProgress() {
+    var frac = current <= 1 ? 0 : Math.min(1, (current - 1) / 6);
+    fill.style.width = (frac * 100) + '%';
   }
 
   function show(n, dir) {
@@ -72,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (+s.getAttribute('data-step') === n) s.classList.add('active', reduced ? '' : dir);
     });
     head.hidden = (n === 1 || n === 7);
-    paintDots();
+    paintProgress();
     window.scrollTo(0, 0);
   }
   back.addEventListener('click', function () { if (current > 1) show(current - 1, 'back'); });
