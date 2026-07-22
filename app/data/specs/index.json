@@ -30,6 +30,13 @@
       "models": 14
     },
     {
+      "file": "hyundai.json",
+      "brand": "Hyundai",
+      "entries": 32,
+      "unverifiedCoreFields": 1,
+      "models": 5
+    },
+    {
       "file": "mazda.json",
       "brand": "Mazda",
       "entries": 19,
@@ -73,8 +80,8 @@
     }
   ],
   "totals": {
-    "brandsBuilt": 10,
-    "entries": 374,
-    "unverifiedCoreFields": 29
+    "brandsBuilt": 11,
+    "entries": 406,
+    "unverifiedCoreFields": 30
   }
 }
