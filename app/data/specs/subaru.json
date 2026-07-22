@@ -1,35 +1,598 @@
 {
   "brand": "Subaru",
-  "entryCount": 21,
+  "entryCount": 32,
   "unverifiedFields": 0,
-  "models": ["WRX", "WRX STI", "BRZ", "Forester", "Outback", "Crosstrek"],
-  "sources": ["0-60specs.com"],
+  "models": [
+    "WRX",
+    "WRX STI",
+    "BRZ",
+    "Forester",
+    "Outback",
+    "Crosstrek",
+    "Impreza",
+    "Legacy",
+    "Ascent"
+  ],
+  "sources": [
+    "0-60specs.com"
+  ],
   "note": "Core 6 verified via 0-60specs.com. accel0to60 is a representative verified tested 0-60 mph. extendedSpecs null this pass. Impreza (non-WRX), Legacy, and Ascent to be added in a later pass.",
   "entries": [
-    { "make": "Subaru", "model": "WRX", "generation": "GV (3rd)", "yearStart": 2011, "yearEnd": 2014, "trim": "WRX", "specs": { "engine": "2.5L turbo flat-4", "horsepower": "265 hp", "torque": "244 lb-ft", "transmission": "5-speed manual", "drivetrain": "AWD", "accel0to60": "4.9 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/wrx-0-60-times" },
-    { "make": "Subaru", "model": "WRX", "generation": "VA (4th)", "yearStart": 2015, "yearEnd": 2021, "trim": "WRX", "specs": { "engine": "2.0L turbo flat-4", "horsepower": "268 hp", "torque": "258 lb-ft", "transmission": "6-speed manual / CVT", "drivetrain": "AWD", "accel0to60": "5.5 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/wrx-0-60-times" },
-    { "make": "Subaru", "model": "WRX STI", "generation": "VA (4th)", "yearStart": 2015, "yearEnd": 2021, "trim": "STI", "specs": { "engine": "2.5L turbo flat-4", "horsepower": "305-310 hp", "torque": "290 lb-ft", "transmission": "6-speed manual", "drivetrain": "AWD", "accel0to60": "4.9 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/wrx-0-60-times" },
-    { "make": "Subaru", "model": "WRX STI", "generation": "VA (4th) S209", "yearStart": 2019, "yearEnd": 2019, "trim": "STI S209", "specs": { "engine": "2.5L turbo flat-4", "horsepower": "341 hp", "torque": "330 lb-ft", "transmission": "6-speed manual", "drivetrain": "AWD", "accel0to60": "4.4 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/wrx-0-60-times" },
-    { "make": "Subaru", "model": "WRX", "generation": "VB (5th)", "yearStart": 2022, "yearEnd": 2025, "trim": "WRX/GT/tS/TR", "specs": { "engine": "2.4L turbo flat-4", "horsepower": "271 hp", "torque": "258 lb-ft", "transmission": "6-speed manual / CVT", "drivetrain": "AWD", "accel0to60": "5.6 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/wrx-0-60-times" },
-
-    { "make": "Subaru", "model": "BRZ", "generation": "1st gen (ZC6)", "yearStart": 2013, "yearEnd": 2021, "trim": "Premium/Limited/tS", "specs": { "engine": "2.0L flat-4", "horsepower": "200-205 hp", "torque": "151-156 lb-ft", "transmission": "6-speed manual / 6-speed automatic", "drivetrain": "RWD", "accel0to60": "6.3 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/brz-0-60-times" },
-    { "make": "Subaru", "model": "BRZ", "generation": "2nd gen (ZD8)", "yearStart": 2022, "yearEnd": 2025, "trim": "Premium/Limited/tS", "specs": { "engine": "2.4L flat-4", "horsepower": "228 hp", "torque": "184 lb-ft", "transmission": "6-speed manual / 6-speed automatic", "drivetrain": "RWD", "accel0to60": "5.4 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/brz-0-60-times" },
-
-    { "make": "Subaru", "model": "Forester", "generation": "SH (3rd)", "yearStart": 2010, "yearEnd": 2013, "trim": "2.5X", "specs": { "engine": "2.5L flat-4", "horsepower": "170 hp", "torque": "170 lb-ft", "transmission": "4-speed automatic / 5-speed manual", "drivetrain": "AWD", "accel0to60": "8.7 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/forester-0-60-times" },
-    { "make": "Subaru", "model": "Forester", "generation": "SH (3rd)", "yearStart": 2010, "yearEnd": 2013, "trim": "2.5XT (turbo)", "specs": { "engine": "2.5L turbo flat-4", "horsepower": "224 hp", "torque": "226 lb-ft", "transmission": "4-speed automatic", "drivetrain": "AWD", "accel0to60": "6.7 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/forester-0-60-times" },
-    { "make": "Subaru", "model": "Forester", "generation": "SJ (4th)", "yearStart": 2014, "yearEnd": 2018, "trim": "2.5i", "specs": { "engine": "2.5L flat-4", "horsepower": "170 hp", "torque": "174 lb-ft", "transmission": "CVT / 6-speed manual", "drivetrain": "AWD", "accel0to60": "8.5 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/forester-0-60-times" },
-    { "make": "Subaru", "model": "Forester", "generation": "SJ (4th)", "yearStart": 2014, "yearEnd": 2018, "trim": "2.0XT (turbo)", "specs": { "engine": "2.0L turbo flat-4", "horsepower": "250 hp", "torque": "258 lb-ft", "transmission": "CVT", "drivetrain": "AWD", "accel0to60": "6.3 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/forester-0-60-times" },
-    { "make": "Subaru", "model": "Forester", "generation": "SK (5th)", "yearStart": 2019, "yearEnd": 2024, "trim": "2.5i/Wilderness", "specs": { "engine": "2.5L flat-4", "horsepower": "182 hp", "torque": "176 lb-ft", "transmission": "CVT", "drivetrain": "AWD", "accel0to60": "8.4 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/forester-0-60-times" },
-
-    { "make": "Subaru", "model": "Outback", "generation": "BR (4th)", "yearStart": 2010, "yearEnd": 2014, "trim": "2.5i", "specs": { "engine": "2.5L flat-4", "horsepower": "170 hp", "torque": "170 lb-ft", "transmission": "CVT", "drivetrain": "AWD", "accel0to60": "9.8 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/outback-0-60-times" },
-    { "make": "Subaru", "model": "Outback", "generation": "BR (4th)", "yearStart": 2010, "yearEnd": 2014, "trim": "3.6R", "specs": { "engine": "3.6L flat-6", "horsepower": "256 hp", "torque": "247 lb-ft", "transmission": "5-speed automatic", "drivetrain": "AWD", "accel0to60": "7.2 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/outback-0-60-times" },
-    { "make": "Subaru", "model": "Outback", "generation": "BS (5th)", "yearStart": 2015, "yearEnd": 2019, "trim": "2.5i", "specs": { "engine": "2.5L flat-4", "horsepower": "175 hp", "torque": "174 lb-ft", "transmission": "CVT", "drivetrain": "AWD", "accel0to60": "9.3 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/outback-0-60-times" },
-    { "make": "Subaru", "model": "Outback", "generation": "BS (5th)", "yearStart": 2015, "yearEnd": 2019, "trim": "3.6R", "specs": { "engine": "3.6L flat-6", "horsepower": "256 hp", "torque": "247 lb-ft", "transmission": "CVT", "drivetrain": "AWD", "accel0to60": "7.1 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/outback-0-60-times" },
-    { "make": "Subaru", "model": "Outback", "generation": "BT (6th)", "yearStart": 2020, "yearEnd": 2025, "trim": "2.5i", "specs": { "engine": "2.5L flat-4", "horsepower": "182 hp", "torque": "176 lb-ft", "transmission": "CVT", "drivetrain": "AWD", "accel0to60": "8.6 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/outback-0-60-times" },
-    { "make": "Subaru", "model": "Outback", "generation": "BT (6th) XT", "yearStart": 2020, "yearEnd": 2025, "trim": "XT (turbo)/Wilderness", "specs": { "engine": "2.4L turbo flat-4", "horsepower": "260 hp", "torque": "277 lb-ft", "transmission": "CVT", "drivetrain": "AWD", "accel0to60": "6.1 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/outback-0-60-times" },
-
-    { "make": "Subaru", "model": "Crosstrek", "generation": "1st gen (GP/GT)", "yearStart": 2016, "yearEnd": 2023, "trim": "2.0i/2.5i", "specs": { "engine": "2.0L / 2.5L flat-4", "horsepower": "152-182 hp", "torque": "145-176 lb-ft", "transmission": "CVT / 6-speed manual", "drivetrain": "AWD", "accel0to60": "8.8 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/crosstrek-0-60-times" },
-    { "make": "Subaru", "model": "Crosstrek", "generation": "1st gen Plug-in Hybrid", "yearStart": 2019, "yearEnd": 2023, "trim": "Plug-in Hybrid", "specs": { "engine": "2.0L flat-4 plug-in hybrid", "horsepower": "148 hp", "torque": "129 lb-ft", "transmission": "CVT", "drivetrain": "AWD", "accel0to60": "8.4 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/crosstrek-0-60-times" },
-    { "make": "Subaru", "model": "Crosstrek", "generation": "2nd gen (GU)", "yearStart": 2024, "yearEnd": 2025, "trim": "Premium/Sport/Limited", "specs": { "engine": "2.0L / 2.5L flat-4", "horsepower": "152-182 hp", "torque": "145-178 lb-ft", "transmission": "CVT", "drivetrain": "AWD", "accel0to60": "7.8 s" }, "extendedSpecs": null, "source": "https://www.0-60specs.com/subaru/crosstrek-0-60-times" }
+    {
+      "make": "Subaru",
+      "model": "WRX",
+      "generation": "GV (3rd)",
+      "yearStart": 2011,
+      "yearEnd": 2014,
+      "trim": "WRX",
+      "specs": {
+        "engine": "2.5L turbo flat-4",
+        "horsepower": "265 hp",
+        "torque": "244 lb-ft",
+        "transmission": "5-speed manual",
+        "drivetrain": "AWD",
+        "accel0to60": "4.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/wrx-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "WRX",
+      "generation": "VA (4th)",
+      "yearStart": 2015,
+      "yearEnd": 2021,
+      "trim": "WRX",
+      "specs": {
+        "engine": "2.0L turbo flat-4",
+        "horsepower": "268 hp",
+        "torque": "258 lb-ft",
+        "transmission": "6-speed manual / CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "5.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/wrx-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "WRX STI",
+      "generation": "VA (4th)",
+      "yearStart": 2015,
+      "yearEnd": 2021,
+      "trim": "STI",
+      "specs": {
+        "engine": "2.5L turbo flat-4",
+        "horsepower": "305-310 hp",
+        "torque": "290 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "AWD",
+        "accel0to60": "4.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/wrx-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "WRX STI",
+      "generation": "VA (4th) S209",
+      "yearStart": 2019,
+      "yearEnd": 2019,
+      "trim": "STI S209",
+      "specs": {
+        "engine": "2.5L turbo flat-4",
+        "horsepower": "341 hp",
+        "torque": "330 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "AWD",
+        "accel0to60": "4.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/wrx-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "WRX",
+      "generation": "VB (5th)",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "WRX/GT/tS/TR",
+      "specs": {
+        "engine": "2.4L turbo flat-4",
+        "horsepower": "271 hp",
+        "torque": "258 lb-ft",
+        "transmission": "6-speed manual / CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "5.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/wrx-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "BRZ",
+      "generation": "1st gen (ZC6)",
+      "yearStart": 2013,
+      "yearEnd": 2021,
+      "trim": "Premium/Limited/tS",
+      "specs": {
+        "engine": "2.0L flat-4",
+        "horsepower": "200-205 hp",
+        "torque": "151-156 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "6.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/brz-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "BRZ",
+      "generation": "2nd gen (ZD8)",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "Premium/Limited/tS",
+      "specs": {
+        "engine": "2.4L flat-4",
+        "horsepower": "228 hp",
+        "torque": "184 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "5.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/brz-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Forester",
+      "generation": "SH (3rd)",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "2.5X",
+      "specs": {
+        "engine": "2.5L flat-4",
+        "horsepower": "170 hp",
+        "torque": "170 lb-ft",
+        "transmission": "4-speed automatic / 5-speed manual",
+        "drivetrain": "AWD",
+        "accel0to60": "8.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/forester-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Forester",
+      "generation": "SH (3rd)",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "2.5XT (turbo)",
+      "specs": {
+        "engine": "2.5L turbo flat-4",
+        "horsepower": "224 hp",
+        "torque": "226 lb-ft",
+        "transmission": "4-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/forester-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Forester",
+      "generation": "SJ (4th)",
+      "yearStart": 2014,
+      "yearEnd": 2018,
+      "trim": "2.5i",
+      "specs": {
+        "engine": "2.5L flat-4",
+        "horsepower": "170 hp",
+        "torque": "174 lb-ft",
+        "transmission": "CVT / 6-speed manual",
+        "drivetrain": "AWD",
+        "accel0to60": "8.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/forester-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Forester",
+      "generation": "SJ (4th)",
+      "yearStart": 2014,
+      "yearEnd": 2018,
+      "trim": "2.0XT (turbo)",
+      "specs": {
+        "engine": "2.0L turbo flat-4",
+        "horsepower": "250 hp",
+        "torque": "258 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "6.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/forester-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Forester",
+      "generation": "SK (5th)",
+      "yearStart": 2019,
+      "yearEnd": 2024,
+      "trim": "2.5i/Wilderness",
+      "specs": {
+        "engine": "2.5L flat-4",
+        "horsepower": "182 hp",
+        "torque": "176 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "8.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/forester-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Outback",
+      "generation": "BR (4th)",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "2.5i",
+      "specs": {
+        "engine": "2.5L flat-4",
+        "horsepower": "170 hp",
+        "torque": "170 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "9.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/outback-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Outback",
+      "generation": "BR (4th)",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "3.6R",
+      "specs": {
+        "engine": "3.6L flat-6",
+        "horsepower": "256 hp",
+        "torque": "247 lb-ft",
+        "transmission": "5-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "7.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/outback-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Outback",
+      "generation": "BS (5th)",
+      "yearStart": 2015,
+      "yearEnd": 2019,
+      "trim": "2.5i",
+      "specs": {
+        "engine": "2.5L flat-4",
+        "horsepower": "175 hp",
+        "torque": "174 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "9.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/outback-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Outback",
+      "generation": "BS (5th)",
+      "yearStart": 2015,
+      "yearEnd": 2019,
+      "trim": "3.6R",
+      "specs": {
+        "engine": "3.6L flat-6",
+        "horsepower": "256 hp",
+        "torque": "247 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "7.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/outback-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Outback",
+      "generation": "BT (6th)",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "2.5i",
+      "specs": {
+        "engine": "2.5L flat-4",
+        "horsepower": "182 hp",
+        "torque": "176 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "8.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/outback-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Outback",
+      "generation": "BT (6th) XT",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "XT (turbo)/Wilderness",
+      "specs": {
+        "engine": "2.4L turbo flat-4",
+        "horsepower": "260 hp",
+        "torque": "277 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "6.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/outback-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Crosstrek",
+      "generation": "1st gen (GP/GT)",
+      "yearStart": 2016,
+      "yearEnd": 2023,
+      "trim": "2.0i/2.5i",
+      "specs": {
+        "engine": "2.0L / 2.5L flat-4",
+        "horsepower": "152-182 hp",
+        "torque": "145-176 lb-ft",
+        "transmission": "CVT / 6-speed manual",
+        "drivetrain": "AWD",
+        "accel0to60": "8.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/crosstrek-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Crosstrek",
+      "generation": "1st gen Plug-in Hybrid",
+      "yearStart": 2019,
+      "yearEnd": 2023,
+      "trim": "Plug-in Hybrid",
+      "specs": {
+        "engine": "2.0L flat-4 plug-in hybrid",
+        "horsepower": "148 hp",
+        "torque": "129 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "8.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/crosstrek-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Crosstrek",
+      "generation": "2nd gen (GU)",
+      "yearStart": 2024,
+      "yearEnd": 2025,
+      "trim": "Premium/Sport/Limited",
+      "specs": {
+        "engine": "2.0L / 2.5L flat-4",
+        "horsepower": "152-182 hp",
+        "torque": "145-178 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "7.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/crosstrek-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Impreza",
+      "generation": "GP/GJ (4th)",
+      "yearStart": 2012,
+      "yearEnd": 2016,
+      "trim": "2.0i",
+      "specs": {
+        "engine": "2.0L flat-4",
+        "horsepower": "148 hp",
+        "torque": "145 lb-ft",
+        "transmission": "5-speed manual / CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "8.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/impreza-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Impreza",
+      "generation": "GK/GT (5th)",
+      "yearStart": 2017,
+      "yearEnd": 2023,
+      "trim": "2.0i",
+      "specs": {
+        "engine": "2.0L flat-4",
+        "horsepower": "152 hp",
+        "torque": "145 lb-ft",
+        "transmission": "5-speed manual / CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "8.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/impreza-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Impreza",
+      "generation": "GU (6th)",
+      "yearStart": 2024,
+      "yearEnd": 2025,
+      "trim": "RS/Sport",
+      "specs": {
+        "engine": "2.5L flat-4",
+        "horsepower": "182 hp",
+        "torque": "178 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "7.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/impreza-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Legacy",
+      "generation": "BM/BR (5th)",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "2.5i",
+      "specs": {
+        "engine": "2.5L flat-4",
+        "horsepower": "170 hp",
+        "torque": "170 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "9.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/legacy-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Legacy",
+      "generation": "BM/BR (5th)",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "2.5GT (turbo)",
+      "specs": {
+        "engine": "2.5L turbo flat-4",
+        "horsepower": "265 hp",
+        "torque": "258 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "AWD",
+        "accel0to60": "5.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/legacy-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Legacy",
+      "generation": "BM/BR (5th)",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "3.6R",
+      "specs": {
+        "engine": "3.6L flat-6",
+        "horsepower": "256 hp",
+        "torque": "247 lb-ft",
+        "transmission": "5-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/legacy-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Legacy",
+      "generation": "BN/BS (6th)",
+      "yearStart": 2015,
+      "yearEnd": 2019,
+      "trim": "2.5i",
+      "specs": {
+        "engine": "2.5L flat-4",
+        "horsepower": "175 hp",
+        "torque": "174 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "9.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/legacy-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Legacy",
+      "generation": "BN/BS (6th)",
+      "yearStart": 2015,
+      "yearEnd": 2019,
+      "trim": "3.6R",
+      "specs": {
+        "engine": "3.6L flat-6",
+        "horsepower": "256 hp",
+        "torque": "247 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "7.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/legacy-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Legacy",
+      "generation": "BW/BT (7th)",
+      "yearStart": 2020,
+      "yearEnd": 2024,
+      "trim": "2.5i",
+      "specs": {
+        "engine": "2.5L flat-4",
+        "horsepower": "182 hp",
+        "torque": "176 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "8.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/legacy-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Legacy",
+      "generation": "BW/BT (7th) XT",
+      "yearStart": 2020,
+      "yearEnd": 2024,
+      "trim": "XT (turbo)",
+      "specs": {
+        "engine": "2.4L turbo flat-4",
+        "horsepower": "260 hp",
+        "torque": "277 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "6.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/legacy-0-60-times"
+    },
+    {
+      "make": "Subaru",
+      "model": "Ascent",
+      "generation": "1st gen",
+      "yearStart": 2019,
+      "yearEnd": 2024,
+      "trim": "Premium/Limited/Touring/Onyx",
+      "specs": {
+        "engine": "2.4L turbo flat-4",
+        "horsepower": "260 hp",
+        "torque": "277 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "6.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/subaru/ascent-0-60-times"
+    }
   ]
 }

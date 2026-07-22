@@ -9,10 +9,12 @@ Skipped by scope: GMC, Ram, Buick, Cadillac, Lincoln, low-volume/fleet/rebadge.
 
 | Brand | Models covered | Entries | Unverified fields | Status |
 |-------|----------------|---------|-------------------|--------|
-| Honda | Civic, Accord, Crosstour, CR-V, Pilot, HR-V, Fit, Odyssey, Ridgeline, Insight, CR-Z, Passport | 44 | 0 | ✅ done (attempt 2) |
-| Toyota | Camry, Corolla, GR Corolla, RAV4, Tacoma, 4Runner, GR86, GR Supra, Tundra, Highlander, Prius | 45 | 9 (hybrid torque n/a) | ✅ done (attempt 2) |
+| Honda | Civic, Accord, Crosstour, CR-V, Pilot, HR-V, Fit, Odyssey, Ridgeline, Insight, CR-Z, Passport, Clarity, Prologue (14) | 47 | 0 | ✅ complete |
+| Toyota | Camry, Corolla, GR Corolla, RAV4, Tacoma, 4Runner, GR86, GR Supra, Tundra, Highlander, Prius, Sienna, Sequoia, Avalon, C-HR, Venza, Land Cruiser, Corolla Cross, Yaris, bZ4X, Mirai (21) | 68 | 14 (hybrid/EV torque n/a) | ✅ complete |
+| Subaru | WRX/STI (incl. S209), BRZ, Forester, Outback, Crosstrek, Impreza, Legacy, Ascent (9) | 32 | 0 | ✅ complete |
 
-Attempt 2 (2026-07-21, after limit reset) — main-thread, no delegation, one high-yield WebFetch per model from 0-60specs.com, compiled + validated + committed per brand. Running total: **89 entries**. Toyota nulls are torque figures the source didn't state (nulled per rules, not invented). Toyota models still to add in a later pass: Sienna, Sequoia, Land Cruiser, Avalon, C-HR, Venza, Mirai, bZ4X.
+Attempt 2 (2026-07-21, after limit reset) — main-thread, no delegation, one high-yield WebFetch per model from 0-60specs.com, compiled + validated + committed per brand. **Running total: 147 verified entries across 3 brands (44 models).** Nulls (14, all Toyota) are hybrid/EV torque figures the source didn't state — nulled per the rules, never invented. Honda/Toyota/Subaru now cover all mainstream US model lines 2010–present at generation+trim granularity (base-trim resolution; a couple of very-low-volume trims folded into their nearest engine variant).
+Still TODO (per SCHEMA notes): extendedSpecs (curbWeight/tires/suspension) are null across all brands so far; the app-facing `tire` field maps from there. Next brands (enthusiast-priority): Mazda, Nissan, BMW, Porsche, then remaining Tier-1.
 
 ## Attempt 1 (2026-07-21) — FAILED, 0 entries saved
 Strategy: launched 10 parallel per-brand research agents (Honda, Toyota, Ford, Chevrolet, BMW, Mercedes-Benz, Audi, Volkswagen, Nissan, Subaru).

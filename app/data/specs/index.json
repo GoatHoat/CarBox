@@ -4,25 +4,28 @@
     {
       "file": "honda.json",
       "brand": "Honda",
-      "entries": 44,
-      "unverifiedCoreFields": 0
+      "entries": 47,
+      "unverifiedCoreFields": 0,
+      "models": 14
     },
     {
       "file": "subaru.json",
       "brand": "Subaru",
-      "entries": 21,
-      "unverifiedCoreFields": 0
+      "entries": 32,
+      "unverifiedCoreFields": 0,
+      "models": 9
     },
     {
       "file": "toyota.json",
       "brand": "Toyota",
-      "entries": 45,
-      "unverifiedCoreFields": 9
+      "entries": 68,
+      "unverifiedCoreFields": 14,
+      "models": 21
     }
   ],
   "totals": {
     "brandsBuilt": 3,
-    "entries": 110,
-    "unverifiedCoreFields": 9
+    "entries": 147,
+    "unverifiedCoreFields": 14
   }
 }
