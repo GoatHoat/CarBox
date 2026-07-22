@@ -191,11 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ── share ── */
   document.getElementById('sharebtn').addEventListener('click', function () {
-    var link = 'https://carbox.app/garage/vojtech13';
-    function done() { UI.toast('Link copied'); }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(link).then(done, done);
-    } else done();
+    UI.share('https://carbox.app/garage/vojtech13', 'Check out my garage on CarBox');
   });
 
   /* ── comments: threaded, with a working composer ── */

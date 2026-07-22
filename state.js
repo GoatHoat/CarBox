@@ -99,13 +99,32 @@ window.CarBox = (function () {
   }
   save();
 
+  /* Tells the native Expo shell (if we're running inside its WebView) to
+     schedule/cancel the recurring "check your service" local notification.
+     Mileage-based reminders have no fixed date to fire on, so the native
+     side schedules a weekly nudge rather than a one-shot alarm. No-op in a
+     plain browser (window.ReactNativeWebView is only defined in the shell). */
+  var NOTIFY_KEYS = { reminders: 1, notifsOn: 1, nextService: 1 };
+  function notifyNative() {
+    if (!window.ReactNativeWebView) return;
+    try {
+      window.ReactNativeWebView.postMessage(JSON.stringify({
+        type: 'reminders',
+        enabled: !!state.reminders && !!state.notifsOn,
+        service: state.nextService
+      }));
+    } catch (e) { /* ignore */ }
+  }
+
   function get(key) { return clone(state[key]); }
   function set(key, value) {
     state[key] = clone(value);
     save();
     subs.forEach(function (fn) { try { fn(key, clone(value)); } catch (e) {} });
+    if (NOTIFY_KEYS[key]) notifyNative();
   }
   function subscribe(fn) { subs.push(fn); }
+  notifyNative(); /* sync native on every page load */
 
   /* ── formatting helpers (units/currency-aware) ── */
   var CUR_SYMBOL = { USD: '$', EUR: '€', GBP: '£' };

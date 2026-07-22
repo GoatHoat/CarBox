@@ -147,11 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
     UI.toast('Coming soon');
   });
   document.getElementById('e-share').addEventListener('click', function () {
-    var link = 'https://carbox.app/e/' + entry.id;
-    function done() { UI.toast('Link copied'); }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(link).then(done, done);
-    } else done();
+    UI.share('https://carbox.app/e/' + entry.id, 'Check out this entry on CarBox');
   });
 });
 </script>

@@ -1,6 +1,9 @@
-/* CarBox Pro paywall — centered modal. Pure state, no payments.
-   Every Pro touchpoint calls Pro.open(); "Start free week" flips isPro and
-   fires a "carbox-pro" event so open pages can unlock live. */
+/* CarBox Pro paywall — centered modal. Preview only, no real payments
+   (no StoreKit/IAP integration yet — see CLAUDE.md before shipping this
+   to the App Store, since Apple requires real In-App Purchase for any
+   paid unlock, not a simulated one). Every Pro touchpoint calls Pro.open();
+   "Preview Pro features" flips isPro locally and fires a "carbox-pro"
+   event so open pages can unlock live. */
 window.Pro = (function () {
   var showing = false;
 
@@ -45,8 +48,8 @@ window.Pro = (function () {
           '<span class="pp-save">SAVE 33%</span>' +
           '<div class="pp-name">Annual</div><div class="pp-amt">$39.99/yr</div></button>' +
       '</div>' +
-      '<button class="pro-cta">Start free week</button>' +
-      '<div class="pro-micro">Cancel anytime</div>';
+      '<button class="pro-cta">Preview Pro features</button>' +
+      '<div class="pro-micro">Planned pricing — preview only, no payment or subscription yet</div>';
 
     document.body.appendChild(scrim);
     document.body.appendChild(card);
@@ -114,7 +117,7 @@ window.Pro = (function () {
       document.dispatchEvent(new CustomEvent('carbox-pro'));
       setTimeout(function () {
         close();
-        UI.toast('Welcome to CarBox Pro');
+        UI.toast('Pro preview unlocked (no purchase made)');
       }, 700);
     });
   }
