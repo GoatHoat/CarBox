@@ -1,0 +1,343 @@
+{
+  "brand": "Lexus",
+  "entryCount": 18,
+  "unverifiedFields": 4,
+  "models": [
+    "RC",
+    "RC F",
+    "NX",
+    "LC",
+    "ES",
+    "RX"
+  ],
+  "sources": [
+    "0-60specs.com"
+  ],
+  "note": "Enthusiast + core verified via 0-60specs.com (incl. RC F, LC 500). IS/IS-F, GS/GS-F, GX, LX, UX pages 404'd (site slug) - to add later. Nulls are hybrid torque the source didn't state.",
+  "entries": [
+    {
+      "make": "Lexus",
+      "model": "RC",
+      "generation": "2nd gen",
+      "yearStart": 2016,
+      "yearEnd": 2018,
+      "trim": "RC 200t/300 (2.0T)",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "241 hp",
+        "torque": "258 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "6.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/rc-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "RC",
+      "generation": "2nd gen",
+      "yearStart": 2015,
+      "yearEnd": 2024,
+      "trim": "RC 350 F Sport",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "306-311 hp",
+        "torque": "277-280 lb-ft",
+        "transmission": "8-speed automatic / 6-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "5.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/rc-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "RC F",
+      "generation": "2nd gen",
+      "yearStart": 2015,
+      "yearEnd": 2021,
+      "trim": "RC F",
+      "specs": {
+        "engine": "5.0L V8",
+        "horsepower": "467-472 hp",
+        "torque": "389-395 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "4.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/rc-f-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "NX",
+      "generation": "AZ10",
+      "yearStart": 2015,
+      "yearEnd": 2021,
+      "trim": "NX 200t/300 (2.0T)",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "235 hp",
+        "torque": "258 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "6.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/nx-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "NX",
+      "generation": "AZ10 Hybrid",
+      "yearStart": 2015,
+      "yearEnd": 2021,
+      "trim": "NX 300h",
+      "specs": {
+        "engine": "2.5L I4 hybrid",
+        "horsepower": "194 hp",
+        "torque": "152 lb-ft",
+        "transmission": "E-CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/nx-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "NX",
+      "generation": "AZ20",
+      "yearStart": 2022,
+      "yearEnd": 2024,
+      "trim": "NX 350 (2.4T)",
+      "specs": {
+        "engine": "2.4L turbo I4",
+        "horsepower": "275 hp",
+        "torque": "317 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/nx-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "NX",
+      "generation": "AZ20 Hybrid",
+      "yearStart": 2022,
+      "yearEnd": 2024,
+      "trim": "NX 350h",
+      "specs": {
+        "engine": "2.5L I4 hybrid",
+        "horsepower": "239 hp",
+        "torque": null,
+        "transmission": "E-CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "7.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/nx-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "NX",
+      "generation": "AZ20 PHEV",
+      "yearStart": 2022,
+      "yearEnd": 2024,
+      "trim": "NX 450h+ PHEV",
+      "specs": {
+        "engine": "2.5L I4 plug-in hybrid",
+        "horsepower": "302 hp",
+        "torque": null,
+        "transmission": "E-CVT",
+        "drivetrain": "AWD",
+        "accel0to60": "5.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/nx-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "LC",
+      "generation": "1st gen",
+      "yearStart": 2018,
+      "yearEnd": 2024,
+      "trim": "LC 500",
+      "specs": {
+        "engine": "5.0L V8",
+        "horsepower": "471 hp",
+        "torque": "398 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "4.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/lc-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "LC",
+      "generation": "1st gen Hybrid",
+      "yearStart": 2018,
+      "yearEnd": 2024,
+      "trim": "LC 500h",
+      "specs": {
+        "engine": "3.5L V6 hybrid",
+        "horsepower": "354 hp",
+        "torque": "257 lb-ft",
+        "transmission": "E-CVT (multi-stage)",
+        "drivetrain": "RWD",
+        "accel0to60": "5.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/lc-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "ES",
+      "generation": "XV60",
+      "yearStart": 2010,
+      "yearEnd": 2012,
+      "trim": "ES 350",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "272 hp",
+        "torque": "254 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "6.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/es-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "ES",
+      "generation": "XV70",
+      "yearStart": 2013,
+      "yearEnd": 2018,
+      "trim": "ES 350",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "268 hp",
+        "torque": "248 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "5.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/es-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "ES",
+      "generation": "XV70 Hybrid",
+      "yearStart": 2013,
+      "yearEnd": 2018,
+      "trim": "ES 300h",
+      "specs": {
+        "engine": "2.5L I4 hybrid",
+        "horsepower": "200 hp",
+        "torque": null,
+        "transmission": "E-CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "7.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/es-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "ES",
+      "generation": "XZ10",
+      "yearStart": 2019,
+      "yearEnd": 2025,
+      "trim": "ES 350 / F Sport",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "302 hp",
+        "torque": "267 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "6.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/es-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "ES",
+      "generation": "XZ10 Hybrid",
+      "yearStart": 2019,
+      "yearEnd": 2024,
+      "trim": "ES 300h",
+      "specs": {
+        "engine": "2.5L I4 hybrid",
+        "horsepower": "215 hp",
+        "torque": null,
+        "transmission": "E-CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "8.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/es-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "ES",
+      "generation": "XZ10",
+      "yearStart": 2021,
+      "yearEnd": 2022,
+      "trim": "ES 250 (AWD)",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "203 hp",
+        "torque": "184 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "8.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/es-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "RX",
+      "generation": "AL20",
+      "yearStart": 2016,
+      "yearEnd": 2022,
+      "trim": "RX 350",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "295 hp",
+        "torque": "267 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/rx-350-0-60-times"
+    },
+    {
+      "make": "Lexus",
+      "model": "RX",
+      "generation": "AL30",
+      "yearStart": 2023,
+      "yearEnd": 2025,
+      "trim": "RX 350 (2.4T)",
+      "specs": {
+        "engine": "2.4L turbo I4",
+        "horsepower": "275 hp",
+        "torque": "317 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/lexus/rx-350-0-60-times"
+    }
+  ]
+}

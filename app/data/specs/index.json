@@ -44,6 +44,13 @@
       "models": 5
     },
     {
+      "file": "lexus.json",
+      "brand": "Lexus",
+      "entries": 18,
+      "unverifiedCoreFields": 4,
+      "models": 6
+    },
+    {
       "file": "mazda.json",
       "brand": "Mazda",
       "entries": 19,
@@ -87,8 +94,8 @@
     }
   ],
   "totals": {
-    "brandsBuilt": 12,
-    "entries": 429,
-    "unverifiedCoreFields": 30
+    "brandsBuilt": 13,
+    "entries": 447,
+    "unverifiedCoreFields": 34
   }
 }
