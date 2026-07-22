@@ -1,0 +1,360 @@
+{
+  "brand": "Mazda",
+  "entryCount": 19,
+  "unverifiedFields": 0,
+  "models": [
+    "MX-5 Miata",
+    "Mazda3",
+    "Mazda6",
+    "CX-5",
+    "CX-90"
+  ],
+  "sources": [
+    "0-60specs.com"
+  ],
+  "note": "Core 6 verified via 0-60specs.com. extendedSpecs null this pass. Mazdaspeed3 (2010-2013) not in source, omitted rather than guessed. CX-30, CX-9, CX-50, CX-70 to add later.",
+  "entries": [
+    {
+      "make": "Mazda",
+      "model": "MX-5 Miata",
+      "generation": "NC (3rd)",
+      "yearStart": 2010,
+      "yearEnd": 2015,
+      "trim": "Grand Touring/Club",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "167 hp",
+        "torque": "140 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "6.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mx-5-miata-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "MX-5 Miata",
+      "generation": "ND (4th)",
+      "yearStart": 2016,
+      "yearEnd": 2018,
+      "trim": "Club/Grand Touring",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "155 hp",
+        "torque": "148 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "6.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mx-5-miata-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "MX-5 Miata",
+      "generation": "ND (4th)",
+      "yearStart": 2019,
+      "yearEnd": 2025,
+      "trim": "Club/GT/RF",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "181 hp",
+        "torque": "151 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "5.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mx-5-miata-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazda3",
+      "generation": "BL (2nd)",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "i (2.0L)",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "155 hp",
+        "torque": "150 lb-ft",
+        "transmission": "5-speed automatic / 6-speed manual",
+        "drivetrain": "FWD",
+        "accel0to60": "8.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mazda3-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazda3",
+      "generation": "BL (2nd)",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "s (2.5L)",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "167 hp",
+        "torque": "168 lb-ft",
+        "transmission": "5/6-speed automatic / 6-speed manual",
+        "drivetrain": "FWD",
+        "accel0to60": "7.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mazda3-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazda3",
+      "generation": "BM/BN (3rd)",
+      "yearStart": 2014,
+      "yearEnd": 2018,
+      "trim": "i (2.0L)",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "155 hp",
+        "torque": "150 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "8.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mazda3-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazda3",
+      "generation": "BM/BN (3rd)",
+      "yearStart": 2014,
+      "yearEnd": 2018,
+      "trim": "s/GT (2.5L)",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "184 hp",
+        "torque": "185 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "6.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mazda3-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazda3",
+      "generation": "BP (4th)",
+      "yearStart": 2019,
+      "yearEnd": 2025,
+      "trim": "2.5 (NA)",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "186 hp",
+        "torque": "186 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mazda3-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazda3",
+      "generation": "BP (4th) Turbo",
+      "yearStart": 2021,
+      "yearEnd": 2025,
+      "trim": "2.5 Turbo",
+      "specs": {
+        "engine": "2.5L turbo I4",
+        "horsepower": "250 hp",
+        "torque": "320 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "5.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mazda3-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazda6",
+      "generation": "GH (2nd)",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "i (2.5L)",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "170 hp",
+        "torque": "167 lb-ft",
+        "transmission": "5-speed automatic / 6-speed manual",
+        "drivetrain": "FWD",
+        "accel0to60": "8.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mazda6-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazda6",
+      "generation": "GH (2nd)",
+      "yearStart": 2010,
+      "yearEnd": 2013,
+      "trim": "s V6",
+      "specs": {
+        "engine": "3.7L V6",
+        "horsepower": "272 hp",
+        "torque": "269 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "6.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mazda6-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazda6",
+      "generation": "GJ/GL (3rd)",
+      "yearStart": 2014,
+      "yearEnd": 2021,
+      "trim": "i/GT (2.5L)",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "184 hp",
+        "torque": "185 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "7.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mazda6-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "Mazda6",
+      "generation": "GJ/GL (3rd) Turbo",
+      "yearStart": 2018,
+      "yearEnd": 2021,
+      "trim": "Signature/Carbon (2.5T)",
+      "specs": {
+        "engine": "2.5L turbo I4",
+        "horsepower": "250 hp",
+        "torque": "310-320 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "6.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/mazda6-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "CX-5",
+      "generation": "KE (1st)",
+      "yearStart": 2013,
+      "yearEnd": 2016,
+      "trim": "Sport (2.0L)",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "155 hp",
+        "torque": "150 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "9.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/cx-5-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "CX-5",
+      "generation": "KE (1st)",
+      "yearStart": 2014,
+      "yearEnd": 2016,
+      "trim": "Touring/GT (2.5L)",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "184 hp",
+        "torque": "185 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/cx-5-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "CX-5",
+      "generation": "KF (2nd)",
+      "yearStart": 2017,
+      "yearEnd": 2025,
+      "trim": "2.5 (NA)",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "187 hp",
+        "torque": "186 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/cx-5-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "CX-5",
+      "generation": "KF (2nd) Turbo",
+      "yearStart": 2019,
+      "yearEnd": 2025,
+      "trim": "2.5 Turbo Signature",
+      "specs": {
+        "engine": "2.5L turbo I4",
+        "horsepower": "250-256 hp",
+        "torque": "320 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/cx-5-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "CX-90",
+      "generation": "1st gen",
+      "yearStart": 2024,
+      "yearEnd": 2025,
+      "trim": "Turbo/Turbo S (3.3 I6)",
+      "specs": {
+        "engine": "3.3L turbo I6 mild-hybrid",
+        "horsepower": "340 hp",
+        "torque": "369 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/cx-90-0-60-times"
+    },
+    {
+      "make": "Mazda",
+      "model": "CX-90",
+      "generation": "1st gen PHEV",
+      "yearStart": 2024,
+      "yearEnd": 2025,
+      "trim": "PHEV",
+      "specs": {
+        "engine": "2.5L I4 plug-in hybrid",
+        "horsepower": "323 hp",
+        "torque": "369 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mazda/cx-90-0-60-times"
+    }
+  ]
+}
