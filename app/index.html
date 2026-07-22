@@ -10,6 +10,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  /* spec list header + small Edit pill (top of the 6-spec list) */
+  .spec-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 7px}
+  .spec-head-lbl{
+    font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--mut,#8D8D8B);
+  }
+  .spec-edit{
+    background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:5px 13px;font-family:'League Spartan',sans-serif;font-size:12px;font-weight:700;
+    min-height:28px;box-shadow:var(--shadow);
+  }
+  /* edit sheet fields — local to this page's specs editor */
+  .cbfield{
+    background:var(--surface,#F5F3F4);border-radius:16px;box-shadow:var(--shadow);
+    padding:8px 14px 9px;margin-top:9px;
+  }
+  .cbfield .cblab{font-size:12px;font-weight:600;color:var(--mut,#9B918F)}
+  .cbfield input{
+    width:100%;border:none;background:transparent;outline:none;
+    font-family:'League Spartan',sans-serif;font-size:16px;font-weight:600;color:var(--tx,#141210);
+    margin-top:2px;padding:0;
+  }
+  .cbfield input::placeholder{color:var(--mut,#AEA6A3);opacity:1;font-weight:500}
+  .cbsheetbtn{
+    width:100%;margin-top:14px;
+    background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:12px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:16px;
+    box-shadow:var(--shadow);
+  }
+</style>
 <script defer src="state.js"></script>
 <script defer src="ui.js"></script>
 <script defer src="nav.js"></script>
@@ -48,13 +79,17 @@
   <h1 class="cartitle serif">Bugatti Chiron</h1>
   <div class="caryear serif">2026</div>
 
+  <div class="spec-head">
+    <span class="spec-head-lbl">Specs</span>
+    <button class="spec-edit" id="specEdit" aria-label="Edit specs">Edit</button>
+  </div>
   <div class="spec">
-    <div class="row"><div class="ic"><img class="i-piston" src="assets/spec_piston.png" alt=""></div><div class="tx">8.0L quad-turbo W16</div></div>
-    <div class="row"><div class="ic"><img class="i-bolt" src="assets/spec_bolt.png" alt=""></div><div class="tx">1,479 hp (1,500 PS); Super Sport: 1,578 hp</div></div>
-    <div class="row"><div class="ic"><img class="i-gear" src="assets/spec_gear.png" alt=""></div><div class="tx">7-speed Ricardo dual-clutch gearbox</div></div>
-    <div class="row"><div class="ic"><img class="i-gearbox" src="assets/spec_gearbox.png" alt=""></div><div class="tx">Double wishbone suspension</div></div>
-    <div class="row"><div class="ic"><img class="i-tire" src="assets/spec_tire.png" alt=""></div><div class="tx">Michelin Cup tires</div></div>
-    <div class="row"><div class="ic"><img class="i-gauge" src="assets/spec_gauge.png" alt=""></div><div class="tx">0-100 km/h: ~2.4 s</div></div>
+    <div class="row"><div class="ic"><img class="i-piston" src="assets/spec_piston.png" alt=""></div><div class="tx" id="spec-engine"></div></div>
+    <div class="row"><div class="ic"><img class="i-bolt" src="assets/spec_bolt.png" alt=""></div><div class="tx" id="spec-horsepower"></div></div>
+    <div class="row"><div class="ic"><img class="i-gearbox" src="assets/spec_gearbox.png" alt=""></div><div class="tx" id="spec-torque"></div></div>
+    <div class="row"><div class="ic"><img class="i-gear" src="assets/spec_gear.png" alt=""></div><div class="tx" id="spec-transmission"></div></div>
+    <div class="row"><div class="ic"><img class="i-tire" src="assets/spec_tire.png" alt=""></div><div class="tx" id="spec-drivetrain"></div></div>
+    <div class="row"><div class="ic"><img class="i-gauge" src="assets/spec_gauge.png" alt=""></div><div class="tx" id="spec-accel"></div></div>
   </div>
 
   <div class="actions">
@@ -85,10 +120,27 @@ document.addEventListener('DOMContentLoaded', function () {
     /* bell swings gently while something is unread */
     document.querySelector('.i-bell').classList.toggle('bell-live', n > 0 && !UI.reduced());
   }
+  /* the six spec rows, in display order, keyed to vehicle.specs fields */
+  var SPEC_ROWS = [
+    { key: 'engine', label: 'Engine' },
+    { key: 'horsepower', label: 'Horsepower' },
+    { key: 'torque', label: 'Torque' },
+    { key: 'transmission', label: 'Transmission' },
+    { key: 'drivetrain', label: 'Drivetrain' },
+    { key: 'accel', label: '0-60 mph' }
+  ];
+  function paintSpecs(vehicle) {
+    var s = vehicle.specs || {};
+    SPEC_ROWS.forEach(function (r) {
+      var el = document.getElementById('spec-' + r.key);
+      if (el) el.textContent = (s[r.key] && String(s[r.key]).trim()) || '—';
+    });
+  }
   function hydrate() {
     var vehicle = CarBox.get('vehicle');
     document.querySelector('.cartitle').textContent = vehicle.name;
     document.querySelector('.caryear').textContent = String(vehicle.year);
+    paintSpecs(vehicle);
     var prof = CarBox.get('profile');
     document.querySelector('.pname').textContent = prof.name;
     document.querySelector('.phandle').textContent = prof.handle;
@@ -301,6 +353,43 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   document.getElementById('gearbtn').addEventListener('click', function () {
     location.href = 'settings.html';
+  });
+
+  /* ── edit specs: sheet with the six fields, prefilled, saves to vehicle ── */
+  document.getElementById('specEdit').addEventListener('click', function () {
+    var vehicle = CarBox.get('vehicle');
+    var specs = vehicle.specs || {};
+    UI.sheet({
+      title: 'Edit specs',
+      label: 'Edit specs',
+      build: function (body) {
+        var inputs = {};
+        SPEC_ROWS.forEach(function (r) {
+          var f = document.createElement('div'); f.className = 'cbfield';
+          var l = document.createElement('div'); l.className = 'cblab'; l.textContent = r.label;
+          var inp = document.createElement('input');
+          inp.type = 'text';
+          inp.value = specs[r.key] == null ? '' : specs[r.key];
+          inp.setAttribute('aria-label', r.label);
+          inp.placeholder = 'Add ' + r.label.toLowerCase();
+          f.appendChild(l); f.appendChild(inp);
+          body.appendChild(f);
+          inputs[r.key] = inp;
+        });
+        var save = document.createElement('button');
+        save.className = 'cbsheetbtn';
+        save.textContent = 'Save';
+        save.addEventListener('click', function () {
+          var next = {};
+          SPEC_ROWS.forEach(function (r) { next[r.key] = inputs[r.key].value.trim(); });
+          vehicle.specs = next;
+          CarBox.set('vehicle', vehicle);
+          paintSpecs(vehicle);
+          UI.toast('Specs updated');
+        });
+        body.appendChild(save);
+      }
+    });
   });
 
   /* subtle parallax on the hero sprite */

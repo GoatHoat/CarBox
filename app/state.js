@@ -5,15 +5,18 @@ window.CarBox = (function () {
   var SEED_IDS = { e1: 1, e2: 1, e3: 1, e4: 1 };
 
   var DEFAULTS = {
-    /* vehicle carries make/model/year + a specs object (filled by onboarding
-       from its curated dataset, or a placeholder the user edits in Settings).
-       `name` stays "Make Model" so the Garage title keeps rendering unchanged. */
+    /* vehicle carries make/model/year + a core-6 specs object. Onboarding
+       fills specs from the car manifest (app/data/cars.js, built from the
+       verified specs DB) for the chosen make/model/year; the Garage renders
+       these six rows and lets the user edit them by hand. Field order matches
+       the six Garage icons: engine, horsepower, torque, transmission,
+       drivetrain, 0-60. `name` stays "Make Model" so the title renders unchanged. */
     vehicle: {
       name: 'Bugatti Chiron', make: 'Bugatti', model: 'Chiron', year: 2026, mileage: 82410,
       specs: {
-        engine: '8.0L quad-turbo W16', horsepower: '1,479 hp (1,500 PS); Super Sport: 1,578 hp',
-        drivetrain: '7-speed Ricardo dual-clutch gearbox', accel: '0-100 km/h: ~2.4 s',
-        tire: 'Michelin Cup tires'
+        engine: '8.0L quad-turbo W16', horsepower: '1,479 hp (1,500 PS)',
+        torque: '1,180 lb-ft', transmission: '7-speed dual-clutch',
+        drivetrain: 'AWD', accel: '0-60 mph: ~2.4 s'
       }
     },
     car: { presetId: 'sprite_chiron', hue: null }, /* hue null = original grey */
@@ -24,14 +27,6 @@ window.CarBox = (function () {
     currency: 'USD',
     theme: 'system',
     isPro: false,
-    specs: [
-      '8.0L quad-turbo W16',
-      '1,479 hp (1,500 PS); Super Sport: 1,578 hp',
-      '7-speed Ricardo dual-clutch gearbox',
-      'Double wishbone suspension',
-      'Michelin Cup tires',
-      '0-100 km/h: ~2.4 s'
-    ],
     entries: [
       { id: 'e1', type: 'mod', title: 'Titanium exhaust install', cost: 12400, miles: 81900, date: 'Jun 30, 2026',
         notes: 'Akrapovic full system. Torqued manifold bolts to 22 Nm. Sourced from EuroParts — part #AK-CH-77.',

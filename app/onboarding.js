@@ -15,37 +15,21 @@ document.addEventListener('DOMContentLoaded', function () {
      and must never be treated as secure. A real signup requires a proper
      backend auth service (hashing, tokens, transport security) before ship. */
 
-  /* curated make/model dataset → auto-fills Garage base specs when matched */
-  var CARS = [
-    { make: 'Bugatti', model: 'Chiron', specs: { engine: '8.0L quad-turbo W16', horsepower: '1,479 hp (1,500 PS)', drivetrain: 'AWD · 7-speed dual-clutch', accel: '0-60 mph: ~2.4 s', tire: 'Michelin Cup 2' } },
-    { make: 'Toyota', model: 'Supra', specs: { engine: '3.0L turbo I6', horsepower: '382 hp', drivetrain: 'RWD · 8-speed auto', accel: '0-60 mph: ~3.9 s', tire: 'Michelin Pilot Super Sport' } },
-    { make: 'Toyota', model: 'GR86', specs: { engine: '2.4L flat-4', horsepower: '228 hp', drivetrain: 'RWD · 6-speed manual', accel: '0-60 mph: ~6.1 s', tire: 'Michelin Pilot Sport 4' } },
-    { make: 'Honda', model: 'Civic Type R', specs: { engine: '2.0L turbo I4', horsepower: '315 hp', drivetrain: 'FWD · 6-speed manual', accel: '0-60 mph: ~5.0 s', tire: 'Michelin Pilot Sport 4S' } },
-    { make: 'Nissan', model: 'GT-R', specs: { engine: '3.8L twin-turbo V6', horsepower: '565 hp', drivetrain: 'AWD · 6-speed dual-clutch', accel: '0-60 mph: ~2.9 s', tire: 'Dunlop SP Sport Maxx GT600' } },
-    { make: 'Mazda', model: 'MX-5 Miata', specs: { engine: '2.0L I4', horsepower: '181 hp', drivetrain: 'RWD · 6-speed manual', accel: '0-60 mph: ~5.7 s', tire: 'Bridgestone Potenza S001' } },
-    { make: 'Subaru', model: 'WRX', specs: { engine: '2.4L turbo flat-4', horsepower: '271 hp', drivetrain: 'AWD · 6-speed manual', accel: '0-60 mph: ~5.4 s', tire: 'Dunlop Sport Maxx GT' } },
-    { make: 'Ford', model: 'Mustang GT', specs: { engine: '5.0L V8', horsepower: '480 hp', drivetrain: 'RWD · 6-speed manual', accel: '0-60 mph: ~4.2 s', tire: 'Pirelli P Zero' } },
-    { make: 'Chevrolet', model: 'Corvette', specs: { engine: '6.2L V8', horsepower: '495 hp', drivetrain: 'RWD · 8-speed dual-clutch', accel: '0-60 mph: ~2.9 s', tire: 'Michelin Pilot Sport 4S' } },
-    { make: 'Dodge', model: 'Charger', specs: { engine: '6.4L V8', horsepower: '485 hp', drivetrain: 'RWD · 8-speed auto', accel: '0-60 mph: ~4.3 s', tire: 'Goodyear Eagle F1' } },
-    { make: 'BMW', model: 'M3', specs: { engine: '3.0L twin-turbo I6', horsepower: '473 hp', drivetrain: 'RWD · 6-speed manual', accel: '0-60 mph: ~4.1 s', tire: 'Michelin Pilot Sport 4S' } },
-    { make: 'Porsche', model: '911', specs: { engine: '3.0L twin-turbo flat-6', horsepower: '379 hp', drivetrain: 'RWD · 8-speed dual-clutch', accel: '0-60 mph: ~4.0 s', tire: 'Pirelli P Zero' } },
-    { make: 'Audi', model: 'R8', specs: { engine: '5.2L V10', horsepower: '562 hp', drivetrain: 'AWD · 7-speed dual-clutch', accel: '0-60 mph: ~3.4 s', tire: 'Michelin Pilot Sport 4S' } },
-    { make: 'Tesla', model: 'Model 3', specs: { engine: 'Dual electric motor', horsepower: '450 hp', drivetrain: 'AWD · single-speed', accel: '0-60 mph: ~3.1 s', tire: 'Michelin Pilot Sport EV' } },
-    { make: 'Volkswagen', model: 'Golf GTI', specs: { engine: '2.0L turbo I4', horsepower: '241 hp', drivetrain: 'FWD · 6-speed manual', accel: '0-60 mph: ~5.6 s', tire: 'Bridgestone Potenza' } }
-  ];
-  var PLACEHOLDER_SPECS = { engine: 'Add engine', horsepower: 'Add horsepower', drivetrain: 'Add drivetrain', accel: 'Add 0-60', tire: 'Add tires' };
+  /* Make/model dropdowns AND the Garage's six specs both come from
+     app/data/cars.js (window.CarBoxCars), which is generated from the verified
+     specs DB in app/data/specs/. The user only picks from real DB entries, so a
+     lookup should always resolve; this placeholder is a defensive fallback. */
+  var PLACEHOLDER_SPECS = { engine: '', horsepower: '', torque: '', transmission: '', drivetrain: '', accel: '' };
 
-  function findCar(make, model) {
-    var m = (make || '').trim().toLowerCase(), md = (model || '').trim().toLowerCase();
-    for (var i = 0; i < CARS.length; i++) {
-      if (CARS[i].make.toLowerCase() === m && CARS[i].model.toLowerCase() === md) return CARS[i];
-    }
-    return null;
-  }
+  /* CarBox policy: model years 2010 and newer only (older years are declined). */
+  var MIN_YEAR = 2010;
 
-  /* single in-memory answer object; survives forward/back navigation */
+  /* single in-memory answer object; survives forward/back navigation.
+     presetId/hue hold the car-appearance choices, committed with everything
+     else at step 6 (default = the grey Chiron sprite, same as Settings). */
   var A = { firstName: '', lastName: '', email: '', password: '',
-            username: '', tag: '', birthday: '', make: '', model: '', year: '' };
+            username: '', tag: '', birthday: '', make: '', model: '', year: '',
+            presetId: 'sprite_chiron', hue: null };
 
   var $ = function (id) { return document.getElementById(id); };
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -186,52 +170,166 @@ document.addEventListener('DOMContentLoaded', function () {
     show(5, 'fwd');
   });
 
-  /* ─── Step 5: Car (curated search → auto specs) ─── */
+  /* ─── Step 5: Car — make/model dropdowns from the specs DB + customizer ─── */
   var make = $('ob-make'), model = $('ob-model'), year = $('ob-year');
   var carErr = $('ob-car-err'), carNext = $('ob-car-next'), specNote = $('ob-specnote');
-  var makesDL = $('ob-makes'), modelsDL = $('ob-models');
   var thisYear = new Date().getFullYear();
-  year.min = 1990; year.max = thisYear + 1;
-  year.placeholder = String(thisYear);
-  /* unique makes */
-  var seenMake = {};
-  CARS.forEach(function (c) {
-    if (!seenMake[c.make]) { seenMake[c.make] = 1; var o = document.createElement('option'); o.value = c.make; makesDL.appendChild(o); }
+  year.min = MIN_YEAR; year.max = thisYear + 1;
+  year.placeholder = String(Math.max(MIN_YEAR, thisYear - 4));
+
+  /* makes: only brands present in the specs DB */
+  CarBoxCars.brands().forEach(function (b) {
+    var o = document.createElement('option'); o.value = b; o.textContent = b; make.appendChild(o);
   });
+  function styleSelect(sel) { sel.classList.toggle('placeheld', !sel.value); }
+
+  /* models: only models the chosen brand actually has in the DB */
   function fillModels() {
-    modelsDL.innerHTML = '';
-    var m = make.value.trim().toLowerCase();
-    CARS.forEach(function (c) {
-      if (!m || c.make.toLowerCase() === m) { var o = document.createElement('option'); o.value = c.model; modelsDL.appendChild(o); }
-    });
+    model.innerHTML = '<option value="">Select model</option>';
+    if (make.value) {
+      CarBoxCars.models(make.value).forEach(function (m) {
+        var o = document.createElement('option'); o.value = m; o.textContent = m; model.appendChild(o);
+      });
+      model.disabled = false;
+    } else {
+      model.disabled = true;
+    }
+    styleSelect(model);
   }
+
   function validCar() {
     var y = parseInt(year.value, 10);
-    return make.value.trim() && model.value.trim() && y >= 1990 && y <= thisYear + 1;
+    return !!(make.value && model.value && y >= MIN_YEAR && y <= thisYear + 1);
   }
   function refreshCar() {
-    var hit = findCar(make.value, model.value);
-    if (make.value.trim() && model.value.trim()) {
+    styleSelect(make); styleSelect(model);
+    var y = parseInt(year.value, 10);
+    var tooOld = !!year.value && y < MIN_YEAR;
+    var badYear = !!year.value && (y < MIN_YEAR || y > thisYear + 1);
+    markInvalid(year.parentElement, badYear);
+    if (tooOld) {
+      /* explicit decline for pre-2010 model years */
+      specNote.className = 'ob-specnote show note';
+      specNote.textContent = 'CarBox supports model years ' + MIN_YEAR + ' and newer.';
+    } else if (make.value && model.value && y >= MIN_YEAR && y <= thisYear + 1) {
+      var hit = CarBoxCars.lookup(make.value, model.value, y);
       specNote.className = 'ob-specnote show ' + (hit ? 'ok' : 'note');
-      specNote.textContent = hit
-        ? '✓ Specs found for ' + hit.make + ' ' + hit.model
-        : 'No match — we’ll add placeholder specs you can edit in Settings';
+      if (hit) {
+        specNote.textContent = '✓ ' + [hit.specs.horsepower, hit.specs.engine, hit.trim]
+          .filter(Boolean).join(' · ') + (hit.exact ? '' : ' (closest: ' + hit.yearStart + '–' + hit.yearEnd + ')');
+      } else {
+        specNote.textContent = 'We’ll add placeholder specs you can edit in your garage.';
+      }
     } else {
       specNote.className = 'ob-specnote';
       specNote.textContent = '';
     }
-    var y = parseInt(year.value, 10);
-    markInvalid(year.parentElement, !!year.value && (y < 1990 || y > thisYear + 1));
+    carErr.classList.remove('show');
     carNext.disabled = !validCar();
   }
-  make.addEventListener('input', function () { fillModels(); refreshCar(); });
-  model.addEventListener('input', refreshCar);
+  make.addEventListener('change', function () { fillModels(); refreshCar(); });
+  model.addEventListener('change', refreshCar);
   year.addEventListener('input', refreshCar);
   fillModels();
-  enterAdvances([make, model, year], carNext);
+  styleSelect(make);
+  enterAdvances([year], carNext);
+
+  /* ── appearance customizer — same behavior as Settings' My Car ── */
+  var PRESETS = [
+    { id: 'sprite_chiron', label: 'Chiron' }, { id: 'preset_coupe', label: 'Coupe' },
+    { id: 'preset_sedan', label: 'Sedan' }, { id: 'preset_pickup', label: 'Pickup' },
+    { id: 'preset_suv', label: 'SUV' }, { id: 'preset_wagon', label: 'Wagon' },
+    { id: 'preset_muscle', label: 'Muscle' }
+  ];
+  var preview = $('ob-carprev'), painter = null;
+  function drawPreview() { if (painter) painter.paint(preview, A.hue); }
+  function loadBase(cb) {
+    UI.spritePainter('assets/' + A.presetId + '.png', function (p) { painter = p; if (cb) cb(); });
+  }
+  function pulsePreview() { preview.classList.remove('pulse'); void preview.offsetWidth; preview.classList.add('pulse'); }
+
+  var presetRow = $('ob-presetRow');
+  PRESETS.forEach(function (p) {
+    var tile = document.createElement('button');
+    tile.type = 'button';
+    tile.className = 'ob-presettile' + (p.id === A.presetId ? ' sel' : '');
+    tile.setAttribute('aria-label', p.label);
+    var img = document.createElement('img'); img.src = 'assets/' + p.id + '.png'; img.alt = '';
+    tile.appendChild(img);
+    tile.addEventListener('click', function () {
+      A.presetId = p.id;
+      presetRow.querySelectorAll('.ob-presettile').forEach(function (t) { t.classList.remove('sel'); });
+      tile.classList.add('sel');
+      loadBase(function () { drawPreview(); pulsePreview(); });
+    });
+    presetRow.appendChild(tile);
+  });
+
+  var slider = $('ob-hueSlider'), knob = $('ob-hueKnob');
+  function paintKnob() {
+    var isHue = typeof A.hue === 'number';
+    knob.style.left = ((isHue ? A.hue : 0) / 360 * 100) + '%';
+    knob.classList.toggle('off', !isHue);
+    slider.setAttribute('aria-valuenow', String(Math.round(isHue ? A.hue : 0)));
+  }
+  var monoRow = $('ob-monoRow');
+  function paintMono() {
+    monoRow.querySelectorAll('.ob-monoswatch').forEach(function (sw, k) {
+      sw.classList.toggle('sel', A.hue === 'mono-' + k);
+    });
+  }
+  (function buildMono() {
+    for (var k = 0; k < 8; k++) {
+      var M = 0.08 + k * (0.92 - 0.08) / 7;
+      var v = Math.round(M * 255);
+      var sw = document.createElement('button');
+      sw.type = 'button'; sw.className = 'ob-monoswatch';
+      sw.style.background = 'rgb(' + v + ',' + v + ',' + v + ')';
+      sw.setAttribute('aria-label', k === 0 ? 'Black' : k === 7 ? 'White' : 'Grey ' + k);
+      (function (kk) {
+        sw.addEventListener('click', function () {
+          A.hue = 'mono-' + kk; paintKnob(); paintMono(); drawPreview(); pulsePreview();
+        });
+      })(k);
+      monoRow.appendChild(sw);
+    }
+  })();
+  var dragging = false, pendingHue = null, rafQueued = false;
+  function hueFromEvent(e) {
+    var r = slider.getBoundingClientRect();
+    var x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+    return Math.round(x / r.width * 360);
+  }
+  function applyHue(h) { A.hue = h; paintKnob(); paintMono(); drawPreview(); }
+  slider.addEventListener('pointerdown', function (e) {
+    dragging = true; knob.classList.add('drag'); slider.setPointerCapture(e.pointerId);
+    applyHue(hueFromEvent(e));
+  });
+  slider.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    pendingHue = hueFromEvent(e);
+    if (!rafQueued) {
+      rafQueued = true;
+      requestAnimationFrame(function () { rafQueued = false; if (pendingHue !== null) applyHue(pendingHue); });
+    }
+  });
+  slider.addEventListener('pointerup', function (e) {
+    if (!dragging) return;
+    dragging = false; knob.classList.remove('drag'); applyHue(hueFromEvent(e)); pulsePreview();
+  });
+  slider.addEventListener('keydown', function (e) {
+    var h = typeof A.hue === 'number' ? A.hue : 0;
+    if (e.key === 'ArrowRight') { e.preventDefault(); applyHue(Math.min(360, h + 10)); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); applyHue(Math.max(0, h - 10)); }
+  });
+  $('ob-greyChip').addEventListener('click', function () {
+    A.hue = null; paintKnob(); paintMono(); drawPreview(); pulsePreview();
+  });
+  paintKnob(); paintMono(); loadBase(drawPreview);
+
   carNext.addEventListener('click', function () {
     if (!validCar()) return;
-    A.make = make.value.trim(); A.model = model.value.trim(); A.year = String(parseInt(year.value, 10));
+    A.make = make.value; A.model = model.value; A.year = String(parseInt(year.value, 10));
     show(6, 'fwd');
   });
 
@@ -277,9 +375,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   finish.addEventListener('click', function () {
     if (finish.disabled) return;
-    /* the single commit moment — everything lands in carbox.v1 at once */
-    var car = findCar(A.make, A.model);
-    var specs = car ? car.specs : PLACEHOLDER_SPECS;
+    /* the single commit moment — everything lands in carbox.v1 at once.
+       The Garage auto-fills its six specs from this vehicle.specs, resolved
+       from the verified specs DB for the chosen make/model/year. */
+    var hit = CarBoxCars.lookup(A.make, A.model, A.year);
+    var specs = hit ? hit.specs : PLACEHOLDER_SPECS;
     CarBox.set('account', {
       firstName: A.firstName, lastName: A.lastName, email: A.email,
       password: A.password /* prototype only — NOT secure, see note at top of file */
@@ -288,8 +388,11 @@ document.addEventListener('DOMContentLoaded', function () {
     CarBox.set('profile', { name: A.username, handle: '@' + A.tag });
     CarBox.set('vehicle', {
       name: A.make + ' ' + A.model, make: A.make, model: A.model,
-      year: parseInt(A.year, 10), mileage: 0, specs: specs
+      year: parseInt(A.year, 10), mileage: 0, specs: specs,
+      trim: hit ? hit.trim : ''
     });
+    /* the appearance choices from the customizer */
+    CarBox.set('car', { presetId: A.presetId, hue: A.hue });
     CarBox.set('onboardingComplete', true);
     show(7, 'fwd');
     var delay = reduced ? 700 : 1500;

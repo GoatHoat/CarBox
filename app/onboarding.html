@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
 <script defer src="ui.js"></script>
+<script defer src="data/cars.js"></script>
 <script defer src="onboarding.js"></script>
 <link rel="prefetch" href="index.html">
 <style>
@@ -120,6 +121,65 @@
   .ob-specnote.show{display:block}
   .ob-specnote.ok{color:var(--accent-tx,#5C7350)}
   .ob-specnote.note{color:var(--mut,#8D8D8B)}
+
+  /* Step 5 — native select styled like the app's fields */
+  .ob-selfield{position:relative}
+  .ob-selfield::after{
+    content:"";position:absolute;right:16px;top:50%;width:9px;height:9px;
+    border-right:2px solid var(--mut,#9B918F);border-bottom:2px solid var(--mut,#9B918F);
+    transform:translateY(-70%) rotate(45deg);pointer-events:none;
+  }
+  .ob-selfield select{
+    width:100%;border:none;background:transparent;outline:none;cursor:pointer;
+    font-family:'League Spartan',sans-serif;font-size:17px;font-weight:600;color:var(--tx,#141210);
+    margin-top:2px;padding:0 24px 0 0;-webkit-appearance:none;appearance:none;
+  }
+  .ob-selfield select:disabled{color:var(--mut,#AEA6A3);cursor:default}
+  .ob-selfield select.placeheld{color:var(--mut,#AEA6A3);font-weight:500}
+
+  /* Step 5 — appearance customizer (mirrors Settings' My Car) */
+  .ob-mini{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--mut,#9B918F);margin-top:14px}
+  .ob-carprev{width:280px;max-width:100%;height:auto;display:block;margin:8px auto 2px}
+  @keyframes obcpulse{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
+  .ob-carprev.pulse{animation:obcpulse .15s ease-out}
+  .ob-presetrow{
+    display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;
+    scroll-snap-type:x mandatory;margin:8px -18px 0;padding:2px 18px 6px;
+  }
+  .ob-presetrow::-webkit-scrollbar{display:none}
+  .ob-presettile{
+    flex:none;width:96px;height:60px;border-radius:14px;
+    background:var(--pill);box-shadow:var(--shadow);border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;padding:0;scroll-snap-align:start;
+  }
+  .ob-presettile img{width:80px;max-height:48px;object-fit:contain}
+  .ob-presettile.sel{box-shadow:var(--shadow),inset 0 0 0 2.5px #6E5A46}
+  .ob-huewrap{display:flex;align-items:center;gap:10px;margin-top:8px}
+  .ob-hueslider{
+    position:relative;flex:1;height:34px;border-radius:999px;cursor:pointer;touch-action:none;
+    background:linear-gradient(to right,
+      hsl(0,75%,55%),hsl(60,75%,55%),hsl(120,70%,45%),hsl(180,70%,45%),
+      hsl(240,75%,58%),hsl(300,75%,55%),hsl(360,75%,55%));
+  }
+  .ob-hueknob{
+    position:absolute;top:50%;left:0;width:26px;height:26px;border-radius:50%;
+    background:#FDFDFC;box-shadow:0 2px 8px rgba(0,0,0,.35);
+    transform:translate(-50%,-50%);pointer-events:none;
+    transition:transform .2s cubic-bezier(.3,1.4,.4,1);
+  }
+  .ob-hueknob.drag{transform:translate(-50%,-50%) scale(1.25)}
+  .ob-hueknob.off{opacity:.45}
+  .ob-greychip{
+    flex:none;background:var(--ctl,#D9D4D0);border:none;border-radius:999px;cursor:pointer;
+    padding:9px 13px;font-family:'League Spartan',sans-serif;font-size:12.5px;font-weight:700;
+    color:var(--meta,#6E6864);min-height:34px;
+  }
+  .ob-monorow{display:flex;gap:7px;margin-top:10px}
+  .ob-monoswatch{
+    flex:1;height:30px;min-width:0;border-radius:999px;border:none;cursor:pointer;padding:0;
+    box-shadow:var(--shadow),inset 0 0 0 1px rgba(0,0,0,.08);
+  }
+  .ob-monoswatch.sel{box-shadow:var(--shadow),0 0 0 2.5px #6E5A46}
 
   /* Step 6 legal */
   .ob-seg{width:100%;height:38px;margin-top:6px}
@@ -238,16 +298,28 @@
     <!-- Step 5 — Car -->
     <section class="ostep" data-step="5">
       <h2 class="serif ob-title">What do you drive?</h2>
-      <div class="ob-sub">This sets up your garage and mod picks.</div>
-      <div class="ob-field"><label for="ob-make">Make</label>
-        <input id="ob-make" type="text" list="ob-makes" autocomplete="off" autocapitalize="words" placeholder="Bugatti"></div>
-      <datalist id="ob-makes"></datalist>
-      <div class="ob-field"><label for="ob-model">Model</label>
-        <input id="ob-model" type="text" list="ob-models" autocomplete="off" autocapitalize="words" placeholder="Chiron"></div>
-      <datalist id="ob-models"></datalist>
+      <div class="ob-sub">Pick your car, then make it yours.</div>
+      <div class="ob-field ob-selfield"><label for="ob-make">Make</label>
+        <select id="ob-make" aria-label="Make"><option value="">Select make</option></select></div>
+      <div class="ob-field ob-selfield"><label for="ob-model">Model</label>
+        <select id="ob-model" aria-label="Model" disabled><option value="">Select model</option></select></div>
       <div class="ob-field"><label for="ob-year">Year</label>
-        <input id="ob-year" type="number" inputmode="numeric" placeholder="2026"></div>
+        <input id="ob-year" type="number" inputmode="numeric" min="2010" placeholder="2020"></div>
       <div class="ob-specnote" id="ob-specnote"></div>
+
+      <div class="ob-pvlabel">Make it yours</div>
+      <canvas class="ob-carprev" id="ob-carprev" aria-label="Car preview"></canvas>
+      <div class="ob-mini">BODY STYLE</div>
+      <div class="ob-presetrow" id="ob-presetRow"></div>
+      <div class="ob-mini">COLOR</div>
+      <div class="ob-huewrap">
+        <div class="ob-hueslider" id="ob-hueSlider" role="slider" aria-label="Car color" aria-valuemin="0" aria-valuemax="360" tabindex="0">
+          <span class="ob-hueknob" id="ob-hueKnob"></span>
+        </div>
+        <button type="button" class="ob-greychip" id="ob-greyChip">Original grey</button>
+      </div>
+      <div class="ob-monorow" id="ob-monoRow" role="group" aria-label="Monotone colors"></div>
+
       <div class="ob-err" id="ob-car-err"></div>
       <button class="ob-btn" id="ob-car-next" disabled>Continue</button>
     </section>
