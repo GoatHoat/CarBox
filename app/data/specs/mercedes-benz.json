@@ -1,0 +1,435 @@
+{
+  "brand": "Mercedes-Benz",
+  "entryCount": 23,
+  "unverifiedFields": 0,
+  "models": [
+    "C-Class",
+    "E-Class",
+    "GLC",
+    "GLE",
+    "CLA",
+    "GLA",
+    "G-Class",
+    "AMG GT"
+  ],
+  "sources": [
+    "0-60specs.com"
+  ],
+  "note": "Enthusiast + SUV core verified via 0-60specs.com. Base C-Class/E-Class/S-Class sedan pages 404'd (site uses model-code slugs) so only their AMG variants are in so far; C43/E43/E53/GLC43/GLC63/S-Class/GLB/SL/EQ to add later.",
+  "entries": [
+    {
+      "make": "Mercedes-Benz",
+      "model": "C-Class",
+      "generation": "W204 C63 AMG",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "C63 AMG",
+      "specs": {
+        "engine": "6.2L V8",
+        "horsepower": "451-510 hp",
+        "torque": "443-457 lb-ft",
+        "transmission": "7-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "4.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/c63-amg-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "E-Class",
+      "generation": "W212 E63 AMG",
+      "yearStart": 2010,
+      "yearEnd": 2016,
+      "trim": "E63 AMG",
+      "specs": {
+        "engine": "5.5L twin-turbo V8",
+        "horsepower": "518-577 hp",
+        "torque": "465-590 lb-ft",
+        "transmission": "7-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "3.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/e63-amg-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLC",
+      "generation": "X253/X254",
+      "yearStart": 2016,
+      "yearEnd": 2024,
+      "trim": "GLC300",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "241-255 hp",
+        "torque": "273 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "6.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/glc-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLC",
+      "generation": "X253 PHEV",
+      "yearStart": 2018,
+      "yearEnd": 2024,
+      "trim": "GLC350e/GLC300e PHEV",
+      "specs": {
+        "engine": "2.0L turbo I4 plug-in hybrid",
+        "horsepower": "313-315 hp",
+        "torque": "406-413 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/glc-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLE",
+      "generation": "W166",
+      "yearStart": 2016,
+      "yearEnd": 2018,
+      "trim": "GLE400",
+      "specs": {
+        "engine": "3.0L twin-turbo V6",
+        "horsepower": "329 hp",
+        "torque": "354 lb-ft",
+        "transmission": "7-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/gle-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLE",
+      "generation": "W166 AMG",
+      "yearStart": 2016,
+      "yearEnd": 2018,
+      "trim": "GLE450 AMG",
+      "specs": {
+        "engine": "3.0L twin-turbo V6",
+        "horsepower": "362 hp",
+        "torque": "384 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/gle-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLE",
+      "generation": "V167",
+      "yearStart": 2020,
+      "yearEnd": 2024,
+      "trim": "GLE350",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "255 hp",
+        "torque": "273 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "6.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/gle-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLE",
+      "generation": "V167",
+      "yearStart": 2020,
+      "yearEnd": 2024,
+      "trim": "GLE450",
+      "specs": {
+        "engine": "3.0L turbo I6 mild-hybrid",
+        "horsepower": "362 hp",
+        "torque": "369 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/gle-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLE",
+      "generation": "V167",
+      "yearStart": 2020,
+      "yearEnd": 2024,
+      "trim": "GLE580",
+      "specs": {
+        "engine": "4.0L twin-turbo V8 mild-hybrid",
+        "horsepower": "510 hp",
+        "torque": "538 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "3.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/gle-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "CLA",
+      "generation": "C117",
+      "yearStart": 2014,
+      "yearEnd": 2019,
+      "trim": "CLA250",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "208 hp",
+        "torque": "258 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "6.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/cla-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "CLA",
+      "generation": "C117 AMG",
+      "yearStart": 2014,
+      "yearEnd": 2019,
+      "trim": "CLA45 AMG",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "355 hp",
+        "torque": "332 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "AWD",
+        "accel0to60": "4.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/cla-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "CLA",
+      "generation": "C118",
+      "yearStart": 2020,
+      "yearEnd": 2024,
+      "trim": "CLA250",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "221 hp",
+        "torque": "258 lb-ft",
+        "transmission": "7/8-speed dual-clutch",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "5.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/cla-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLA",
+      "generation": "X156",
+      "yearStart": 2015,
+      "yearEnd": 2020,
+      "trim": "GLA250",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "208 hp",
+        "torque": "258 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "AWD",
+        "accel0to60": "6.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/gla-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLA",
+      "generation": "X156 AMG",
+      "yearStart": 2015,
+      "yearEnd": 2020,
+      "trim": "GLA45 AMG",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "355 hp",
+        "torque": "332 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "AWD",
+        "accel0to60": "4.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/gla-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "GLA",
+      "generation": "H247",
+      "yearStart": 2021,
+      "yearEnd": 2024,
+      "trim": "GLA250",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "221 hp",
+        "torque": "258 lb-ft",
+        "transmission": "8-speed dual-clutch",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "6.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/gla-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "G-Class",
+      "generation": "W463",
+      "yearStart": 2010,
+      "yearEnd": 2018,
+      "trim": "G550",
+      "specs": {
+        "engine": "5.5L V8",
+        "horsepower": "382 hp",
+        "torque": "391 lb-ft",
+        "transmission": "7-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "5.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/g-class-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "G-Class",
+      "generation": "W463 AMG",
+      "yearStart": 2013,
+      "yearEnd": 2018,
+      "trim": "G63 AMG",
+      "specs": {
+        "engine": "5.5L twin-turbo V8",
+        "horsepower": "536 hp",
+        "torque": "560 lb-ft",
+        "transmission": "7-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "5.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/g-class-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "G-Class",
+      "generation": "W463A",
+      "yearStart": 2019,
+      "yearEnd": 2024,
+      "trim": "G550",
+      "specs": {
+        "engine": "4.0L twin-turbo V8",
+        "horsepower": "416 hp",
+        "torque": "450 lb-ft",
+        "transmission": "9-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "5.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/g-class-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "AMG GT",
+      "generation": "C190",
+      "yearStart": 2016,
+      "yearEnd": 2018,
+      "trim": "GT S",
+      "specs": {
+        "engine": "4.0L twin-turbo V8",
+        "horsepower": "503 hp",
+        "torque": "479 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "3.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/amg-gt-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "AMG GT",
+      "generation": "C190",
+      "yearStart": 2018,
+      "yearEnd": 2020,
+      "trim": "GT C",
+      "specs": {
+        "engine": "4.0L twin-turbo V8",
+        "horsepower": "550 hp",
+        "torque": "502 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "3.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/amg-gt-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "AMG GT",
+      "generation": "C190",
+      "yearStart": 2018,
+      "yearEnd": 2020,
+      "trim": "GT R",
+      "specs": {
+        "engine": "4.0L twin-turbo V8",
+        "horsepower": "577 hp",
+        "torque": "516 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "3.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/amg-gt-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "AMG GT",
+      "generation": "C190",
+      "yearStart": 2020,
+      "yearEnd": 2021,
+      "trim": "GT/GT Roadster",
+      "specs": {
+        "engine": "4.0L twin-turbo V8",
+        "horsepower": "469-523 hp",
+        "torque": "465-494 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "3.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/amg-gt-0-60-times"
+    },
+    {
+      "make": "Mercedes-Benz",
+      "model": "AMG GT",
+      "generation": "C190 Black Series",
+      "yearStart": 2021,
+      "yearEnd": 2021,
+      "trim": "GT Black Series",
+      "specs": {
+        "engine": "4.0L twin-turbo V8",
+        "horsepower": "720 hp",
+        "torque": "590 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "2.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/mercedes-benz/amg-gt-0-60-times"
+    }
+  ]
+}

@@ -37,6 +37,13 @@
       "models": 5
     },
     {
+      "file": "mercedes-benz.json",
+      "brand": "Mercedes-Benz",
+      "entries": 23,
+      "unverifiedCoreFields": 0,
+      "models": 8
+    },
+    {
       "file": "nissan.json",
       "brand": "Nissan",
       "entries": 43,
@@ -66,8 +73,8 @@
     }
   ],
   "totals": {
-    "brandsBuilt": 9,
-    "entries": 351,
+    "brandsBuilt": 10,
+    "entries": 374,
     "unverifiedCoreFields": 29
   }
 }
