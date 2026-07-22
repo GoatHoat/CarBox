@@ -352,7 +352,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); location.href = 'log.html'; }
   });
   document.getElementById('gearbtn').addEventListener('click', function () {
-    location.href = 'settings.html';
+    /* cache-bust: WKWebView otherwise serves settings.html from cache without
+       hitting the dev server, so code changes never appear. Harmless in prod. */
+    location.href = 'settings.html?v=' + Date.now();
   });
 
   /* ── edit specs: sheet with the six fields, prefilled, saves to vehicle ── */

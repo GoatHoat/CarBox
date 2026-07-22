@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
      else at step 6 (default = the grey Chiron sprite, same as Settings). */
   var A = { firstName: '', lastName: '', email: '', password: '',
             username: '', tag: '', birthday: '', make: '', model: '', year: '',
-            presetId: 'sprite_chiron', hue: null };
+            presetId: 'preset_suv', hue: null };
 
   var $ = function (id) { return document.getElementById(id); };
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -236,10 +236,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ── appearance customizer — same behavior as Settings' My Car ── */
   var PRESETS = [
-    { id: 'sprite_chiron', label: 'Chiron' }, { id: 'preset_coupe', label: 'Coupe' },
-    { id: 'preset_sedan', label: 'Sedan' }, { id: 'preset_pickup', label: 'Pickup' },
-    { id: 'preset_suv', label: 'SUV' }, { id: 'preset_wagon', label: 'Wagon' },
-    { id: 'preset_muscle', label: 'Muscle' }
+    { id: 'preset_suv', label: 'SUV' },
+    { id: 'preset_suvcoupe', label: 'SUV coupe' },
+    { id: 'preset_coupe2', label: '2-door coupe' },
+    { id: 'preset_coupe4', label: '4-door coupe' },
+    { id: 'preset_sedan', label: 'Sedan' }
   ];
   var preview = $('ob-carprev'), painter = null;
   function drawPreview() { if (painter) painter.paint(preview, A.hue); }
@@ -321,9 +322,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var h = typeof A.hue === 'number' ? A.hue : 0;
     if (e.key === 'ArrowRight') { e.preventDefault(); applyHue(Math.min(360, h + 10)); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); applyHue(Math.max(0, h - 10)); }
-  });
-  $('ob-greyChip').addEventListener('click', function () {
-    A.hue = null; paintKnob(); paintMono(); drawPreview(); pulsePreview();
   });
   paintKnob(); paintMono(); loadBase(drawPreview);
 
@@ -411,6 +409,6 @@ document.addEventListener('DOMContentLoaded', function () {
     CarBox.set('onboardingComplete', true);
     show(7, 'fwd');
     var delay = reduced ? 700 : 1500;
-    setTimeout(function () { location.replace('index.html'); }, delay);
+    setTimeout(function () { location.replace('index.html?v=' + Date.now()); }, delay);
   });
 });

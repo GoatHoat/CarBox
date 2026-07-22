@@ -201,7 +201,6 @@
           <div class="hueslider" id="hueSlider" role="slider" aria-label="Car color" aria-valuemin="0" aria-valuemax="360" tabindex="0">
             <span class="hueknob" id="hueKnob"></span>
           </div>
-          <button class="greychip" id="greyChip">Original grey</button>
         </div>
         <div class="monorow" id="monoRow" role="group" aria-label="Monotone colors"></div>
         <div class="field"><div class="flab">Car name</div><input id="f-name" type="text" autocomplete="off"></div>
@@ -329,13 +328,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ════ MY CAR ════ */
   var PRESETS = [
-    { id: 'sprite_chiron', label: 'Chiron' },
-    { id: 'preset_coupe', label: 'Coupe' },
-    { id: 'preset_sedan', label: 'Sedan' },
-    { id: 'preset_pickup', label: 'Pickup' },
     { id: 'preset_suv', label: 'SUV' },
-    { id: 'preset_wagon', label: 'Wagon' },
-    { id: 'preset_muscle', label: 'Muscle' }
+    { id: 'preset_suvcoupe', label: 'SUV coupe' },
+    { id: 'preset_coupe2', label: '2-door coupe' },
+    { id: 'preset_coupe4', label: '4-door coupe' },
+    { id: 'preset_sedan', label: 'Sedan' }
   ];
   var car = CarBox.get('car') || { presetId: 'sprite_chiron', hue: null };
   var vehicle = CarBox.get('vehicle');
@@ -500,16 +497,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (e.key === 'ArrowRight') { e.preventDefault(); applyHue(Math.min(360, h + 10), true); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); applyHue(Math.max(0, h - 10), true); }
   });
-  $('greyChip').addEventListener('click', function () {
-    car.hue = null;
-    saveCar();
-    paintKnob();
-    paintMono();
-    drawPreview();
-    pulsePreview();
-    refreshHeadSprite();
-  });
-
   /* vehicle fields */
   function fillFields() {
     var units = CarBox.get('units');
@@ -715,7 +702,7 @@ document.addEventListener('DOMContentLoaded', function () {
       confirmLabel: 'Sign out',
       onConfirm: function () {
         CarBox.set('onboardingComplete', false);
-        location.replace('onboarding.html');
+        location.replace('onboarding.html?v=' + Date.now());
       }
     });
   });
@@ -728,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function () {
       onConfirm: function () {
         try { localStorage.removeItem('carbox.v1'); } catch (e) {}
         try { localStorage.removeItem('carbox_entries'); } catch (e) {}
-        location.replace('onboarding.html');
+        location.replace('onboarding.html?v=' + Date.now());
       }
     });
   });
@@ -743,7 +730,7 @@ document.addEventListener('DOMContentLoaded', function () {
       confirmLabel: 'Restart sign-up',
       onConfirm: function () {
         CarBox.set('onboardingComplete', false);
-        location.replace('onboarding.html');
+        location.replace('onboarding.html?v=' + Date.now());
       }
     });
   });
