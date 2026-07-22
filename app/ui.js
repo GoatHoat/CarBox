@@ -319,37 +319,47 @@ window.UI = (function () {
         }
         entry.painter = {
           width: w, height: h,
-          paint: function (canvas, hue) {
+          paint: function (canvas, hue, shade) {
             canvas.width = w; canvas.height = h;
             var ctx = canvas.getContext('2d');
             var out = new ImageData(new Uint8ClampedArray(d), w, h);
-            if (hue !== null && hue !== undefined && hue !== '') {
-              var lut = new Uint8Array(256 * 3);
-              var mono = typeof hue === 'string' && hue.indexOf('mono-') === 0;
-              for (var L = 0; L < 256; L++) {
-                var rgb;
-                if (mono) {
-                  /* Target tone M (black..white); apply the sprite's shading as
-                     CONTRAST around it so even light/white cars keep deep
-                     shadows and bright highlights (base luminance centers ~0.42).
-                     The old formula squeezed white into 0.84–1.0 = nearly flat. */
-                  var k = parseInt(hue.slice(5), 10) || 0;
-                  var M = 0.08 + k * (0.92 - 0.08) / 7;
-                  var l = L / 255;
-                  var v = M + (l - 0.42) * 1.15;
-                  if (v < 0) v = 0; else if (v > 1) v = 1;
-                  v = Math.round(v * 255);
-                  rgb = [v, v, v];
-                } else {
-                  rgb = hslToRgb(hue, TINT_SAT, L / 255);
+            /* shade in (0,1) darkens the body on top of the chosen colour;
+               1 (or undefined) = no darkening. */
+            var sh = (typeof shade === 'number' && shade >= 0 && shade < 1) ? shade : 1;
+            var hasHue = (hue !== null && hue !== undefined && hue !== '');
+            if (hasHue || sh < 1) {
+              var lut = null;
+              if (hasHue) {
+                lut = new Uint8Array(256 * 3);
+                var mono = typeof hue === 'string' && hue.indexOf('mono-') === 0;
+                for (var L = 0; L < 256; L++) {
+                  var rgb;
+                  if (mono) {
+                    /* Target tone M (black..white); apply the sprite's shading as
+                       CONTRAST around it so even light/white cars keep deep
+                       shadows and bright highlights (base luminance centers ~0.42). */
+                    var k = parseInt(hue.slice(5), 10) || 0;
+                    var M = 0.08 + k * (0.92 - 0.08) / 7;
+                    var l = L / 255;
+                    var v = M + (l - 0.42) * 1.15;
+                    if (v < 0) v = 0; else if (v > 1) v = 1;
+                    v = Math.round(v * 255);
+                    rgb = [v, v, v];
+                  } else {
+                    rgb = hslToRgb(hue, TINT_SAT, L / 255);
+                  }
+                  lut[L * 3] = rgb[0]; lut[L * 3 + 1] = rgb[1]; lut[L * 3 + 2] = rgb[2];
                 }
-                lut[L * 3] = rgb[0]; lut[L * 3 + 1] = rgb[1]; lut[L * 3 + 2] = rgb[2];
               }
               var od = out.data;
               for (var i = 0; i < n; i++) {
                 if (!masked[i]) continue;
                 var o = i * 4, li = lumArr[i] * 3;
-                od[o] = lut[li]; od[o + 1] = lut[li + 1]; od[o + 2] = lut[li + 2];
+                var rr, gg, bb;
+                if (lut) { rr = lut[li]; gg = lut[li + 1]; bb = lut[li + 2]; }
+                else { rr = od[o]; gg = od[o + 1]; bb = od[o + 2]; }   /* default greyscale base */
+                if (sh < 1) { rr = rr * sh; gg = gg * sh; bb = bb * sh; }
+                od[o] = rr; od[o + 1] = gg; od[o + 2] = bb;
               }
             }
             ctx.putImageData(out, 0, 0);
@@ -365,25 +375,27 @@ window.UI = (function () {
     maskImg.src = src.replace(/([^\/]+)\.png$/, 'mask_$1.png');
   }
 
-  function tintSprite(src, hue, cb) {
-    if (hue === null || hue === undefined || hue === '') { cb(src); return; }
-    var key = src + '|' + hue;
+  function tintSprite(src, hue, shade, cb) {
+    var sh = (typeof shade === 'number' && shade >= 0 && shade < 1) ? shade : 1;
+    var noHue = (hue === null || hue === undefined || hue === '');
+    if (noHue && sh === 1) { cb(src); return; }
+    var key = src + '|' + hue + '|' + sh;
     if (tintCache[key]) { cb(tintCache[key]); return; }
     spritePainter(src, function (painter) {
       try {
         var c = document.createElement('canvas');
-        painter.paint(c, hue);
+        painter.paint(c, hue, sh);
         var url = c.toDataURL('image/png');
         tintCache[key] = url;
         cb(url);
       } catch (e) { cb(src); }
     });
   }
-  /* apply the saved {presetId, hue} to any <img> that shows the car */
+  /* apply the saved {presetId, hue, shade} to any <img> that shows the car */
   function carSprite(imgEl) {
     if (!imgEl || !window.CarBox) return;
     var car = CarBox.get('car') || { presetId: 'sprite_chiron', hue: null };
-    tintSprite('assets/' + car.presetId + '.png', car.hue, function (url) { imgEl.src = url; });
+    tintSprite('assets/' + car.presetId + '.png', car.hue, car.shade, function (url) { imgEl.src = url; });
   }
 
   /* ── theme: resolve system + follow live changes ── */

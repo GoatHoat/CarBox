@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
      else at step 6 (default = the grey Chiron sprite, same as Settings). */
   var A = { firstName: '', lastName: '', email: '', password: '',
             username: '', tag: '', birthday: '', make: '', model: '', year: '',
-            presetId: 'preset_suv', hue: null };
+            presetId: 'body_suv', hue: null, shade: 1 };
 
   var $ = function (id) { return document.getElementById(id); };
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -236,14 +236,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ── appearance customizer — same behavior as Settings' My Car ── */
   var PRESETS = [
-    { id: 'preset_suv', label: 'SUV' },
-    { id: 'preset_suvcoupe', label: 'SUV coupe' },
-    { id: 'preset_coupe2', label: '2-door coupe' },
-    { id: 'preset_coupe4', label: '4-door coupe' },
-    { id: 'preset_sedan', label: 'Sedan' }
+    { id: 'body_suv', label: 'SUV' },
+    { id: 'body_suvcoupe', label: 'SUV coupe' },
+    { id: 'body_coupe2', label: '2-door coupe' },
+    { id: 'body_coupe4', label: '4-door coupe' },
+    { id: 'body_sedan', label: 'Sedan' }
   ];
+  var SHADES = [1, 0.82, 0.64, 0.47, 0.32];   /* darkness levels for the DARKNESS row */
   var preview = $('ob-carprev'), painter = null;
-  function drawPreview() { if (painter) painter.paint(preview, A.hue); }
+  function drawPreview() { if (painter) painter.paint(preview, A.hue, A.shade); }
   function loadBase(cb) {
     UI.spritePainter('assets/' + A.presetId + '.png', function (p) { painter = p; if (cb) cb(); });
   }
@@ -295,6 +296,26 @@ document.addEventListener('DOMContentLoaded', function () {
       monoRow.appendChild(sw);
     }
   })();
+  /* DARKNESS row: darkens the chosen colour toward black (A.shade multiplier) */
+  var shadeRow = $('ob-shadeRow');
+  function paintShade() {
+    shadeRow.querySelectorAll('.ob-monoswatch').forEach(function (sw, k) {
+      sw.classList.toggle('sel', (A.shade || 1) === SHADES[k]);
+    });
+  }
+  SHADES.forEach(function (s, k) {
+    var sw = document.createElement('button');
+    sw.type = 'button'; sw.className = 'ob-monoswatch';
+    var v = Math.round(s * 200);
+    sw.style.background = 'rgb(' + v + ',' + v + ',' + v + ')';
+    sw.setAttribute('aria-label', k === 0 ? 'No darkening' : 'Darker level ' + k);
+    sw.addEventListener('click', function () {
+      A.shade = s; paintShade(); drawPreview(); pulsePreview();
+    });
+    shadeRow.appendChild(sw);
+  });
+  paintShade();
+
   var dragging = false, pendingHue = null, rafQueued = false;
   function hueFromEvent(e) {
     var r = slider.getBoundingClientRect();
@@ -390,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function () {
       trim: hit ? hit.trim : ''
     });
     /* the appearance choices from the customizer */
-    CarBox.set('car', { presetId: A.presetId, hue: A.hue });
+    CarBox.set('car', { presetId: A.presetId, hue: A.hue, shade: A.shade });
 
     /* fresh account: a real new signup starts with an empty garage — clear the
        Bugatti demo activity so the whole app reflects THIS car, not the seeds.

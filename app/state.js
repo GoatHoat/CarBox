@@ -19,7 +19,7 @@ window.CarBox = (function () {
         drivetrain: 'AWD', accel: '0-60 mph: ~2.4 s'
       }
     },
-    car: { presetId: 'sprite_chiron', hue: null }, /* hue null = original grey */
+    car: { presetId: 'sprite_chiron', hue: null, shade: 1 }, /* hue null = greyscale base; shade 1 = no darkening */
     profile: { name: 'Vojtech13', handle: '@Vojtech.Arkes' },
     account: null,          /* {firstName,lastName,email,password} — see onboarding note */
     birthday: null,         /* ISO yyyy-mm-dd */

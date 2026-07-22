@@ -203,6 +203,8 @@
           </div>
         </div>
         <div class="monorow" id="monoRow" role="group" aria-label="Monotone colors"></div>
+        <div class="sec-mini">DARKNESS</div>
+        <div class="monorow" id="shadeRow" role="group" aria-label="Darkness"></div>
         <div class="field"><div class="flab">Car name</div><input id="f-name" type="text" autocomplete="off"></div>
         <div class="fieldrow">
           <div class="field"><div class="flab">Year</div><input id="f-year" inputmode="numeric" autocomplete="off"></div>
@@ -328,13 +330,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ════ MY CAR ════ */
   var PRESETS = [
-    { id: 'preset_suv', label: 'SUV' },
-    { id: 'preset_suvcoupe', label: 'SUV coupe' },
-    { id: 'preset_coupe2', label: '2-door coupe' },
-    { id: 'preset_coupe4', label: '4-door coupe' },
-    { id: 'preset_sedan', label: 'Sedan' }
+    { id: 'body_suv', label: 'SUV' },
+    { id: 'body_suvcoupe', label: 'SUV coupe' },
+    { id: 'body_coupe2', label: '2-door coupe' },
+    { id: 'body_coupe4', label: '4-door coupe' },
+    { id: 'body_sedan', label: 'Sedan' }
   ];
-  var car = CarBox.get('car') || { presetId: 'sprite_chiron', hue: null };
+  var SHADES = [1, 0.82, 0.64, 0.47, 0.32];   /* darkness levels for the SHADE row */
+  var car = CarBox.get('car') || { presetId: 'body_suv', hue: null, shade: 1 };
+  if (typeof car.shade !== 'number') car.shade = 1;
   var vehicle = CarBox.get('vehicle');
 
   var mycar = $('mycar'), head = $('mycarHead'), body = $('mycarBody');
@@ -348,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   /* mask-based painter from ui.js: only body pixels recolor, shading kept */
   function drawPreview() {
-    if (painter) painter.paint(preview, car.hue);
+    if (painter) painter.paint(preview, car.hue, car.shade);
   }
   function loadBase(cb) {
     UI.spritePainter('assets/' + car.presetId + '.png', function (p) {
@@ -446,6 +450,32 @@ document.addEventListener('DOMContentLoaded', function () {
       monoRow.appendChild(sw);
     }
   })();
+  /* DARKNESS row: darkens the chosen colour toward black (car.shade multiplier) */
+  var shadeRow = $('shadeRow');
+  function paintShade() {
+    shadeRow.querySelectorAll('.monoswatch').forEach(function (sw, k) {
+      sw.classList.toggle('sel', (car.shade || 1) === SHADES[k]);
+    });
+  }
+  SHADES.forEach(function (s, k) {
+    var sw = document.createElement('button');
+    sw.type = 'button';
+    sw.className = 'monoswatch';
+    var v = Math.round(s * 200);
+    sw.style.background = 'rgb(' + v + ',' + v + ',' + v + ')';
+    sw.setAttribute('aria-label', k === 0 ? 'No darkening' : 'Darker level ' + k);
+    sw.addEventListener('click', function () {
+      car.shade = s;
+      saveCar();
+      paintShade();
+      drawPreview();
+      pulsePreview();
+      refreshHeadSprite();
+    });
+    shadeRow.appendChild(sw);
+  });
+  paintShade();
+
   var dragging = false, pendingHue = null, rafQueued = false;
   function hueFromEvent(e) {
     var r = slider.getBoundingClientRect();
