@@ -1,0 +1,1175 @@
+{
+  "brand": "Ford",
+  "entryCount": 64,
+  "unverifiedFields": 3,
+  "models": [
+    "Mustang",
+    "F-150",
+    "Explorer",
+    "Escape",
+    "Focus",
+    "Bronco",
+    "Ranger",
+    "Edge",
+    "Maverick",
+    "Fusion"
+  ],
+  "sources": [
+    "0-60specs.com"
+  ],
+  "note": "Core 6 verified via 0-60specs.com. Nulls are Mustang GTD torque + Escape hybrid/PHEV torque the source did not state. Fiesta/Fiesta ST, Taurus/SHO, Expedition, Bronco Sport, Mach-E to add later.",
+  "entries": [
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S197",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "V6",
+      "specs": {
+        "engine": "3.7L V6",
+        "horsepower": "305 hp",
+        "torque": "280 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "5.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S197",
+      "yearStart": 2011,
+      "yearEnd": 2014,
+      "trim": "GT",
+      "specs": {
+        "engine": "5.0L V8",
+        "horsepower": "420 hp",
+        "torque": "390 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "4.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S197 Boss 302",
+      "yearStart": 2012,
+      "yearEnd": 2013,
+      "trim": "Boss 302",
+      "specs": {
+        "engine": "5.0L V8",
+        "horsepower": "444 hp",
+        "torque": "380 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "RWD",
+        "accel0to60": "4.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S197 GT500",
+      "yearStart": 2011,
+      "yearEnd": 2012,
+      "trim": "Shelby GT500",
+      "specs": {
+        "engine": "5.4L supercharged V8",
+        "horsepower": "550 hp",
+        "torque": "510 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "RWD",
+        "accel0to60": "4.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S197 GT500",
+      "yearStart": 2013,
+      "yearEnd": 2014,
+      "trim": "Shelby GT500",
+      "specs": {
+        "engine": "5.8L supercharged V8",
+        "horsepower": "662 hp",
+        "torque": "631 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "RWD",
+        "accel0to60": "3.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S550",
+      "yearStart": 2015,
+      "yearEnd": 2017,
+      "trim": "V6",
+      "specs": {
+        "engine": "3.7L V6",
+        "horsepower": "300 hp",
+        "torque": "280 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "5.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S550 EcoBoost",
+      "yearStart": 2015,
+      "yearEnd": 2023,
+      "trim": "EcoBoost",
+      "specs": {
+        "engine": "2.3L turbo I4",
+        "horsepower": "310-330 hp",
+        "torque": "320-350 lb-ft",
+        "transmission": "6-speed manual / 10-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "5.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S550 GT",
+      "yearStart": 2015,
+      "yearEnd": 2023,
+      "trim": "GT",
+      "specs": {
+        "engine": "5.0L V8",
+        "horsepower": "435-480 hp",
+        "torque": "400-420 lb-ft",
+        "transmission": "6-speed manual / 10-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "4.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S550 GT350",
+      "yearStart": 2016,
+      "yearEnd": 2020,
+      "trim": "Shelby GT350/R",
+      "specs": {
+        "engine": "5.2L V8",
+        "horsepower": "526 hp",
+        "torque": "429 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "RWD",
+        "accel0to60": "3.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S550 GT500",
+      "yearStart": 2020,
+      "yearEnd": 2022,
+      "trim": "Shelby GT500",
+      "specs": {
+        "engine": "5.2L supercharged V8",
+        "horsepower": "760 hp",
+        "torque": "625 lb-ft",
+        "transmission": "7-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "3.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S550 Mach 1",
+      "yearStart": 2021,
+      "yearEnd": 2023,
+      "trim": "Mach 1",
+      "specs": {
+        "engine": "5.0L V8",
+        "horsepower": "480 hp",
+        "torque": "420 lb-ft",
+        "transmission": "6-speed manual / 10-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "4.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S650 EcoBoost",
+      "yearStart": 2024,
+      "yearEnd": 2025,
+      "trim": "EcoBoost",
+      "specs": {
+        "engine": "2.3L turbo I4",
+        "horsepower": "315-330 hp",
+        "torque": "350 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "4.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S650 GT",
+      "yearStart": 2024,
+      "yearEnd": 2025,
+      "trim": "GT",
+      "specs": {
+        "engine": "5.0L V8",
+        "horsepower": "480-500 hp",
+        "torque": "415-418 lb-ft",
+        "transmission": "6-speed manual / 10-speed automatic",
+        "drivetrain": "RWD",
+        "accel0to60": "3.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Mustang",
+      "generation": "S650 GTD",
+      "yearStart": 2025,
+      "yearEnd": 2025,
+      "trim": "GTD",
+      "specs": {
+        "engine": "5.2L supercharged V8",
+        "horsepower": "800 hp",
+        "torque": null,
+        "transmission": "8-speed dual-clutch",
+        "drivetrain": "RWD",
+        "accel0to60": "2.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/mustang-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "12th gen",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "3.7 V6",
+      "specs": {
+        "engine": "3.7L V6",
+        "horsepower": "302 hp",
+        "torque": "278 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "7.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "12th gen",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "5.0 V8",
+      "specs": {
+        "engine": "5.0L V8",
+        "horsepower": "360 hp",
+        "torque": "380 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "6.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "12th gen",
+      "yearStart": 2011,
+      "yearEnd": 2014,
+      "trim": "3.5 EcoBoost",
+      "specs": {
+        "engine": "3.5L twin-turbo V6",
+        "horsepower": "365 hp",
+        "torque": "420 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "6.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "12th gen",
+      "yearStart": 2010,
+      "yearEnd": 2014,
+      "trim": "6.2 V8",
+      "specs": {
+        "engine": "6.2L V8",
+        "horsepower": "411 hp",
+        "torque": "434 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "6.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "13th gen",
+      "yearStart": 2015,
+      "yearEnd": 2020,
+      "trim": "2.7 EcoBoost",
+      "specs": {
+        "engine": "2.7L twin-turbo V6",
+        "horsepower": "325 hp",
+        "torque": "375 lb-ft",
+        "transmission": "6/10-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "6.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "13th gen",
+      "yearStart": 2015,
+      "yearEnd": 2020,
+      "trim": "3.5 EcoBoost",
+      "specs": {
+        "engine": "3.5L twin-turbo V6",
+        "horsepower": "365 hp",
+        "torque": "420 lb-ft",
+        "transmission": "6/10-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "5.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "13th gen",
+      "yearStart": 2015,
+      "yearEnd": 2020,
+      "trim": "5.0 V8",
+      "specs": {
+        "engine": "5.0L V8",
+        "horsepower": "385-395 hp",
+        "torque": "387-410 lb-ft",
+        "transmission": "6/10-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "6.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "13th gen Raptor",
+      "yearStart": 2017,
+      "yearEnd": 2020,
+      "trim": "Raptor",
+      "specs": {
+        "engine": "3.5L twin-turbo V6",
+        "horsepower": "450 hp",
+        "torque": "510 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "5.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "14th gen",
+      "yearStart": 2021,
+      "yearEnd": 2024,
+      "trim": "2.7 EcoBoost",
+      "specs": {
+        "engine": "2.7L twin-turbo V6",
+        "horsepower": "325 hp",
+        "torque": "400 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "6.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "14th gen",
+      "yearStart": 2021,
+      "yearEnd": 2024,
+      "trim": "3.5 EcoBoost",
+      "specs": {
+        "engine": "3.5L twin-turbo V6",
+        "horsepower": "400 hp",
+        "torque": "500 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "5.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "14th gen PowerBoost",
+      "yearStart": 2021,
+      "yearEnd": 2024,
+      "trim": "PowerBoost Hybrid",
+      "specs": {
+        "engine": "3.5L twin-turbo V6 hybrid",
+        "horsepower": "430 hp",
+        "torque": "570 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "5.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "14th gen",
+      "yearStart": 2021,
+      "yearEnd": 2024,
+      "trim": "5.0 V8",
+      "specs": {
+        "engine": "5.0L V8",
+        "horsepower": "400 hp",
+        "torque": "410 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "6.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "14th gen Raptor",
+      "yearStart": 2021,
+      "yearEnd": 2024,
+      "trim": "Raptor",
+      "specs": {
+        "engine": "3.5L twin-turbo V6",
+        "horsepower": "450 hp",
+        "torque": "510 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "5.4 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "14th gen Raptor R",
+      "yearStart": 2023,
+      "yearEnd": 2024,
+      "trim": "Raptor R",
+      "specs": {
+        "engine": "5.2L supercharged V8",
+        "horsepower": "700-720 hp",
+        "torque": "640 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "3.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "Lightning",
+      "yearStart": 2022,
+      "yearEnd": 2024,
+      "trim": "Lightning (EV)",
+      "specs": {
+        "engine": "dual-motor electric",
+        "horsepower": "452-580 hp",
+        "torque": "775 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "4.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/f-150-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Explorer",
+      "generation": "U502",
+      "yearStart": 2011,
+      "yearEnd": 2019,
+      "trim": "3.5 V6",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "290 hp",
+        "torque": "255 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/explorer-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Explorer",
+      "generation": "U502 Sport",
+      "yearStart": 2013,
+      "yearEnd": 2019,
+      "trim": "Sport/Platinum EcoBoost",
+      "specs": {
+        "engine": "3.5L twin-turbo V6",
+        "horsepower": "365 hp",
+        "torque": "350 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/explorer-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Explorer",
+      "generation": "U502",
+      "yearStart": 2016,
+      "yearEnd": 2019,
+      "trim": "2.3 EcoBoost",
+      "specs": {
+        "engine": "2.3L turbo I4",
+        "horsepower": "280 hp",
+        "torque": "310 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/explorer-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Explorer",
+      "generation": "U625",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "2.3 EcoBoost",
+      "specs": {
+        "engine": "2.3L turbo I4",
+        "horsepower": "300 hp",
+        "torque": "310 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "RWD/AWD",
+        "accel0to60": "6.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/explorer-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Explorer",
+      "generation": "U625 ST",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "ST",
+      "specs": {
+        "engine": "3.0L twin-turbo V6",
+        "horsepower": "400 hp",
+        "torque": "415 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/explorer-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Explorer",
+      "generation": "U625 Hybrid",
+      "yearStart": 2020,
+      "yearEnd": 2024,
+      "trim": "Hybrid",
+      "specs": {
+        "engine": "3.3L V6 hybrid",
+        "horsepower": "318 hp",
+        "torque": "322 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "7.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/explorer-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Escape",
+      "generation": "3rd gen",
+      "yearStart": 2013,
+      "yearEnd": 2019,
+      "trim": "2.5 I4",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "168 hp",
+        "torque": "170 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "9.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/escape-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Escape",
+      "generation": "3rd gen",
+      "yearStart": 2013,
+      "yearEnd": 2019,
+      "trim": "1.6 EcoBoost",
+      "specs": {
+        "engine": "1.6L turbo I4",
+        "horsepower": "178 hp",
+        "torque": "184 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/escape-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Escape",
+      "generation": "3rd gen",
+      "yearStart": 2013,
+      "yearEnd": 2019,
+      "trim": "2.0 EcoBoost",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "240-245 hp",
+        "torque": "270-275 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/escape-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Escape",
+      "generation": "4th gen",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "1.5 EcoBoost",
+      "specs": {
+        "engine": "1.5L turbo I3",
+        "horsepower": "181 hp",
+        "torque": "190 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "8.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/escape-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Escape",
+      "generation": "4th gen",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "2.0 EcoBoost",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "250 hp",
+        "torque": "280 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/escape-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Escape",
+      "generation": "4th gen Hybrid",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "Hybrid",
+      "specs": {
+        "engine": "2.5L I4 hybrid",
+        "horsepower": "192-200 hp",
+        "torque": null,
+        "transmission": "CVT",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/escape-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Escape",
+      "generation": "4th gen PHEV",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "Plug-in Hybrid",
+      "specs": {
+        "engine": "2.5L I4 plug-in hybrid",
+        "horsepower": "210-221 hp",
+        "torque": null,
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "7.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/escape-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Focus",
+      "generation": "Mk3",
+      "yearStart": 2012,
+      "yearEnd": 2018,
+      "trim": "SE/Titanium",
+      "specs": {
+        "engine": "2.0L I4",
+        "horsepower": "160 hp",
+        "torque": "146 lb-ft",
+        "transmission": "5-speed manual / 6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "7.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/focus-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Focus",
+      "generation": "Mk3 ST",
+      "yearStart": 2015,
+      "yearEnd": 2018,
+      "trim": "ST",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "252 hp",
+        "torque": "270 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "FWD",
+        "accel0to60": "6.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/focus-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Focus",
+      "generation": "Mk3 RS",
+      "yearStart": 2016,
+      "yearEnd": 2018,
+      "trim": "RS",
+      "specs": {
+        "engine": "2.3L turbo I4",
+        "horsepower": "350 hp",
+        "torque": "350 lb-ft",
+        "transmission": "6-speed manual",
+        "drivetrain": "AWD",
+        "accel0to60": "4.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/focus-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Focus",
+      "generation": "Mk3 Electric",
+      "yearStart": 2012,
+      "yearEnd": 2016,
+      "trim": "Electric",
+      "specs": {
+        "engine": "electric",
+        "horsepower": "143 hp",
+        "torque": "184 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "FWD",
+        "accel0to60": "10.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/focus-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Bronco",
+      "generation": "6th gen",
+      "yearStart": 2021,
+      "yearEnd": 2025,
+      "trim": "2.3 EcoBoost",
+      "specs": {
+        "engine": "2.3L turbo I4",
+        "horsepower": "300 hp",
+        "torque": "325 lb-ft",
+        "transmission": "7-speed manual / 10-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "6.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/bronco-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Bronco",
+      "generation": "6th gen",
+      "yearStart": 2021,
+      "yearEnd": 2025,
+      "trim": "2.7 EcoBoost",
+      "specs": {
+        "engine": "2.7L twin-turbo V6",
+        "horsepower": "330 hp",
+        "torque": "415 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "6.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/bronco-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Bronco",
+      "generation": "6th gen Raptor",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "Raptor",
+      "specs": {
+        "engine": "3.0L twin-turbo V6",
+        "horsepower": "418 hp",
+        "torque": "440 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "5.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/bronco-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Ranger",
+      "generation": "4th gen",
+      "yearStart": 2019,
+      "yearEnd": 2023,
+      "trim": "2.3 EcoBoost",
+      "specs": {
+        "engine": "2.3L turbo I4",
+        "horsepower": "270 hp",
+        "torque": "310 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "RWD/4x4",
+        "accel0to60": "6.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/ranger-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Ranger",
+      "generation": "4th gen",
+      "yearStart": 2024,
+      "yearEnd": 2025,
+      "trim": "2.7 EcoBoost",
+      "specs": {
+        "engine": "2.7L twin-turbo V6",
+        "horsepower": "315 hp",
+        "torque": "400 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "5.6 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/ranger-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Ranger",
+      "generation": "4th gen Raptor",
+      "yearStart": 2024,
+      "yearEnd": 2025,
+      "trim": "Raptor",
+      "specs": {
+        "engine": "3.0L twin-turbo V6",
+        "horsepower": "405 hp",
+        "torque": "430 lb-ft",
+        "transmission": "10-speed automatic",
+        "drivetrain": "4x4",
+        "accel0to60": "5.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/ranger-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Edge",
+      "generation": "CD3",
+      "yearStart": 2011,
+      "yearEnd": 2014,
+      "trim": "3.5 V6",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "285 hp",
+        "torque": "253 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/edge-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Edge",
+      "generation": "CD3 Sport",
+      "yearStart": 2011,
+      "yearEnd": 2014,
+      "trim": "Sport",
+      "specs": {
+        "engine": "3.7L V6",
+        "horsepower": "305 hp",
+        "torque": "280 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "6.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/edge-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Edge",
+      "generation": "CD4",
+      "yearStart": 2015,
+      "yearEnd": 2024,
+      "trim": "2.0 EcoBoost",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "245-250 hp",
+        "torque": "275-280 lb-ft",
+        "transmission": "6/8-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "7.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/edge-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Edge",
+      "generation": "CD4 Sport/ST",
+      "yearStart": 2015,
+      "yearEnd": 2024,
+      "trim": "Sport/ST",
+      "specs": {
+        "engine": "2.7L twin-turbo V6",
+        "horsepower": "315-335 hp",
+        "torque": "350-380 lb-ft",
+        "transmission": "6/8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.7 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/edge-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Maverick",
+      "generation": "1st gen Hybrid",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "Hybrid",
+      "specs": {
+        "engine": "2.5L I4 hybrid",
+        "horsepower": "191 hp",
+        "torque": "155 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "7.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/maverick-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Maverick",
+      "generation": "1st gen",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "2.0 EcoBoost",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "250 hp",
+        "torque": "277 lb-ft",
+        "transmission": "8-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/maverick-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Fusion",
+      "generation": "1st gen",
+      "yearStart": 2010,
+      "yearEnd": 2012,
+      "trim": "2.5 I4",
+      "specs": {
+        "engine": "2.5L I4",
+        "horsepower": "175 hp",
+        "torque": "172 lb-ft",
+        "transmission": "6-speed manual / 6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "8.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/fusion-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Fusion",
+      "generation": "1st gen",
+      "yearStart": 2010,
+      "yearEnd": 2012,
+      "trim": "3.5 V6",
+      "specs": {
+        "engine": "3.5L V6",
+        "horsepower": "263 hp",
+        "torque": "249 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD/AWD",
+        "accel0to60": "6.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/fusion-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Fusion",
+      "generation": "2nd gen",
+      "yearStart": 2013,
+      "yearEnd": 2020,
+      "trim": "EcoBoost (1.5/1.6)",
+      "specs": {
+        "engine": "1.5-1.6L turbo I4",
+        "horsepower": "178-181 hp",
+        "torque": "184-185 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "FWD",
+        "accel0to60": "8.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/fusion-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Fusion",
+      "generation": "2nd gen",
+      "yearStart": 2013,
+      "yearEnd": 2020,
+      "trim": "2.0 EcoBoost Titanium",
+      "specs": {
+        "engine": "2.0L turbo I4",
+        "horsepower": "240 hp",
+        "torque": "270 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "7.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/fusion-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Fusion",
+      "generation": "2nd gen Sport",
+      "yearStart": 2017,
+      "yearEnd": 2018,
+      "trim": "Sport",
+      "specs": {
+        "engine": "2.7L twin-turbo V6",
+        "horsepower": "325 hp",
+        "torque": "380 lb-ft",
+        "transmission": "6-speed automatic",
+        "drivetrain": "AWD",
+        "accel0to60": "5.1 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/fusion-0-60-times"
+    },
+    {
+      "make": "Ford",
+      "model": "Fusion",
+      "generation": "2nd gen Hybrid",
+      "yearStart": 2013,
+      "yearEnd": 2020,
+      "trim": "Hybrid/Energi",
+      "specs": {
+        "engine": "2.0L I4 hybrid",
+        "horsepower": "188 hp",
+        "torque": "129 lb-ft",
+        "transmission": "CVT",
+        "drivetrain": "FWD",
+        "accel0to60": "8.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/ford/fusion-0-60-times"
+    }
+  ]
+}

@@ -9,6 +9,13 @@
       "models": 7
     },
     {
+      "file": "ford.json",
+      "brand": "Ford",
+      "entries": 64,
+      "unverifiedCoreFields": 3,
+      "models": 10
+    },
+    {
       "file": "honda.json",
       "brand": "Honda",
       "entries": 47,
@@ -52,8 +59,8 @@
     }
   ],
   "totals": {
-    "brandsBuilt": 7,
-    "entries": 258,
-    "unverifiedCoreFields": 26
+    "brandsBuilt": 8,
+    "entries": 322,
+    "unverifiedCoreFields": 29
   }
 }
