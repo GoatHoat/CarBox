@@ -153,6 +153,8 @@
     padding:11px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:16px;
     box-shadow:var(--shadow);
   }
+  .sheetbtn.danger{background:#B3402F}
+  .sheetbtn.ghost{background:transparent;color:var(--tx,#141210);box-shadow:none;margin-top:4px}
 
   @media (prefers-reduced-motion: reduce){
     .mycar-body,.mchead-chev,.seg3 .segpill{transition-duration:.01ms}
@@ -667,8 +669,56 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   });
-  bindRow('signout', function () { UI.toast('Available when accounts launch'); });
-  bindRow('delacct', function () { UI.toast('Available when accounts launch'); });
+  /* confirm sheet: a message + a primary action + Cancel. No real backend yet,
+     so these operate on the local carbox.v1 store and route back to signup. */
+  function confirmSheet(opts) {
+    var sh = UI.sheet({
+      title: opts.title,
+      label: opts.title,
+      build: function (bodyEl) {
+        var note = document.createElement('div');
+        note.className = 'sheet-note';
+        note.style.marginTop = '0';
+        note.textContent = opts.message;
+        bodyEl.appendChild(note);
+        var go = document.createElement('button');
+        go.className = 'sheetbtn' + (opts.danger ? ' danger' : '');
+        go.textContent = opts.confirmLabel;
+        go.addEventListener('click', function () { sh.close(); opts.onConfirm(); });
+        bodyEl.appendChild(go);
+        var cancel = document.createElement('button');
+        cancel.className = 'sheetbtn ghost';
+        cancel.textContent = 'Cancel';
+        cancel.addEventListener('click', function () { sh.close(); });
+        bodyEl.appendChild(cancel);
+      }
+    });
+  }
+
+  bindRow('signout', function () {
+    confirmSheet({
+      title: 'Sign out',
+      message: 'You’ll be taken back to the sign-up screen. Your garage data stays on this device and is replaced when you finish signing up again.',
+      confirmLabel: 'Sign out',
+      onConfirm: function () {
+        CarBox.set('onboardingComplete', false);
+        location.replace('onboarding.html');
+      }
+    });
+  });
+  bindRow('delacct', function () {
+    confirmSheet({
+      title: 'Delete account',
+      message: 'This permanently erases your account, car, and every logged entry on this device. This can’t be undone.',
+      confirmLabel: 'Delete everything',
+      danger: true,
+      onConfirm: function () {
+        try { localStorage.removeItem('carbox.v1'); } catch (e) {}
+        try { localStorage.removeItem('carbox_entries'); } catch (e) {}
+        location.replace('onboarding.html');
+      }
+    });
+  });
 
   /* ════ CARBOX PRO ════ */
   function paintPlan() {
