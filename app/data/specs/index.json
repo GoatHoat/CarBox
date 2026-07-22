@@ -37,6 +37,13 @@
       "models": 9
     },
     {
+      "file": "tesla.json",
+      "brand": "Tesla",
+      "entries": 14,
+      "unverifiedCoreFields": 7,
+      "models": 4
+    },
+    {
       "file": "toyota.json",
       "brand": "Toyota",
       "entries": 68,
@@ -45,8 +52,8 @@
     }
   ],
   "totals": {
-    "brandsBuilt": 6,
-    "entries": 244,
-    "unverifiedCoreFields": 19
+    "brandsBuilt": 7,
+    "entries": 258,
+    "unverifiedCoreFields": 26
   }
 }

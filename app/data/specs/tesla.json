@@ -1,0 +1,269 @@
+{
+  "brand": "Tesla",
+  "entryCount": 14,
+  "unverifiedFields": 7,
+  "models": [
+    "Model 3",
+    "Model Y",
+    "Model S",
+    "Model X"
+  ],
+  "sources": [
+    "0-60specs.com"
+  ],
+  "note": "0-60 times are tested/verified. Tesla does NOT officially publish horsepower/torque for several dual-motor variants, and third-party figures conflict, so hp/torque are NULL where not confidently verifiable (counted as unverified) rather than guessed. Cybertruck not included.",
+  "entries": [
+    {
+      "make": "Tesla",
+      "model": "Model 3",
+      "generation": "1st gen",
+      "yearStart": 2017,
+      "yearEnd": 2023,
+      "trim": "Long Range RWD",
+      "specs": {
+        "engine": "electric (75-79 kWh)",
+        "horsepower": "258 hp",
+        "torque": "317 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "RWD",
+        "accel0to60": "4.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-3-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model 3",
+      "generation": "1st gen",
+      "yearStart": 2018,
+      "yearEnd": 2024,
+      "trim": "Long Range Dual Motor",
+      "specs": {
+        "engine": "dual-motor electric",
+        "horsepower": "346 hp",
+        "torque": "389 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "4.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-3-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model 3",
+      "generation": "1st gen",
+      "yearStart": 2018,
+      "yearEnd": 2023,
+      "trim": "Performance",
+      "specs": {
+        "engine": "dual-motor electric",
+        "horsepower": "450 hp",
+        "torque": "471 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "3.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-3-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model 3",
+      "generation": "1st gen",
+      "yearStart": 2019,
+      "yearEnd": 2024,
+      "trim": "Standard Range Plus / RWD",
+      "specs": {
+        "engine": "electric",
+        "horsepower": "283 hp",
+        "torque": "307 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "RWD",
+        "accel0to60": "5.3 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-3-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model 3",
+      "generation": "Highland (refresh)",
+      "yearStart": 2024,
+      "yearEnd": 2025,
+      "trim": "Performance",
+      "specs": {
+        "engine": "dual-motor electric (79.7 kWh)",
+        "horsepower": "510 hp",
+        "torque": "554 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "2.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-3-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model Y",
+      "generation": "1st gen",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "trim": "Long Range Dual Motor",
+      "specs": {
+        "engine": "dual-motor electric (~80 kWh)",
+        "horsepower": null,
+        "torque": null,
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "4.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-y-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model Y",
+      "generation": "1st gen",
+      "yearStart": 2020,
+      "yearEnd": 2022,
+      "trim": "Performance",
+      "specs": {
+        "engine": "dual-motor electric",
+        "horsepower": "456 hp",
+        "torque": "497 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "3.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-y-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model S",
+      "generation": "1st gen",
+      "yearStart": 2012,
+      "yearEnd": 2016,
+      "trim": "60/75/85 RWD",
+      "specs": {
+        "engine": "electric (60-85 kWh)",
+        "horsepower": "302-315 hp",
+        "torque": "317-325 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "RWD",
+        "accel0to60": "5.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-s-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model S",
+      "generation": "1st gen Dual Motor",
+      "yearStart": 2014,
+      "yearEnd": 2020,
+      "trim": "85D/90D/100D",
+      "specs": {
+        "engine": "dual-motor electric",
+        "horsepower": null,
+        "torque": null,
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "3.9 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-s-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model S",
+      "generation": "1st gen Performance",
+      "yearStart": 2015,
+      "yearEnd": 2020,
+      "trim": "P90D/P100D Ludicrous",
+      "specs": {
+        "engine": "dual-motor electric",
+        "horsepower": "762 hp",
+        "torque": "713 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "2.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-s-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model S",
+      "generation": "Plaid",
+      "yearStart": 2021,
+      "yearEnd": 2025,
+      "trim": "Plaid",
+      "specs": {
+        "engine": "tri-motor electric",
+        "horsepower": "1020 hp",
+        "torque": "1050 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "2.0 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-s-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model X",
+      "generation": "1st gen",
+      "yearStart": 2016,
+      "yearEnd": 2021,
+      "trim": "75D/90D/100D",
+      "specs": {
+        "engine": "dual-motor electric",
+        "horsepower": null,
+        "torque": null,
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "4.8 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-x-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model X",
+      "generation": "1st gen Performance",
+      "yearStart": 2016,
+      "yearEnd": 2020,
+      "trim": "P90D/P100D Ludicrous",
+      "specs": {
+        "engine": "dual-motor electric",
+        "horsepower": "762 hp",
+        "torque": null,
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "3.2 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-x-0-60-times"
+    },
+    {
+      "make": "Tesla",
+      "model": "Model X",
+      "generation": "Plaid",
+      "yearStart": 2022,
+      "yearEnd": 2025,
+      "trim": "Plaid",
+      "specs": {
+        "engine": "tri-motor electric",
+        "horsepower": "1020 hp",
+        "torque": "1050 lb-ft",
+        "transmission": "single-speed",
+        "drivetrain": "AWD",
+        "accel0to60": "2.5 s"
+      },
+      "extendedSpecs": null,
+      "source": "https://www.0-60specs.com/tesla/model-x-0-60-times"
+    }
+  ]
+}
