@@ -1,73 +1,28 @@
 {
   "generatedNote": "CarBox specs DB index. See SCHEMA.md.",
-  "tiers": {
-    "tier1": [
-      "Honda",
-      "Toyota",
-      "Ford",
-      "Chevrolet",
-      "BMW",
-      "Mercedes-Benz",
-      "Audi",
-      "Volkswagen",
-      "Nissan",
-      "Subaru",
-      "Mazda",
-      "Hyundai",
-      "Kia",
-      "Lexus",
-      "Porsche",
-      "Jeep",
-      "Mini",
-      "Volvo",
-      "Mitsubishi",
-      "Tesla"
-    ]
-  },
   "files": [
     {
       "file": "honda.json",
       "brand": "Honda",
       "entries": 44,
-      "unverifiedCoreFields": 0,
-      "models": [
-        "Civic",
-        "Accord",
-        "Accord Crosstour",
-        "CR-V",
-        "Pilot",
-        "HR-V",
-        "Fit",
-        "Odyssey",
-        "Ridgeline",
-        "Insight",
-        "CR-Z",
-        "Passport"
-      ]
+      "unverifiedCoreFields": 0
+    },
+    {
+      "file": "subaru.json",
+      "brand": "Subaru",
+      "entries": 21,
+      "unverifiedCoreFields": 0
     },
     {
       "file": "toyota.json",
       "brand": "Toyota",
       "entries": 45,
-      "unverifiedCoreFields": 9,
-      "models": [
-        "Camry",
-        "Corolla",
-        "GR Corolla",
-        "RAV4",
-        "Tacoma",
-        "4Runner",
-        "GR86",
-        "GR Supra",
-        "Tundra",
-        "Highlander",
-        "Prius"
-      ]
+      "unverifiedCoreFields": 9
     }
   ],
   "totals": {
-    "brandsBuilt": 2,
-    "entries": 89,
+    "brandsBuilt": 3,
+    "entries": 110,
     "unverifiedCoreFields": 9
   }
 }
