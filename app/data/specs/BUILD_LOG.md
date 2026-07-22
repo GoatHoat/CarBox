@@ -9,7 +9,10 @@ Skipped by scope: GMC, Ram, Buick, Cadillac, Lincoln, low-volume/fleet/rebadge.
 
 | Brand | Models covered | Entries | Unverified fields | Status |
 |-------|----------------|---------|-------------------|--------|
-| _none saved_ | — | 0 | — | attempt 1 failed (see below) |
+| Honda | Civic, Accord, Crosstour, CR-V, Pilot, HR-V, Fit, Odyssey, Ridgeline, Insight, CR-Z, Passport | 44 | 0 | ✅ done (attempt 2) |
+| Toyota | Camry, Corolla, GR Corolla, RAV4, Tacoma, 4Runner, GR86, GR Supra, Tundra, Highlander, Prius | 45 | 9 (hybrid torque n/a) | ✅ done (attempt 2) |
+
+Attempt 2 (2026-07-21, after limit reset) — main-thread, no delegation, one high-yield WebFetch per model from 0-60specs.com, compiled + validated + committed per brand. Running total: **89 entries**. Toyota nulls are torque figures the source didn't state (nulled per rules, not invented). Toyota models still to add in a later pass: Sienna, Sequoia, Land Cruiser, Avalon, C-HR, Venza, Mirai, bZ4X.
 
 ## Attempt 1 (2026-07-21) — FAILED, 0 entries saved
 Strategy: launched 10 parallel per-brand research agents (Honda, Toyota, Ford, Chevrolet, BMW, Mercedes-Benz, Audi, Volkswagen, Nissan, Subaru).
