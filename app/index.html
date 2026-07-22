@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Garage</title>
 <style>html{background:#E9E9E9}</style>
-<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
+<script>(function(){try{if(!(JSON.parse(localStorage.getItem('carbox.v1'))||{}).onboardingComplete){location.replace('onboarding.html');return}}catch(e){location.replace('onboarding.html');return}var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">

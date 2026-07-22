@@ -5,9 +5,22 @@ window.CarBox = (function () {
   var SEED_IDS = { e1: 1, e2: 1, e3: 1, e4: 1 };
 
   var DEFAULTS = {
-    vehicle: { name: 'Bugatti Chiron', year: 2026, mileage: 82410 },
+    /* vehicle carries make/model/year + a specs object (filled by onboarding
+       from its curated dataset, or a placeholder the user edits in Settings).
+       `name` stays "Make Model" so the Garage title keeps rendering unchanged. */
+    vehicle: {
+      name: 'Bugatti Chiron', make: 'Bugatti', model: 'Chiron', year: 2026, mileage: 82410,
+      specs: {
+        engine: '8.0L quad-turbo W16', horsepower: '1,479 hp (1,500 PS); Super Sport: 1,578 hp',
+        drivetrain: '7-speed Ricardo dual-clutch gearbox', accel: '0-100 km/h: ~2.4 s',
+        tire: 'Michelin Cup tires'
+      }
+    },
     car: { presetId: 'sprite_chiron', hue: null }, /* hue null = original grey */
     profile: { name: 'Vojtech13', handle: '@Vojtech.Arkes' },
+    account: null,          /* {firstName,lastName,email,password} — see onboarding note */
+    birthday: null,         /* ISO yyyy-mm-dd */
+    onboardingComplete: false,
     currency: 'USD',
     theme: 'system',
     isPro: false,
@@ -118,9 +131,18 @@ window.CarBox = (function () {
     return { invested: invested, count: count };
   }
 
+  /* redirect into onboarding if the user hasn't finished it.
+     NOTE: the real gate lives in each page's pre-paint <script> (zero flash);
+     this is a convenience mirror for scripts that run later. */
+  function requireOnboarding() {
+    if (!state.onboardingComplete) { location.replace('onboarding.html'); return false; }
+    return true;
+  }
+
   return {
     get: get, set: set, subscribe: subscribe,
     reload: function () { state = load(); },
+    requireOnboarding: requireOnboarding,
     fmtMoney: fmtMoney, fmtMiles: fmtMiles, toUnits: toUnits,
     totals: totals, isSeed: isSeed
   };

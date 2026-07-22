@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CarBox — Welcome</title>
+<style>html{background:#E9E9E9}</style>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script defer src="state.js"></script>
+<script defer src="ui.js"></script>
+<script defer src="onboarding.js"></script>
+<link rel="prefetch" href="index.html">
+<style>
+  .phone{padding-bottom:40px;min-height:100vh}
+
+  /* header: back + progress dots (hidden on Welcome + Done) */
+  .ob-head{display:flex;align-items:center;gap:12px;min-height:44px;margin-bottom:6px}
+  .ob-head[hidden]{display:none}
+  .ob-back{background:none;border:none;cursor:pointer;padding:6px 8px 6px 0;display:flex;align-items:center;min-height:44px}
+  .ob-back img{width:32px}
+  .ob-dots{display:flex;gap:7px;flex:1}
+  .ob-dot{width:100%;height:4px;border-radius:999px;background:var(--hairline);transition:background .3s ease-out}
+  .ob-dot.on{background:var(--brown-warm)}
+
+  /* steps */
+  .ob-steps{position:relative}
+  .ostep{display:none;flex-direction:column}
+  .ostep.active{display:flex}
+  @keyframes obInFwd{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+  @keyframes obInBack{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+  .ostep.active.fwd{animation:obInFwd .32s cubic-bezier(.3,1.4,.4,1)}
+  .ostep.active.back{animation:obInBack .32s cubic-bezier(.3,1.4,.4,1)}
+
+  .ob-title{font-size:32px;color:var(--tx,#141210);line-height:1.05;letter-spacing:-.4px;margin:6px 2px 4px}
+  .ob-sub{font-size:15px;font-weight:500;color:var(--mut,#8D8D8B);margin:0 2px 14px}
+
+  /* fields — reuse card surface + hairline language */
+  .ob-field{
+    background:var(--surface,#F5F3F4);border-radius:16px;box-shadow:var(--shadow);
+    padding:9px 15px 10px;margin-top:11px;
+    border:1.5px solid transparent;transition:border-color .2s ease-out;
+  }
+  .ob-field label{display:block;font-size:12px;font-weight:600;color:var(--mut,#9B918F)}
+  .ob-field input{
+    width:100%;border:none;background:transparent;outline:none;
+    font-family:'League Spartan',sans-serif;font-size:17px;font-weight:600;color:var(--tx,#141210);
+    margin-top:2px;padding:0;
+  }
+  .ob-field input::placeholder{color:var(--mut,#AEA6A3);opacity:1;font-weight:500}
+  .ob-field.invalid{border-color:#B3402F}
+  .ob-row{display:flex;gap:10px}
+  .ob-row .ob-field{flex:1;min-width:0}
+
+  .ob-passwrap{display:flex;align-items:flex-end;gap:10px}
+  .ob-passwrap input{flex:1}
+  .ob-passtoggle{
+    background:none;border:none;cursor:pointer;flex:none;padding:0 0 1px;
+    font-family:'League Spartan',sans-serif;font-size:13.5px;font-weight:700;color:var(--accent-tx,#776357);
+  }
+
+  /* inline error — reuse app warning tone (#B3402F danger already in app) */
+  .ob-err{
+    display:none;align-items:center;gap:7px;margin:9px 2px 0;
+    font-size:13px;font-weight:600;color:#B3402F;
+  }
+  .ob-err.show{display:flex}
+  .ob-err::before{content:"⚠";font-size:14px}
+
+  /* primary button — same clay pill as every CTA in the app */
+  .ob-btn{
+    width:100%;margin-top:18px;min-height:52px;
+    background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:15px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:18px;
+    box-shadow:var(--shadow);
+    transition:background .2s ease-out,opacity .2s ease-out,transform 90ms ease-out;
+  }
+  .ob-btn:disabled{cursor:default;opacity:1}
+  .ob-btn.ob-btn-disabled,.ob-btn:disabled{
+    background:var(--ctl,#D9D4D0);color:var(--mut,#9B918F);box-shadow:none;
+  }
+
+  /* Step 1 Welcome */
+  .welcome{align-items:center;text-align:center;padding-top:8vh}
+  .ob-sprite{width:300px;max-width:86%;margin:0 auto 2px}
+  .ob-word{font-size:60px;color:var(--tx,#141210);line-height:1;letter-spacing:-1px}
+  .ob-tag{font-size:16px;font-weight:500;color:var(--mut,#8D8D8B);margin-top:8px}
+  .welcome .ob-btn{max-width:340px;margin-top:26px}
+
+  /* Step 3 preview — reuse .pname/.phandle + .avatar from style.css */
+  .ob-taginput{display:flex;align-items:center;margin-top:2px}
+  .ob-taginput span{font-size:17px;font-weight:600;color:var(--mut,#9B918F);margin-right:1px}
+  .ob-taginput input{margin-top:0}
+  .ob-preview{
+    display:flex;align-items:center;gap:16px;margin-top:20px;
+    background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:14px 16px;
+  }
+  .ob-preview .avatar{width:56px;height:56px;box-shadow:none}
+  .ob-preview .pname{font-size:22px}
+  .ob-preview .phandle{font-size:14px}
+  .ob-pvlabel{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut,#9B918F);margin:18px 2px 0}
+
+  /* Step 5 spec note */
+  .ob-specnote{display:none;margin:11px 4px 0;font-size:13px;font-weight:600}
+  .ob-specnote.show{display:block}
+  .ob-specnote.ok{color:var(--accent-tx,#5C7350)}
+  .ob-specnote.note{color:var(--mut,#8D8D8B)}
+
+  /* Step 6 legal */
+  .ob-seg{width:100%;height:38px;margin-top:6px}
+  .ob-seg .segpill{width:calc(50% - 2px)}
+  .ob-seg.privacy .segpill{transform:translateX(100%)}
+  .ob-seg button{font-size:13px}
+  .ob-legalbox{
+    height:190px;overflow-y:auto;scrollbar-width:none;
+    background:var(--surface,#F5F3F4);border-radius:16px;box-shadow:var(--shadow);
+    padding:13px 15px;margin-top:11px;
+    font-size:13.5px;font-weight:500;line-height:1.5;color:var(--tx2,#3E3630);white-space:pre-wrap;
+  }
+  .ob-legalbox::-webkit-scrollbar{display:none}
+  .ob-check{
+    display:flex;align-items:flex-start;gap:11px;margin-top:14px;cursor:pointer;
+    font-size:14.5px;font-weight:600;color:var(--tx,#141311);line-height:1.3;
+  }
+  .ob-check input{
+    width:22px;height:22px;flex:none;margin-top:1px;cursor:pointer;
+    accent-color:var(--brown-warm);
+  }
+
+  /* Step 7 done */
+  .done{align-items:center;text-align:center;padding-top:16vh}
+  .ob-checkcircle{
+    width:88px;height:88px;border-radius:50%;background:var(--brown-warm);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 6px;
+    animation:obPop .4s cubic-bezier(.3,1.4,.4,1);
+  }
+  @keyframes obPop{0%{transform:scale(0)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+  .ob-checkcircle svg{width:44px;height:44px}
+  .ob-checkcircle path{stroke-dasharray:32;stroke-dashoffset:32;animation:obDraw .4s ease-out .15s forwards}
+  @keyframes obDraw{to{stroke-dashoffset:0}}
+
+  @media (prefers-reduced-motion: reduce){
+    .ostep.active.fwd,.ostep.active.back,.ob-checkcircle{animation:none}
+    .ob-checkcircle path{stroke-dashoffset:0;animation:none}
+    .ob-dot{transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="ob-head" id="ob-head" hidden>
+    <button class="ob-back" id="ob-back" aria-label="Back"><img src="assets/icon_back.png" alt=""></button>
+    <div class="ob-dots" id="ob-dots" role="progressbar" aria-label="Signup progress"></div>
+  </div>
+
+  <div class="ob-steps">
+
+    <!-- Step 1 — Welcome -->
+    <section class="ostep active" data-step="1">
+      <div class="welcome">
+        <img class="ob-sprite" src="assets/sprite_chiron.png" alt="">
+        <h1 class="serif ob-word">CarBox</h1>
+        <p class="ob-tag">Your garage, your build, your story.</p>
+        <button class="ob-btn" id="ob-start">Get Started</button>
+      </div>
+    </section>
+
+    <!-- Step 2 — Account -->
+    <section class="ostep" data-step="2">
+      <h2 class="serif ob-title">Create your account</h2>
+      <div class="ob-sub">Start your CarBox garage.</div>
+      <div class="ob-row">
+        <div class="ob-field"><label for="ob-first">First name</label>
+          <input id="ob-first" type="text" autocomplete="given-name" autocapitalize="words" placeholder="Alex"></div>
+        <div class="ob-field"><label for="ob-last">Last name</label>
+          <input id="ob-last" type="text" autocomplete="family-name" autocapitalize="words" placeholder="Rivera"></div>
+      </div>
+      <div class="ob-field"><label for="ob-email">Email</label>
+        <input id="ob-email" type="email" autocomplete="email" inputmode="email" autocapitalize="off" placeholder="you@email.com"></div>
+      <div class="ob-field"><label for="ob-pass">Password</label>
+        <div class="ob-passwrap">
+          <input id="ob-pass" type="password" autocomplete="new-password" placeholder="At least 8 characters">
+          <button type="button" class="ob-passtoggle" id="ob-pass-toggle" aria-label="Show password">Show</button>
+        </div>
+      </div>
+      <div class="ob-err" id="ob-acc-err"></div>
+      <button class="ob-btn" id="ob-acc-next" disabled>Continue</button>
+    </section>
+
+    <!-- Step 3 — Username & tag -->
+    <section class="ostep" data-step="3">
+      <h2 class="serif ob-title">Pick your handle</h2>
+      <div class="ob-sub">Your username signs you in. Your tag is public.</div>
+      <div class="ob-field"><label for="ob-user">Username</label>
+        <input id="ob-user" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="alexbuilds"></div>
+      <div class="ob-field"><label for="ob-tag">Tag</label>
+        <div class="ob-taginput"><span>@</span><input id="ob-tag" type="text" autocapitalize="off" spellcheck="false" placeholder="Alex.Rivera"></div></div>
+      <div class="ob-pvlabel">Preview</div>
+      <div class="ob-preview">
+        <div class="avatar"></div>
+        <div>
+          <div class="pname" id="ob-pv-name">yourname</div>
+          <div class="phandle" id="ob-pv-tag">@yourtag</div>
+        </div>
+      </div>
+      <div class="ob-err" id="ob-user-err"></div>
+      <button class="ob-btn" id="ob-user-next" disabled>Continue</button>
+    </section>
+
+    <!-- Step 4 — Birthday -->
+    <section class="ostep" data-step="4">
+      <h2 class="serif ob-title">When’s your birthday?</h2>
+      <div class="ob-sub">CarBox is for ages 16 and up.</div>
+      <div class="ob-field"><label for="ob-bday">Birthday</label>
+        <input id="ob-bday" type="date"></div>
+      <div class="ob-err" id="ob-bday-err"></div>
+      <button class="ob-btn" id="ob-bday-next" disabled>Continue</button>
+    </section>
+
+    <!-- Step 5 — Car -->
+    <section class="ostep" data-step="5">
+      <h2 class="serif ob-title">What do you drive?</h2>
+      <div class="ob-sub">This sets up your garage and mod picks.</div>
+      <div class="ob-field"><label for="ob-make">Make</label>
+        <input id="ob-make" type="text" list="ob-makes" autocomplete="off" autocapitalize="words" placeholder="Bugatti"></div>
+      <datalist id="ob-makes"></datalist>
+      <div class="ob-field"><label for="ob-model">Model</label>
+        <input id="ob-model" type="text" list="ob-models" autocomplete="off" autocapitalize="words" placeholder="Chiron"></div>
+      <datalist id="ob-models"></datalist>
+      <div class="ob-field"><label for="ob-year">Year</label>
+        <input id="ob-year" type="number" inputmode="numeric" placeholder="2026"></div>
+      <div class="ob-specnote" id="ob-specnote"></div>
+      <div class="ob-err" id="ob-car-err"></div>
+      <button class="ob-btn" id="ob-car-next" disabled>Continue</button>
+    </section>
+
+    <!-- Step 6 — Terms & Privacy -->
+    <section class="ostep" data-step="6">
+      <h2 class="serif ob-title">Terms &amp; Privacy</h2>
+      <div class="ob-sub">Please review before you start.</div>
+      <div class="seg ob-seg" id="ob-legalseg" role="tablist" aria-label="Legal document">
+        <span class="segpill" aria-hidden="true"></span>
+        <button type="button" data-doc="terms" role="tab" aria-selected="true">Terms of Service</button>
+        <button type="button" data-doc="privacy" role="tab" aria-selected="false">Privacy Policy</button>
+      </div>
+      <div class="ob-legalbox" id="ob-legalbox" tabindex="0" aria-label="Legal text"></div>
+      <label class="ob-check"><input type="checkbox" id="ob-agree-terms"><span>I have read and agree to the Terms of Service</span></label>
+      <label class="ob-check"><input type="checkbox" id="ob-agree-privacy"><span>I have read and agree to the Privacy Policy</span></label>
+      <button class="ob-btn ob-btn-disabled" id="ob-finish" disabled>Get Started</button>
+    </section>
+
+    <!-- Step 7 — Done -->
+    <section class="ostep done" data-step="7">
+      <div class="ob-checkcircle">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5 L10 18.5 L20 6.5" fill="none" stroke="#FBF8F4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2 class="serif ob-title" style="text-align:center">You’re all set</h2>
+      <p class="ob-tag">Welcome to CarBox</p>
+    </section>
+
+  </div>
+</div>
+</body>
+</html>
