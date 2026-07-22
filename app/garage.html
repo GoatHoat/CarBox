@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CarBox — Garage</title>
+<style>html{background:#E9E9E9}</style>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script defer src="state.js"></script>
+<script defer src="ui.js"></script>
+<style>
+  .phone{padding-bottom:40px}
+  .pubbar{display:flex;align-items:center;gap:8px;padding:6px 2px;font-size:12.5px;font-weight:600;color:var(--mut,#9A928B)}
+  .pubbar .dot{width:6px;height:6px;border-radius:50%;background:var(--brown-warm)}
+  .pubprofile{display:flex;align-items:center;gap:14px;margin-top:6px}
+  .pubprofile .avatar{width:52px;height:52px}
+  .caryear{margin-bottom:6px}
+  .publikes{display:flex;align-items:center;gap:7px;justify-content:center;margin-top:12px;color:var(--meta);font-weight:600;font-size:14px}
+  .publikes img{width:20px}
+  /* read-only timeline (mirrors log.html visuals) */
+  .tl{position:relative;margin-top:16px}
+  .tl .rail{position:absolute;left:9px;top:22px;bottom:22px;width:3px;background:#6E5B4B;border-radius:2px}
+  .tlh{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut,#9A928B);margin:0 2px 4px}
+  .ent{position:relative;margin-left:26px;margin-bottom:7px}
+  .ent .dot{position:absolute;left:-20px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;background:#6E5B4B}
+  .ecard{background:var(--surface,#F5F4F3);border-radius:16px;box-shadow:var(--shadow);padding:8px 12px}
+  .chip{display:inline-block;border-radius:999px;padding:3px 11px;font-size:10.5px;font-weight:600;letter-spacing:.04em}
+  .chip.mod{background:var(--brown-warm);color:#FBF8F4}
+  .chip.maint{background:var(--ctl,#D9D4D0);color:var(--meta)}
+  .chip.repair{background:#656469;color:#F2F0EE}
+  .chip.cosmetic{background:#CFC8BF;color:#4A4038}
+  .ecard .etitle{font-size:15px;font-weight:600;color:var(--tx,#17130F);margin-top:4px;line-height:1.15}
+  .ecard .emeta{font-size:12px;font-weight:500;color:var(--meta);margin-top:1px}
+  .pubmsg{text-align:center;padding:40px 24px;font-size:15px;font-weight:600;color:var(--mut,#9A928B);line-height:1.5}
+  .pubcta{display:block;margin:18px auto 0;background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;
+    padding:11px 22px;font-family:'League Spartan',sans-serif;font-weight:600;font-size:15px;box-shadow:var(--shadow);cursor:pointer;text-decoration:none;width:fit-content}
+</style>
+</head>
+<body>
+<div class="phone" id="phone"></div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var phone = document.getElementById('phone');
+  function param(k) {
+    var m = new RegExp('[?&]' + k + '=([^&]+)').exec(location.search);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  /* PUBLIC VIEW — read-only. Today it reads the car from THIS device's local
+     store by id. NOTE (Part E): truly public viewing (someone else opening the
+     link on their phone) needs the backend, hosting + DB. When that exists,
+     fetch the car JSON by id from the API here instead of CarBox.cars(). */
+  var wantId = param('car');
+  var cars = CarBox.cars();
+  var car = null;
+  cars.forEach(function (c) { if (c.id === wantId) car = c; });
+  if (!car && !wantId) car = cars[0];
+
+  var prof = CarBox.get('profile');
+
+  if (!car) {
+    phone.innerHTML =
+      '<div class="pubmsg">This CarBox garage lives on its owner’s device.<br>' +
+      'Public garage links go live with the CarBox backend (accounts + hosting).' +
+      '<a class="pubcta" href="index.html">Open CarBox</a></div>';
+    return;
+  }
+
+  var v = car.vehicle || {};
+  var SPEC_ROWS = [
+    ['engine', 'spec_piston'], ['horsepower', 'spec_bolt'], ['torque', 'spec_gearbox'],
+    ['transmission', 'spec_gear'], ['drivetrain', 'spec_tire'], ['accel', 'spec_gauge']
+  ];
+  var specHtml = SPEC_ROWS.map(function (r) {
+    var val = (v.specs && v.specs[r[0]] && String(v.specs[r[0]]).trim()) || '—';
+    return '<div class="row"><div class="ic"><img src="assets/' + r[1] + '.png" alt=""></div><div class="tx"></div></div>';
+  }).join('');
+
+  var CHIP = { mod: 'MOD', maint: 'MAINTENANCE', repair: 'REPAIR', cosmetic: 'COSMETIC' };
+  var entries = car.entries || [];
+  var tlHtml = '';
+  if (entries.length) {
+    tlHtml = '<div class="tlh">Build & maintenance</div><div class="tl"><div class="rail"></div>' +
+      entries.map(function (e) {
+        var parts = [];
+        if (e.cost > 0) parts.push(CarBox.fmtMoney(e.cost));
+        if (e.miles > 0) parts.push(CarBox.fmtMiles(e.miles));
+        if (e.date) parts.push(e.date);
+        return '<div class="ent"><span class="dot"></span><div class="ecard">' +
+          '<span class="chip ' + e.type + '">' + (CHIP[e.type] || 'MOD') + '</span>' +
+          '<div class="etitle"></div><div class="emeta"></div></div></div>';
+      }).join('') + '</div>';
+  }
+
+  phone.innerHTML =
+    '<div class="pubbar"><span class="dot"></span>Public garage</div>' +
+    '<div class="pubprofile"><div class="avatar"></div><div>' +
+      '<div class="pname"></div><div class="phandle"></div></div></div>' +
+    '<div class="hero"><img class="i-sprite" alt=""></div>' +
+    '<h1 class="cartitle serif"></h1><div class="caryear serif"></div>' +
+    '<div class="spec">' + specHtml + '</div>' +
+    '<div class="publikes"><img src="assets/icon_thumb.png" alt=""><span></span></div>' +
+    tlHtml;
+
+  /* fill text via textContent (avoids any HTML injection from stored strings) */
+  phone.querySelector('.pname').textContent = prof.name;
+  phone.querySelector('.phandle').textContent = prof.handle;
+  phone.querySelector('.cartitle').textContent = v.name || 'Car';
+  phone.querySelector('.caryear').textContent = String(v.year || '');
+  phone.querySelector('.publikes span').textContent = (car.likes || 0) + ' likes';
+  var specTx = phone.querySelectorAll('.spec .tx');
+  SPEC_ROWS.forEach(function (r, i) {
+    specTx[i].textContent = (v.specs && v.specs[r[0]] && String(v.specs[r[0]]).trim()) || '—';
+  });
+  var ents = phone.querySelectorAll('.ent');
+  entries.forEach(function (e, i) {
+    ents[i].querySelector('.etitle').textContent = e.title || '';
+    var parts = [];
+    if (e.cost > 0) parts.push(CarBox.fmtMoney(e.cost));
+    if (e.miles > 0) parts.push(CarBox.fmtMiles(e.miles));
+    if (e.date) parts.push(e.date);
+    ents[i].querySelector('.emeta').textContent = parts.join(' · ');
+  });
+  /* tint the sprite with THIS car's appearance (not the active car) */
+  var ap = car.appearance || { presetId: 'body_suv', hue: null, shade: 1 };
+  UI.tintSprite('assets/' + ap.presetId + '.png', ap.hue, ap.shade, function (url) {
+    phone.querySelector('.i-sprite').src = url;
+  });
+});
+</script>
+</body>
+</html>

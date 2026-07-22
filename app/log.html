@@ -368,8 +368,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /* photos: picker -> thumbnails pop in (previews only, not persisted) */
+  /* photos: picker -> thumbnails pop in. These are LOCAL PREVIEWS ONLY.
+     We deliberately do NOT persist them (storing base64 would bloat
+     localStorage). Real storage needs the backend: see the upload integration
+     point in the Save handler below (Part E, cloud storage). */
   var photoInput = $('photoinput');
+  var pickedFiles = [];
   function pickPhotos() { photoInput.click(); }
   $('photobox').addEventListener('click', pickPhotos);
   $('photobox').addEventListener('keydown', function (e) {
@@ -379,6 +383,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var thumbs = $('photothumbs');
     Array.prototype.forEach.call(photoInput.files, function (file) {
       if (thumbs.children.length >= 6) return;
+      pickedFiles.push(file);            /* kept in memory for the upload point below */
       var img = document.createElement('img');
       img.alt = '';
       img.src = URL.createObjectURL(file);
@@ -477,11 +482,19 @@ document.addEventListener('DOMContentLoaded', function () {
       cost: num($('f-cost').value),
       miles: num($('f-miles').value),
       date: formatISO($('f-date').value || todayISO()),
-      notes: $('f-notes').value.trim()
+      notes: $('f-notes').value.trim(),
+      photos: []   /* URLs, filled by the upload step below once storage exists */
     };
+    /* ── PHOTO UPLOAD INTEGRATION POINT (Part E) ──
+       `pickedFiles` holds the chosen File objects. When cloud storage exists,
+       upload them here and assign the returned URLs to entry.photos BEFORE the
+       CarBox.set('entries', ...) below, e.g.:
+           entry.photos = await CarBoxUploads.put(pickedFiles);
+       We do NOT base64-inline them into localStorage (keeps the store small). */
     entry.id = 'u' + Date.now().toString(36);
     entries.unshift(entry);
-    CarBox.set('entries', entries);
+    CarBox.set('entries', entries);   /* store recomputes nextService from the log */
+    paintReminder();                  /* a new maintenance entry updates the reminder live */
 
     /* mileage sanity: a newer, higher odometer updates the vehicle */
     if (entry.miles > vehicle.mileage) {
@@ -493,6 +506,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ['f-title', 'f-cost', 'f-miles', 'f-date', 'f-notes'].forEach(function (id) { $(id).value = ''; });
     $('photothumbs').innerHTML = '';
     $('photolabel').textContent = 'Add photos';
+    pickedFiles = [];
     closeSheet();
 
     /* FLIP: existing cards slide down, the new card drops in on top */
@@ -536,15 +550,26 @@ document.addEventListener('DOMContentLoaded', function () {
   hydrateHead();
   window.addEventListener('pageshow', function (e) { if (e.persisted) { CarBox.reload(); hydrateHead(); } });
   document.addEventListener('prerenderingchange', function () { CarBox.reload(); hydrateHead(); });
-  var svc = CarBox.get('nextService');
   var remEl = document.querySelector('.reminder');
-  remEl.querySelector('span').textContent = 'Next: ' + svc.title + ' @ ' + CarBox.fmtMiles(svc.due);
   remEl.setAttribute('data-press', '');
   remEl.setAttribute('role', 'button');
   remEl.setAttribute('tabindex', '0');
   remEl.style.cursor = 'pointer';
+  /* computed advised service (Part C); hidden when the reminders toggle is off */
+  function paintReminder() {
+    var on = CarBox.get('reminders');
+    var svc = CarBox.get('nextService');
+    if (!on || !svc || !svc.due) { remEl.style.display = 'none'; return; }
+    remEl.style.display = '';
+    remEl.querySelector('span').textContent = 'Next: ' + svc.title + ' @ ' + CarBox.fmtMiles(svc.due);
+  }
+  paintReminder();
   remEl.addEventListener('click', function () {
-    UI.toast(svc.title + ' at ' + CarBox.fmtMiles(svc.due) + ' — in ' + CarBox.fmtMiles(svc.due - vehicle.mileage));
+    var svc = CarBox.get('nextService'), v = CarBox.get('vehicle');
+    var diff = svc.due - (v.mileage || 0);
+    UI.toast(diff >= 0
+      ? svc.title + ' at ' + CarBox.fmtMiles(svc.due) + ' (in ' + CarBox.fmtMiles(diff) + ')'
+      : svc.title + ' overdue by ' + CarBox.fmtMiles(-diff));
   });
 
   /* reverse view-transition target for the card we came back from */

@@ -1,25 +1,109 @@
 /* CarBox state store — single source of truth, persisted under "carbox.v1".
-   Pages hydrate from this on load so HTML and store never disagree. */
+   Pages hydrate from this on load so HTML and store never disagree.
+
+   MULTI-CAR (2026-07-22): all per-car data lives inside state.cars[], and
+   state.activeCarId names the one currently shown. get/set on the legacy
+   per-car keys (vehicle, car, entries, planItems, goal, nextService, stats,
+   likes, liked, comments) TRANSPARENTLY route to the active car, so existing
+   page code keeps working unchanged. Free users get 1 car, Pro up to 3. */
 window.CarBox = (function () {
   var KEY = 'carbox.v1';
   var SEED_IDS = { e1: 1, e2: 1, e3: 1, e4: 1 };
 
-  var DEFAULTS = {
-    /* vehicle carries make/model/year + a core-6 specs object. Onboarding
-       fills specs from the car manifest (app/data/cars.js, built from the
-       verified specs DB) for the chosen make/model/year; the Garage renders
-       these six rows and lets the user edit them by hand. Field order matches
-       the six Garage icons: engine, horsepower, torque, transmission,
-       drivetrain, 0-60. `name` stays "Make Model" so the title renders unchanged. */
-    vehicle: {
-      name: 'Bugatti Chiron', make: 'Bugatti', model: 'Chiron', year: 2026, mileage: 82410,
-      specs: {
-        engine: '8.0L quad-turbo W16', horsepower: '1,479 hp (1,500 PS)',
-        torque: '1,180 lb-ft', transmission: '7-speed dual-clutch',
-        drivetrain: 'AWD', accel: '0-60 mph: ~2.4 s'
+  /* keys that live PER CAR. Legacy key 'car' maps to the car's `appearance`.
+     `goalLocked` = the free one-time goal choice for this car has been used
+     (changing the goal again requires CarBox Pro). */
+  var PER_CAR = {
+    vehicle: 'vehicle', car: 'appearance', entries: 'entries',
+    planItems: 'planItems', goal: 'goal', goalLocked: 'goalLocked',
+    nextService: 'nextService', stats: 'stats', likes: 'likes',
+    liked: 'liked', comments: 'comments'
+  };
+
+  function clone(v) { return v == null ? v : JSON.parse(JSON.stringify(v)); }
+  function uid(prefix) {
+    return (prefix || 'car') + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     SERVICE INTERVALS (Part C) — sensible approximations, NOT manufacturer-exact
+     schedules. All the tuning lives in this one place so it is easy to adjust.
+     ───────────────────────────────────────────────────────────────────────── */
+  function computeServiceInterval(vehicle) {
+    var s = (vehicle && vehicle.specs) || {};
+    var eng = String(s.engine || '').toLowerCase();
+    var dt = String(s.drivetrain || '').toLowerCase();
+    /* Electric: no oil. Advise tire rotation / brake inspection instead. */
+    var isEV = /electric|\bev\b/.test(eng) || eng.indexOf('motor') >= 0 ||
+      /electric/.test(dt) || (String(vehicle && vehicle.make).toLowerCase() === 'tesla');
+    if (isEV) return { title: 'Tire rotation / brake inspection', interval: 7500 };
+    /* Gas default 7,500 mi; shorten to 5,000 for boosted/high-output or older cars. */
+    var boosted = /turbo|supercharg/.test(eng);
+    var hp = parseInt(String(s.horsepower || '').replace(/[^0-9]/g, ''), 10) || 0;
+    var year = (vehicle && vehicle.year) || 9999;
+    var interval = (boosted || hp >= 400 || year < 2015) ? 5000 : 7500;
+    return { title: 'Oil change', interval: interval };
+  }
+
+  /* Anchor to the owner's actual last maintenance entry (highest-mileage 'maint'),
+     else the current odometer (0 for a brand-new empty garage). */
+  function computeNextService(car) {
+    var v = car.vehicle || {};
+    var ci = computeServiceInterval(v);
+    var lastMaint = null;
+    (car.entries || []).forEach(function (e) {
+      if (e.type === 'maint' && typeof e.miles === 'number' && e.miles > 0) {
+        if (lastMaint === null || e.miles > lastMaint) lastMaint = e.miles;
       }
-    },
-    car: { presetId: 'sprite_chiron', hue: null, shade: 1 }, /* hue null = greyscale base; shade 1 = no darkening */
+    });
+    var anchor = (lastMaint !== null) ? lastMaint : (v.mileage || 0);
+    return { title: ci.title, due: anchor + ci.interval, interval: ci.interval };
+  }
+
+  /* ── demo car (matches the approved mockups: Bugatti Chiron, 4 entries) ── */
+  function demoCar() {
+    return {
+      id: 'car-demo',
+      vehicle: {
+        name: 'Bugatti Chiron', make: 'Bugatti', model: 'Chiron', year: 2026, trim: '', mileage: 82410,
+        specs: {
+          engine: '8.0L quad-turbo W16', horsepower: '1,479 hp (1,500 PS)',
+          torque: '1,180 lb-ft', transmission: '7-speed dual-clutch',
+          drivetrain: 'AWD', accel: '0-60 mph: ~2.4 s'
+        }
+      },
+      appearance: { presetId: 'sprite_chiron', hue: null, shade: 1 },
+      entries: [
+        { id: 'e1', type: 'mod', title: 'Titanium exhaust install', cost: 12400, miles: 81900, date: 'Jun 30, 2026',
+          notes: 'Akrapovic full system. Torqued manifold bolts to 22 Nm. Sourced from EuroParts, part #AK-CH-77.',
+          part: 'Akrapovic Evolution', shop: 'Apex Performance' },
+        { id: 'e2', type: 'maint', title: 'Oil change + inspection', cost: 620, miles: 80500, date: 'May 12, 2026',
+          notes: 'Liqui Moly 5W-40, 9.2 L. Replaced drain plug washer, reset service indicator. All fluids topped.',
+          part: 'Liqui Moly 5W-40', shop: 'Bugatti Service Center' },
+        { id: 'e3', type: 'mod', title: 'Michelin Cup 2 tires', cost: 3800, miles: 79100, date: 'Apr 2, 2026',
+          notes: 'Square setup. Cold pressures 32/30 psi. TPMS re-learned on the first drive.',
+          part: 'Michelin Cup 2 R', shop: 'Apex Performance' },
+        { id: 'e4', type: 'repair', title: 'Front sensor replacement', cost: 1150, miles: 78300, date: 'Feb 18, 2026',
+          notes: 'Front collision sensor fault P2D11. Cleared after replacement and static calibration.',
+          part: 'OEM radar sensor', shop: 'Bugatti Service Center' }
+      ],
+      planItems: [],
+      goal: 'More power',
+      goalLocked: false,
+      nextService: { title: 'Oil change', due: 82800, interval: 5000 },
+      stats: { baseInvested: 48200, baseCount: 31 },
+      likes: 412, liked: false,
+      comments: [
+        { id: 'c1', user: '@TurboTom', text: 'That exhaust note must be insane.', reply: null },
+        { id: 'c2', user: '@LinaDrives', text: 'Cleanest Chiron build on here, easily.', reply: null },
+        { id: 'c3', user: '@BoostedBen', text: 'What tune are you running for stage 1?', reply: null }
+      ]
+    };
+  }
+
+  var DEFAULTS = {
+    cars: [demoCar()],
+    activeCarId: 'car-demo',
     profile: { name: 'Vojtech13', handle: '@Vojtech.Arkes' },
     account: null,          /* {firstName,lastName,email,password} — see onboarding note */
     birthday: null,         /* ISO yyyy-mm-dd */
@@ -27,91 +111,168 @@ window.CarBox = (function () {
     currency: 'USD',
     theme: 'system',
     isPro: false,
-    entries: [
-      { id: 'e1', type: 'mod', title: 'Titanium exhaust install', cost: 12400, miles: 81900, date: 'Jun 30, 2026',
-        notes: 'Akrapovic full system. Torqued manifold bolts to 22 Nm. Sourced from EuroParts — part #AK-CH-77.',
-        part: 'Akrapovic Evolution', shop: 'Apex Performance' },
-      { id: 'e2', type: 'maint', title: 'Oil change + inspection', cost: 620, miles: 80500, date: 'May 12, 2026',
-        notes: 'Liqui Moly 5W-40, 9.2 L. Replaced drain plug washer, reset service indicator. All fluids topped.',
-        part: 'Liqui Moly 5W-40', shop: 'Bugatti Service Center' },
-      { id: 'e3', type: 'mod', title: 'Michelin Cup 2 tires', cost: 3800, miles: 79100, date: 'Apr 2, 2026',
-        notes: 'Square setup. Cold pressures 32/30 psi. TPMS re-learned on the first drive.',
-        part: 'Michelin Cup 2 R', shop: 'Apex Performance' },
-      { id: 'e4', type: 'repair', title: 'Front sensor replacement', cost: 1150, miles: 78300, date: 'Feb 18, 2026',
-        notes: 'Front collision sensor fault P2D11. Cleared after replacement and static calibration.',
-        part: 'OEM radar sensor', shop: 'Bugatti Service Center' }
-    ],
-    stats: { baseInvested: 48200, baseCount: 31 }, /* totals shown on Log; seeds are part of these */
-    likes: 412,
-    liked: false,
-    goal: 'More power',
-    planItems: [],
-    /* Upgrades: AI recommendations cached per (car+goal) so we don't re-call
-       the API every visit — {key:'make|model|year|trim|goal', items:[...], source:'ai'|'local'} */
+    /* Upgrades AI recs, cached per (car+goal); mappedMod = which rec's shops show.
+       Kept top-level: the cache key already includes the car, so switching cars
+       naturally invalidates it. */
     recs: null,
-    mappedMod: null,        /* name of the recommendation whose shops show on the map */
-    locationGranted: false, /* user allowed location during onboarding (or later on Upgrades) */
-    location: null,         /* last known {lat, lng} when granted */
+    mappedMod: null,
+    locationGranted: false,
+    location: null,
+    /* notifications stay a single top-level list; service items carry a carId so
+       the text can say which car they are for. (Service reminders are also
+       COMPUTED live from each car's nextService — see index.html / log.html.) */
     notifications: [
-      { id: 'oil', type: 'service', text: 'Oil change due in 400 mi', unread: true },
-      { id: 'n-c1', type: 'comment', ref: 'c1', user: '@TurboTom', text: 'That exhaust note must be insane.', unread: false },
-      { id: 'n-c2', type: 'comment', ref: 'c2', user: '@LinaDrives', text: 'Cleanest Chiron build on here, easily.', unread: false },
-      { id: 'n-c3', type: 'comment', ref: 'c3', user: '@BoostedBen', text: 'What tune are you running for stage 1?', unread: false }
+      { id: 'n-c1', type: 'comment', ref: 'c1', carId: 'car-demo', user: '@TurboTom', text: 'That exhaust note must be insane.', unread: false },
+      { id: 'n-c2', type: 'comment', ref: 'c2', carId: 'car-demo', user: '@LinaDrives', text: 'Cleanest Chiron build on here, easily.', unread: false },
+      { id: 'n-c3', type: 'comment', ref: 'c3', carId: 'car-demo', user: '@BoostedBen', text: 'What tune are you running for stage 1?', unread: false }
     ],
-    comments: [
-      { id: 'c1', user: '@TurboTom', text: 'That exhaust note must be insane.', reply: null },
-      { id: 'c2', user: '@LinaDrives', text: 'Cleanest Chiron build on here, easily.', reply: null },
-      { id: 'c3', user: '@BoostedBen', text: 'What tune are you running for stage 1?', reply: null }
-    ],
-    nextService: { title: 'Oil change', due: 82800 },
     units: 'mi',
     reminders: true,
     notifsOn: true
   };
 
-  function clone(v) { return JSON.parse(JSON.stringify(v)); }
+  /* ── migration: wrap a legacy flat single-car store into cars[0] ── */
+  function migrateFlat(raw) {
+    if (raw.cars || !(raw.vehicle || raw.entries || raw.car)) return raw;
+    var car = {
+      id: uid('car'),
+      vehicle: raw.vehicle || clone(demoCar().vehicle),
+      appearance: raw.car || { presetId: 'body_suv', hue: null, shade: 1 },
+      entries: raw.entries || [],
+      planItems: raw.planItems || [],
+      goal: raw.goal || 'More power',
+      goalLocked: !!raw.goalLocked,
+      nextService: raw.nextService || null,
+      stats: raw.stats || { baseInvested: 0, baseCount: 0 },
+      likes: typeof raw.likes === 'number' ? raw.likes : 0,
+      liked: !!raw.liked,
+      comments: raw.comments || []
+    };
+    if (car.vehicle && car.vehicle.trim === undefined) car.vehicle.trim = '';
+    raw.cars = [car];
+    raw.activeCarId = car.id;
+    ['vehicle', 'car', 'entries', 'planItems', 'goal', 'nextService', 'stats', 'likes', 'liked', 'comments']
+      .forEach(function (k) { delete raw[k]; });
+    return raw;
+  }
 
   function load() {
     var state = clone(DEFAULTS);
-    try {
-      var raw = JSON.parse(localStorage.getItem(KEY));
-      if (raw && typeof raw === 'object') {
-        Object.keys(raw).forEach(function (k) { state[k] = raw[k]; });
-      }
-    } catch (e) { /* corrupted storage: fall back to defaults */ }
-    /* migrate entries saved by the pre-store add-entry sheet */
+    var raw = null;
+    try { raw = JSON.parse(localStorage.getItem(KEY)); } catch (e) { /* corrupted */ }
+    if (raw && typeof raw === 'object') {
+      raw = migrateFlat(raw);
+      Object.keys(raw).forEach(function (k) { state[k] = raw[k]; });
+    }
+    /* guarantee a valid cars[] + activeCarId */
+    if (!Array.isArray(state.cars) || !state.cars.length) {
+      state.cars = [demoCar()]; state.activeCarId = state.cars[0].id;
+    }
+    state.cars.forEach(function (c) {
+      if (!c.id) c.id = uid('car');
+      if (!c.appearance) c.appearance = { presetId: 'body_suv', hue: null, shade: 1 };
+      if (!Array.isArray(c.entries)) c.entries = [];
+      if (!Array.isArray(c.planItems)) c.planItems = [];
+      if (!Array.isArray(c.comments)) c.comments = [];
+      if (!c.stats) c.stats = { baseInvested: 0, baseCount: 0 };
+      if (typeof c.goalLocked !== 'boolean') c.goalLocked = false;
+      if (c.vehicle && c.vehicle.trim === undefined) c.vehicle.trim = '';
+    });
+    if (!findCar(state, state.activeCarId)) state.activeCarId = state.cars[0].id;
+    /* Pro lapse (Part B3): free/lapsed users can only use the first car. */
+    if (!state.isPro && state.activeCarId !== state.cars[0].id) state.activeCarId = state.cars[0].id;
+
+    /* legacy: entries saved by the pre-store add-entry sheet -> active car */
     try {
       var legacy = JSON.parse(localStorage.getItem('carbox_entries'));
       if (legacy && legacy.length) {
-        legacy.forEach(function (entry, i) {
-          entry.id = 'u' + Date.now().toString(36) + i;
-          state.entries.unshift(entry);
-        });
+        var ac = findCar(state, state.activeCarId);
+        legacy.forEach(function (entry, i) { entry.id = 'u' + Date.now().toString(36) + i; ac.entries.unshift(entry); });
         localStorage.removeItem('carbox_entries');
       }
     } catch (e) { /* ignore */ }
-    /* migrate pre-thread comment/notification shapes */
-    if (!state.comments || !state.comments[0] || !state.comments[0].id) {
-      state.comments = clone(DEFAULTS.comments);
-      state.notifications = clone(DEFAULTS.notifications);
-    }
+
+    /* recompute each car's advised service from its own log (Part C) */
+    state.cars.forEach(function (c) { c.nextService = computeNextService(c); });
     return state;
+  }
+
+  function findCar(st, id) {
+    for (var i = 0; i < st.cars.length; i++) if (st.cars[i].id === id) return st.cars[i];
+    return null;
   }
 
   var state = load();
   var subs = [];
+  function active() { return findCar(state, state.activeCarId) || state.cars[0]; }
+
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage full/blocked */ }
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* full/blocked */ }
   }
   save();
 
-  function get(key) { return clone(state[key]); }
+  function notify(key, value) { subs.forEach(function (fn) { try { fn(key, clone(value)); } catch (e) {} }); }
+
+  function get(key) {
+    if (PER_CAR.hasOwnProperty(key)) return clone(active()[PER_CAR[key]]);
+    return clone(state[key]);
+  }
   function set(key, value) {
-    state[key] = clone(value);
+    if (PER_CAR.hasOwnProperty(key)) {
+      var car = active();
+      car[PER_CAR[key]] = clone(value);
+      /* keep advised service current whenever the log or the car itself changes */
+      if (key === 'entries' || key === 'vehicle') car.nextService = computeNextService(car);
+    } else {
+      state[key] = clone(value);
+    }
     save();
-    subs.forEach(function (fn) { try { fn(key, clone(value)); } catch (e) {} });
+    notify(key, value);
   }
   function subscribe(fn) { subs.push(fn); }
+
+  /* ── multi-car helpers ── */
+  function cars() { return clone(state.cars); }
+  function activeCar() { return clone(active()); }
+  function activeCarId() { return state.activeCarId; }
+  function maxCars() { return state.isPro ? 3 : 1; }
+  function setActiveCar(id) {
+    var c = findCar(state, id);
+    if (!c) return false;
+    /* free/lapsed users may only switch to the primary car */
+    if (!state.isPro && id !== state.cars[0].id) return false;
+    state.activeCarId = id;
+    save();
+    notify('activeCarId', id);
+    return true;
+  }
+  function addCar(carObj) {
+    carObj = clone(carObj) || {};
+    carObj.id = carObj.id || uid('car');
+    if (!carObj.appearance) carObj.appearance = { presetId: 'body_suv', hue: null, shade: 1 };
+    if (!Array.isArray(carObj.entries)) carObj.entries = [];
+    if (!Array.isArray(carObj.planItems)) carObj.planItems = [];
+    if (!Array.isArray(carObj.comments)) carObj.comments = [];
+    if (!carObj.stats) carObj.stats = { baseInvested: 0, baseCount: 0 };
+    if (typeof carObj.likes !== 'number') carObj.likes = 0;
+    if (typeof carObj.liked !== 'boolean') carObj.liked = false;
+    if (!carObj.goal) carObj.goal = 'More power';
+    if (typeof carObj.goalLocked !== 'boolean') carObj.goalLocked = false;
+    if (carObj.vehicle && carObj.vehicle.trim === undefined) carObj.vehicle.trim = '';
+    carObj.nextService = computeNextService(carObj);
+    state.cars.push(carObj);
+    save();
+    notify('cars', state.cars);
+    return carObj.id;
+  }
+  function removeCar(id) {
+    if (state.cars.length <= 1) return false;
+    state.cars = state.cars.filter(function (c) { return c.id !== id; });
+    if (state.activeCarId === id) state.activeCarId = state.cars[0].id;
+    save();
+    notify('cars', state.cars);
+    return true;
+  }
 
   /* ── formatting helpers (units/currency-aware) ── */
   var CUR_SYMBOL = { USD: '$', EUR: '€', GBP: '£' };
@@ -123,18 +284,16 @@ window.CarBox = (function () {
     return toUnits(mi).toLocaleString('en-US') + ' ' + state.units;
   }
   function isSeed(id) { return !!SEED_IDS[id]; }
-  /* invested/count totals = seeded base + anything added on top of the seeds */
+  /* invested/count totals for the ACTIVE car = seeded base + non-seed entries */
   function totals() {
-    var invested = state.stats.baseInvested, count = state.stats.baseCount;
-    state.entries.forEach(function (entry) {
+    var car = active();
+    var invested = car.stats.baseInvested, count = car.stats.baseCount;
+    car.entries.forEach(function (entry) {
       if (!isSeed(entry.id)) { invested += entry.cost || 0; count += 1; }
     });
     return { invested: invested, count: count };
   }
 
-  /* redirect into onboarding if the user hasn't finished it.
-     NOTE: the real gate lives in each page's pre-paint <script> (zero flash);
-     this is a convenience mirror for scripts that run later. */
   function requireOnboarding() {
     if (!state.onboardingComplete) { location.replace('onboarding.html'); return false; }
     return true;
@@ -145,6 +304,11 @@ window.CarBox = (function () {
     reload: function () { state = load(); },
     requireOnboarding: requireOnboarding,
     fmtMoney: fmtMoney, fmtMiles: fmtMiles, toUnits: toUnits,
-    totals: totals, isSeed: isSeed
+    totals: totals, isSeed: isSeed,
+    /* multi-car API */
+    cars: cars, activeCar: activeCar, activeCarId: activeCarId,
+    setActiveCar: setActiveCar, addCar: addCar, removeCar: removeCar, maxCars: maxCars,
+    /* service-interval helpers (also used by pages that surface reminders) */
+    computeServiceInterval: computeServiceInterval, computeNextService: computeNextService
   };
 })();

@@ -463,10 +463,10 @@ document.addEventListener('DOMContentLoaded', function () {
     CarBox.set('liked', false);
     CarBox.set('planItems', []);
     CarBox.set('comments', []);
-    CarBox.set('notifications', [
-      { id: 'welcome', type: 'service', text: 'Add your first entry to start your build log', unread: false }
-    ]);
-    CarBox.set('nextService', { title: 'First service', due: 5000 });
+    CarBox.set('notifications', []);
+    CarBox.set('goalLocked', false);   /* fresh car: the free one-time goal choice is unused */
+    /* nextService is computed automatically from the (empty) log + this vehicle
+       by the store — no hardcoded guess (see state.js computeNextService). */
 
     CarBox.set('onboardingComplete', true);
     show(8, 'fwd');

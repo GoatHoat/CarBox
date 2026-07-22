@@ -57,6 +57,13 @@
     padding:14px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:19px;
     box-shadow:var(--shadow);
   }
+  /* one-time-goal confirm popup buttons */
+  .gsheetbtn{
+    width:100%;margin-top:12px;
+    background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:12px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:16px;box-shadow:var(--shadow);
+  }
+  .gsheetbtn.ghost{background:transparent;color:var(--tx,#141210);box-shadow:none;margin-top:4px}
 </style>
 </head>
 <body>
@@ -72,26 +79,23 @@
       <img class="g-cash" src="assets/goal_cash.png" alt="">
       <span class="glabel">More power</span>
     </button>
-    <button class="goalcard locked" data-goal="Better handling" aria-label="Better handling — CarBox Pro">
+    <button class="goalcard" data-goal="Better handling">
       <img class="g-tire" src="assets/goal_tire.png" alt="">
       <span class="glabel">Better handling</span>
-      <img class="lock" src="assets/badge_lock.png" alt="">
     </button>
-    <button class="goalcard locked" data-goal="Show car looks" aria-label="Show car looks — CarBox Pro">
+    <button class="goalcard" data-goal="Show car looks">
       <img class="g-star" src="assets/goal_star.png" alt="">
       <span class="glabel">Show car looks</span>
-      <img class="lock" src="assets/badge_lock.png" alt="">
     </button>
-    <button class="goalcard locked" data-goal="Track ready" aria-label="Track ready — CarBox Pro">
+    <button class="goalcard" data-goal="Track ready">
       <img class="g-watch" src="assets/goal_watch.png" alt="">
       <span class="glabel">Track ready</span>
-      <img class="lock" src="assets/badge_lock.png" alt="">
     </button>
   </div>
 
   <div class="goalfoot">
     <div class="prorow">
-      <div class="protx">Free plan includes 1 goal.<br>unlock all with Pro</div>
+      <div class="protx">Pick one goal for free.<br>Change it anytime with Pro</div>
       <button class="probadge" aria-label="CarBox Pro"><img src="assets/badge_pro.png" alt=""></button>
     </div>
     <button class="continue" id="continue">Continue</button>
@@ -111,44 +115,67 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   refresh();
 
-  /* Pro unlocks every goal — padlocks drop away */
-  function unlockAll(animated) {
-    cards.forEach(function (card) {
-      if (!card.classList.contains('locked')) return;
-      var lock = card.querySelector('.lock');
-      if (lock) {
-        if (animated) {
-          lock.classList.add('unlock');
-          setTimeout(function () { lock.remove(); }, 450);
-        } else lock.remove();
-      }
-      card.classList.remove('locked');
-    });
-    document.querySelector('.protx').innerHTML = 'All goals unlocked.<br>Thanks for going Pro';
-  }
-  if (CarBox.get('isPro')) unlockAll(false);
-  document.addEventListener('carbox-pro', function () { unlockAll(true); });
-
+  /* every goal is selectable now; the free plan just limits you to ONE choice. */
   cards.forEach(function (card) {
     card.addEventListener('click', function () {
-      if (card.classList.contains('locked')) {
-        UI.wiggle(card);
-        Pro.open();
-        return;
-      }
       selected = card.getAttribute('data-goal');
       refresh();
     });
   });
+
+  function proText() {
+    if (CarBox.get('isPro')) document.querySelector('.protx').innerHTML = 'CarBox Pro: change your goal anytime.';
+  }
+  proText();
+  document.addEventListener('carbox-pro', proText);
 
   document.querySelector('.probadge').addEventListener('click', function () {
     if (CarBox.get('isPro')) UI.toast('You’re on CarBox Pro');
     else Pro.open();
   });
 
+  /* one-time-choice confirm popup (free users, first goal pick) */
+  function confirmGoalOnce(goal, onProceed) {
+    var sh = UI.sheet({
+      title: 'Lock in ' + goal + '?',
+      label: 'Confirm goal',
+      build: function (body) {
+        var p = document.createElement('div');
+        p.className = 'sheet-note'; p.style.marginTop = '0';
+        p.textContent = 'On the free plan you can pick one goal, and this will be it. ' +
+          'To choose a different goal later you will need CarBox Pro. Continue with ' + goal + '?';
+        body.appendChild(p);
+        var go = document.createElement('button');
+        go.className = 'gsheetbtn'; go.textContent = 'Continue with ' + goal;
+        go.addEventListener('click', function () { sh.close(); onProceed(); });
+        body.appendChild(go);
+        var cancel = document.createElement('button');
+        cancel.className = 'gsheetbtn ghost'; cancel.textContent = 'Cancel';
+        cancel.addEventListener('click', function () { sh.close(); });
+        body.appendChild(cancel);
+      }
+    });
+  }
+
   document.getElementById('continue').addEventListener('click', function () {
-    CarBox.set('goal', selected);
-    location.href = 'upgrades.html';
+    var pro = CarBox.get('isPro');
+    var locked = CarBox.get('goalLocked');
+    var current = CarBox.get('goal');
+    /* Pro: change freely. */
+    if (pro) { CarBox.set('goal', selected); location.href = 'upgrades.html'; return; }
+    /* Free + already used the one-time choice: cannot switch without Pro. */
+    if (locked) {
+      if (selected === current) { location.href = 'upgrades.html'; return; }
+      UI.toast('Changing your goal needs CarBox Pro');
+      Pro.open();
+      return;
+    }
+    /* Free + first choice: explain it is one-time, then lock it in. */
+    confirmGoalOnce(selected, function () {
+      CarBox.set('goal', selected);
+      CarBox.set('goalLocked', true);
+      location.href = 'upgrades.html';
+    });
   });
 
   if (location.hash === '#pro') Pro.open();

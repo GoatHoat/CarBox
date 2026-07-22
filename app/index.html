@@ -40,9 +40,37 @@
     padding:12px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:16px;
     box-shadow:var(--shadow);
   }
+  .cbsheetbtn:disabled{background:var(--ctl,#D9D4D0);color:var(--mut,#9B918F);box-shadow:none;cursor:default}
+
+  /* multi-car switcher — appended into the top-right .iconstack (Pro only) */
+  .carbtn{
+    position:relative;width:45px;height:45px;border-radius:50%;
+    background:var(--pill);box-shadow:var(--shadow);border:2px solid transparent;
+    cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;overflow:hidden;
+    transition:border-color .25s ease-out,transform .25s cubic-bezier(.3,1.4,.4,1);
+  }
+  .carbtn img{width:40px;height:auto;pointer-events:none}
+  .carbtn.active{border-color:#6E5A46}
+  .carbtn.locked{opacity:.45}
+  .carbtn.locked::after{
+    content:"";position:absolute;inset:0;background:url("assets/badge_lock.png") center/16px no-repeat;
+    opacity:.9;
+  }
+  @keyframes carbtnin{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+  .carbtn.justadded{animation:carbtnin .4s cubic-bezier(.3,1.4,.4,1)}
+  .addcarbtn{
+    width:45px;height:45px;border-radius:50%;
+    background:var(--pill);box-shadow:var(--shadow);border:2px dashed var(--mut,#C2B6AA);
+    cursor:pointer;font-size:24px;line-height:1;color:var(--mut,#8D8579);
+    display:flex;align-items:center;justify-content:center;padding:0;
+  }
+  @media (prefers-reduced-motion: reduce){ .carbtn.justadded{animation:none} }
 </style>
 <script defer src="state.js"></script>
 <script defer src="ui.js"></script>
+<script defer src="pro.js"></script>
+<script defer src="data/cars.js"></script>
+<script defer src="carform.js"></script>
 <script defer src="nav.js"></script>
 <link rel="prefetch" href="log.html">
 <link rel="prefetch" href="upgrades.html">
@@ -136,6 +164,17 @@ document.addEventListener('DOMContentLoaded', function () {
       if (el) el.textContent = (s[r.key] && String(s[r.key]).trim()) || '—';
     });
   }
+  /* computed advised-service line for the ACTIVE car (Part C). Returns null when
+     there's no meaningful reminder or the Settings "Service reminders" toggle is off. */
+  function serviceLine() {
+    if (!CarBox.get('reminders')) return null;
+    var v = CarBox.get('vehicle'), ns = CarBox.get('nextService');
+    if (!ns || !ns.due) return null;
+    var diff = ns.due - (v.mileage || 0);
+    return diff >= 0
+      ? ns.title + ' due in ' + CarBox.fmtMiles(diff)
+      : ns.title + ' overdue by ' + CarBox.fmtMiles(-diff);
+  }
   function hydrate() {
     var vehicle = CarBox.get('vehicle');
     document.querySelector('.cartitle').textContent = vehicle.name;
@@ -145,10 +184,85 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('.pname').textContent = prof.name;
     document.querySelector('.phandle').textContent = prof.handle;
     UI.carSprite(document.querySelector('.i-sprite'));
-    var notifs = CarBox.get('notifications');
-    if (notifs[0]) document.getElementById('notiftext').textContent = notifs[0].text;
+    /* pill shows the computed service reminder; hidden when reminders off / none */
+    var line = serviceLine();
+    var pillEl = document.getElementById('notifpill');
+    if (line) { document.getElementById('notiftext').textContent = line; pillEl.style.display = ''; }
+    else { pillEl.style.display = 'none'; }
+    paintCarSwitcher();
     paintBadge();
   }
+  /* ── multi-car switcher (Part B): round car buttons + "+" in the icon stack.
+     Shown only for Pro users, or for lapsed users who still hold extra cars
+     (those extras appear LOCKED with a resubscribe affordance — Part B3). ── */
+  var stack = document.querySelector('.iconstack');
+  function tintCarBtn(img, ap) {
+    ap = ap || { presetId: 'body_suv', hue: null, shade: 1 };
+    UI.tintSprite('assets/' + ap.presetId + '.png', ap.hue, ap.shade, function (url) { img.src = url; });
+  }
+  function paintCarSwitcher(justAddedId) {
+    stack.querySelectorAll('.carbtn, .addcarbtn').forEach(function (b) { b.remove(); });
+    var pro = CarBox.get('isPro');
+    var list = CarBox.cars();
+    if (!pro && list.length <= 1) return;          /* free single-car: no switcher */
+    var activeId = CarBox.activeCarId();
+    list.forEach(function (c, i) {
+      var locked = !pro && i > 0;                   /* lapsed: only the first car is usable */
+      var b = document.createElement('button');
+      b.className = 'carbtn' + (c.id === activeId ? ' active' : '') + (locked ? ' locked' : '') +
+        (c.id === justAddedId ? ' justadded' : '');
+      b.setAttribute('aria-label', (c.vehicle && c.vehicle.name) || 'Car');
+      var img = document.createElement('img'); img.alt = ''; b.appendChild(img);
+      tintCarBtn(img, c.appearance);
+      b.addEventListener('click', function () {
+        if (locked) { UI.toast('Resubscribe to CarBox Pro to use this car'); if (window.Pro) Pro.open(); return; }
+        if (c.id === CarBox.activeCarId()) return;
+        CarBox.setActiveCar(c.id);
+        hydrate();                                  /* re-render the whole Garage to this car */
+      });
+      stack.appendChild(b);
+    });
+    var add = document.createElement('button');
+    add.className = 'addcarbtn'; add.setAttribute('aria-label', 'Add a car'); add.textContent = '+';
+    add.addEventListener('click', onAddCar);
+    stack.appendChild(add);
+  }
+  function onAddCar() {
+    if (!CarBox.get('isPro')) { if (window.Pro) Pro.open(); return; }   /* free/lapsed -> paywall */
+    if (CarBox.cars().length >= CarBox.maxCars()) { UI.toast('You’ve reached 3 cars'); return; }
+    openAddCarSheet();
+  }
+  function openAddCarSheet() {
+    var sh = UI.sheet({
+      title: 'Add a car',
+      label: 'Add a car',
+      build: function (body) {
+        var host = document.createElement('div');
+        body.appendChild(host);
+        var addBtn = document.createElement('button');
+        addBtn.className = 'cbsheetbtn'; addBtn.textContent = 'Add car'; addBtn.disabled = true;
+        var form = CarForm.mount(host, { onChange: function (valid) { addBtn.disabled = !valid; } });
+        addBtn.addEventListener('click', function () {
+          var v = form.value();
+          if (!v.valid) return;
+          var id = CarBox.addCar({
+            vehicle: { name: v.make + ' ' + v.model, make: v.make, model: v.model, year: v.year, trim: v.trim, mileage: 0, specs: v.specs },
+            appearance: { presetId: v.presetId, hue: v.hue, shade: v.shade },
+            entries: [], planItems: [], goal: 'More power', goalLocked: false,
+            stats: { baseInvested: 0, baseCount: 0 }, likes: 0, liked: false, comments: []
+          });
+          CarBox.setActiveCar(id);
+          sh.close();
+          hydrate();
+          paintCarSwitcher(id);                     /* animate the new button in */
+        });
+        body.appendChild(addBtn);
+      }
+    });
+  }
+  /* upgrading unlocks the switcher live */
+  document.addEventListener('carbox-pro', function () { hydrate(); });
+
   hydrate();
   window.addEventListener('pageshow', function (e) { if (e.persisted) { CarBox.reload(); hydrate(); } });
   document.addEventListener('prerenderingchange', function () { CarBox.reload(); hydrate(); });
@@ -176,23 +290,29 @@ document.addEventListener('DOMContentLoaded', function () {
       })(s);
     }
   }
-  var likeState = { count: CarBox.get('likes'), liked: CarBox.get('liked') };
+  /* LIKES — local-until-backend (Part D/E). Read/write straight through the store
+     each click so switching cars never uses a stale count. To go real, swap these
+     CarBox.get/set('likes'|'liked') calls for backend reads/writes (needs DB +
+     auth); the UI here does not change. */
   document.getElementById('likebtn').addEventListener('click', function () {
-    likeState.liked = !likeState.liked;
-    likeState.count += likeState.liked ? 1 : -1;
-    CarBox.set('likes', likeState.count);
-    CarBox.set('liked', likeState.liked);
+    var liked = !CarBox.get('liked');
+    var count = CarBox.get('likes') + (liked ? 1 : -1);
+    CarBox.set('liked', liked);
+    CarBox.set('likes', count);
     var ic = this.querySelector('img');
     ic.classList.remove('pop');
     void ic.offsetWidth;
     ic.classList.add('pop');
-    if (likeState.liked) burst(this);
+    if (liked) burst(this);
   });
 
-  /* ── share ── */
+  /* ── share: copies a link to the REAL read-only public garage page for the
+     active car (garage.html). Works on this device now; cross-device viewing
+     needs the backend + hosting (Part E). ── */
   document.getElementById('sharebtn').addEventListener('click', function () {
-    var link = 'https://carbox.app/garage/vojtech13';
-    function done() { UI.toast('Link copied'); }
+    var dir = location.href.replace(/[?#].*$/, '').replace(/[^\/]*$/, '');
+    var link = dir + 'garage.html?car=' + encodeURIComponent(CarBox.activeCarId());
+    function done() { UI.toast('Garage link copied'); }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(link).then(done, done);
     } else done();
@@ -267,8 +387,22 @@ document.addEventListener('DOMContentLoaded', function () {
       build: function (body) {
         function render() {
           body.innerHTML = '';
-          var list = CarBox.get('notifications');
-          if (!list.length) {
+          /* computed service reminder for the active car sits at the top (Part C) */
+          var svc = serviceLine();
+          if (svc) {
+            var srow = document.createElement('div');
+            srow.className = 'sheetrow';
+            srow.setAttribute('data-press', ''); srow.setAttribute('role', 'button');
+            srow.setAttribute('tabindex', '0'); srow.style.cursor = 'pointer';
+            var stx = document.createElement('div'); stx.className = 'rowtx';
+            stx.textContent = svc + ' · ' + CarBox.get('vehicle').name;
+            srow.appendChild(stx);
+            srow.addEventListener('click', function () { location.href = 'log.html'; });
+            body.appendChild(srow);
+          }
+          /* stored notifications = comments/replies only (service is computed above) */
+          var list = CarBox.get('notifications').filter(function (n) { return n.type !== 'service'; });
+          if (!svc && !list.length) {
             var empty = document.createElement('div');
             empty.className = 'sheet-note';
             empty.textContent = 'You’re all caught up.';
@@ -278,19 +412,6 @@ document.addEventListener('DOMContentLoaded', function () {
           list.slice().reverse().forEach(function (n) {
             var row = document.createElement('div');
             row.className = 'sheetrow';
-            if (n.type === 'service') {
-              row.setAttribute('data-press', '');
-              row.setAttribute('role', 'button');
-              row.setAttribute('tabindex', '0');
-              row.style.cursor = 'pointer';
-              var tx = document.createElement('div');
-              tx.className = 'rowtx';
-              tx.textContent = n.text;
-              row.appendChild(tx);
-              row.addEventListener('click', function () { location.href = 'log.html'; });
-              body.appendChild(row);
-              return;
-            }
             var top = document.createElement('div');
             top.className = 'rowtop';
             top.textContent = n.user + (n.type === 'reply' ? ' replied' : ' commented');
