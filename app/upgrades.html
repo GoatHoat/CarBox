@@ -25,13 +25,13 @@
   .upghead .sub{font-size:15px;font-weight:500;color:var(--warmgray);margin-top:2px}
 
   .goalrow{display:flex;gap:9px;margin-top:10px}
+  /* goal label — NOT a button: plain chip, no press/hover, no chevron */
   .goalpill{
-    display:flex;align-items:center;gap:10px;
-    background:var(--accent,#796457);border-radius:999px;border:none;cursor:pointer;
-    padding:8px 15px;box-shadow:var(--shadow);
+    display:flex;align-items:center;
+    background:var(--accent,#796457);border-radius:999px;
+    padding:8px 15px;box-shadow:var(--shadow);cursor:default;
   }
   .goalpill span{color:#FBF8F4;font-weight:600;font-size:14.5px;white-space:nowrap}
-  .goalpill img{width:11px}
   .changegoal{
     background:transparent;border:2.5px solid #C2B6AA;border-radius:999px;cursor:pointer;
     padding:7px 16px;color:var(--mut,#8D8579);font-family:'League Spartan',sans-serif;font-weight:600;font-size:14.5px;
@@ -49,22 +49,30 @@
   }
   .scard{
     background:var(--surface,#F5F3F4);border-radius:16px;box-shadow:var(--shadow);
-    padding:10px 13px;position:relative;
+    padding:10px 13px;position:relative;cursor:pointer;
   }
+  .scard.mapped{box-shadow:var(--shadow),inset 0 0 0 2.5px #6E5A46}
   .schip{
     display:inline-block;border-radius:999px;padding:3px 11px;
     background:var(--accent,#7B6558);color:#FBF8F4;
     font-size:10.5px;font-weight:600;letter-spacing:.05em;
   }
-  .scard .stitle{font-size:17px;font-weight:600;color:var(--tx,#17130F);margin-top:5px;line-height:1.1}
-  .scard .smeta{font-size:13.5px;font-weight:600;color:var(--meta);margin-top:2px}
-  .addplan{
+  .scard .stitle{font-size:17px;font-weight:600;color:var(--tx,#17130F);margin-top:5px;line-height:1.1;padding-right:70px}
+  .scard .smeta{font-size:13.5px;font-weight:600;color:var(--meta);margin-top:2px;padding-right:70px}
+  .addmap{
     position:absolute;right:13px;bottom:11px;
     background:none;border:none;cursor:pointer;
     color:var(--accent-tx,#776357);font-family:'League Spartan',sans-serif;font-weight:600;font-size:13.5px;
     min-height:24px;
   }
-  .addplan.inplan{color:var(--brown-warm)}
+  .addmap.onmap{color:var(--brown-warm)}
+
+  /* loading skeleton — same card bones, gently pulsing */
+  .skelline{height:12px;border-radius:6px;background:var(--ctl,#E3DED9);margin-top:8px}
+  .skelline.w40{width:40%}.skelline.w70{width:70%}.skelline.w55{width:55%}
+  .scard.skel{cursor:default;min-height:64px}
+  @keyframes skelpulse{0%,100%{opacity:.55}50%{opacity:1}}
+  .skelline{animation:skelpulse 1.3s ease-in-out infinite}
 
   .mapcard{
     background:var(--surface,#F5F3F4);border-radius:18px;box-shadow:var(--shadow);
@@ -87,6 +95,35 @@
     padding:9px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:14.5px;
     box-shadow:var(--shadow);
   }
+
+  /* location-locked map state: opaque brown block, lock, explanation */
+  .maplock{
+    background:var(--brown-warm);border-radius:12px;margin-top:8px;
+    min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;padding:18px 22px;text-align:center;
+  }
+  .maplock img{width:34px}
+  .maplock .lktx{color:#FBF8F4;font-size:14px;font-weight:600;line-height:1.35}
+  .maplock .lkbtn{
+    margin-top:4px;background:#FBF8F4;color:var(--brown-warm);border:none;border-radius:999px;cursor:pointer;
+    padding:9px 20px;font-family:'League Spartan',sans-serif;font-weight:700;font-size:14px;
+  }
+
+  /* error / empty message inside the map card */
+  .mapmsg{
+    margin-top:10px;padding:14px 6px 6px;text-align:center;
+    font-size:13.5px;font-weight:600;color:var(--mut,#8D8D8B);line-height:1.4;
+  }
+  .mapmsg .retry{
+    display:block;margin:10px auto 4px;
+    background:transparent;border:2.5px solid #A79A8C;border-radius:999px;cursor:pointer;
+    padding:6px 16px;color:var(--accent-tx,#776357);font-family:'League Spartan',sans-serif;font-weight:600;font-size:13.5px;
+  }
+  .shopskel{margin-top:12px}
+
+  @media (prefers-reduced-motion: reduce){
+    .skelline{animation:none;opacity:.7}
+  }
 </style>
 </head>
 <body>
@@ -95,57 +132,24 @@
   <div class="upghead">
     <div>
       <h1 class="serif">Upgrades</h1>
-      <div class="sub">for your Bugatti Chiron</div>
+      <div class="sub">for your car</div>
     </div>
   </div>
 
   <div class="goalrow">
-    <button class="goalpill">
-      <span>Goal: More power</span>
-      <img src="assets/icon_chevron.png" alt="">
-    </button>
+    <div class="goalpill"><span>Goal: More power</span></div>
     <button class="changegoal">Change goal</button>
   </div>
 
-  <div class="stages">
+  <!-- AI recommendations render here (skeleton first, then 2 cards) -->
+  <div class="stages" id="recs">
     <div class="rail"></div>
-
-    <div class="stage">
-      <span class="dot"></span>
-      <div class="scard">
-        <span class="schip">STAGE 1</span>
-        <div class="stitle">ECU tune</div>
-        <div class="smeta">+120 hp &middot; ~$4,500</div>
-        <button class="addplan">Add to plan</button>
-      </div>
-    </div>
-
-    <div class="stage">
-      <span class="dot"></span>
-      <div class="scard">
-        <span class="schip">STAGE 2</span>
-        <div class="stitle">Downpipes + intercooler</div>
-        <div class="smeta">+90 hp &middot; ~$8,200</div>
-        <button class="addplan">Add to plan</button>
-      </div>
-    </div>
   </div>
 
   <div class="mapcard">
     <h2>Where to get it done</h2>
-    <div class="msub">ECU tune &middot; 4 shops near you</div>
-    <div class="mapwrap">
-      <img class="mapimg" src="assets/map_shops.png" alt="Map of nearby shops">
-      <span class="pinpulse" style="left:47%;top:42%" aria-hidden="true"></span>
-    </div>
-    <div class="shoprow">
-      <div>
-        <div class="sname">Apex Performance Tuning</div>
-        <div class="srate">4.8 &#9733; &middot; 2.1 mi &middot; from $3,900</div>
-      </div>
-      <button class="directions">Directions</button>
-    </div>
-    <button class="seeall">See all 4 shops</button>
+    <div class="msub" id="mapsub"></div>
+    <div id="mapzone"></div>
   </div>
 
   <nav class="nav" data-active="2">
@@ -158,115 +162,340 @@
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  function goGoal() { location.href = 'goal-picker.html'; }
-  document.querySelector('.goalpill').addEventListener('click', goGoal);
-  document.querySelector('.changegoal').addEventListener('click', goGoal);
+  var $ = function (id) { return document.getElementById(id); };
 
-  /* goal pill + subtitle reflect state */
-  document.querySelector('.goalpill span').textContent = 'Goal: ' + CarBox.get('goal');
-  document.querySelector('.upghead .sub').textContent = 'for your ' + CarBox.get('vehicle').name;
-
-  /* ── stages: add-to-plan toggles + running total pill ── */
-  var STAGES = [{ id: 's1', cost: 4500 }, { id: 's2', cost: 8200 }];
-  var plan = CarBox.get('planItems');
-  var btns = Array.prototype.slice.call(document.querySelectorAll('.addplan'));
-  var totalPill = document.createElement('div');
-  totalPill.className = 'plantotal';
-  document.querySelector('.stages').insertAdjacentElement('afterend', totalPill);
-  var shownTotal = 0;
-
-  function planTotal() {
-    var t = 0;
-    STAGES.forEach(function (s) { if (plan.indexOf(s.id) !== -1) t += s.cost; });
-    return t;
+  /* ── API proxy base (keys live server-side, see /server/README.md).
+     Default: same host as the page on port 8787 (the local proxy). Override
+     once with localStorage.setItem('carbox.apiBase','https://your-deploy'). ── */
+  var API_BASE = (function () {
+    try { var s = localStorage.getItem('carbox.apiBase'); if (s) return s.replace(/\/+$/, ''); } catch (e) {}
+    if (location.protocol === 'http:' || location.protocol === 'https:')
+      return location.protocol + '//' + location.hostname + ':8787';
+    return 'http://localhost:8787';
+  })();
+  function api(path, payload, timeoutMs) {
+    var ctl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = ctl && setTimeout(function () { ctl.abort(); }, timeoutMs || 12000);
+    return fetch(API_BASE + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: ctl ? ctl.signal : undefined
+    }).then(function (r) {
+      if (timer) clearTimeout(timer);
+      if (!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    }, function (e) { if (timer) clearTimeout(timer); throw e; });
   }
-  var CHECK_SVG = '<svg class="checkdraw" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" ' +
-    'style="display:inline-block;vertical-align:-1px"><path d="M4 12.5 L10 18.5 L20 6.5" fill="none" ' +
-    'stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  function paintPlan(animate) {
-    btns.forEach(function (btn, i) {
-      var inPlan = plan.indexOf(STAGES[i].id) !== -1;
-      var was = btn.classList.contains('inplan');
-      if (inPlan) {
-        btn.innerHTML = 'In plan ' + CHECK_SVG;   /* checkmark draws itself */
-        if (!animate || was) {
-          var p = btn.querySelector('path');
-          if (p) p.style.strokeDashoffset = '0';
-        }
-      } else {
-        btn.textContent = 'Add to plan';
-      }
-      btn.classList.toggle('inplan', inPlan);
-    });
-    var t = planTotal();
-    if (t > 0) {
-      totalPill.classList.add('show');
-      if (animate) {
-        UI.countUp(totalPill, shownTotal, t, function (n) { return 'Plan total: ~' + CarBox.fmtMoney(n); });
-      } else {
-        totalPill.textContent = 'Plan total: ~' + CarBox.fmtMoney(t);
-      }
-    } else {
-      totalPill.classList.remove('show');
-    }
-    shownTotal = t;
-  }
-  paintPlan(false);
-  btns.forEach(function (btn, i) {
-    btn.addEventListener('click', function () {
-      var id = STAGES[i].id;
-      var idx = plan.indexOf(id);
-      if (idx === -1) plan.push(id); else plan.splice(idx, 1);
-      CarBox.set('planItems', plan);
-      btn.classList.remove('pop');
-      void btn.offsetWidth;
-      btn.classList.add('pop');
-      paintPlan(true);
-    });
+  /* the no-dashes rule is enforced in the AI system prompt AND here as a backstop */
+  function clean(s) { return String(s || '').replace(/\s*[—–]\s*/g, ', '); }
+
+  var vehicle = CarBox.get('vehicle');
+  var goal = CarBox.get('goal');
+  document.querySelector('.goalpill span').textContent = 'Goal: ' + goal;
+  document.querySelector('.upghead .sub').textContent = 'for your ' + vehicle.name;
+  /* "Change goal" is the ONLY way into the goal picker (the pill is a label) */
+  document.querySelector('.changegoal').addEventListener('click', function () {
+    location.href = 'goal-picker.html';
   });
 
-  /* ── shops ── */
-  var SHOPS = [
-    { name: 'Apex Performance Tuning', rate: 4.8, dist: 2.1, from: 3900 },
-    { name: 'Redline Dyno Works', rate: 4.7, dist: 3.4, from: 4200 },
-    { name: 'Precision Motorsport Lab', rate: 4.9, dist: 5.0, from: 4800 },
-    { name: 'Velocity Garage', rate: 4.6, dist: 6.2, from: 3650 }
-  ];
+  /* ════════ AI RECOMMENDATIONS (Part B) ════════ */
+  var recsWrap = $('recs');
+  var recsKey = [vehicle.make, vehicle.model, vehicle.year, vehicle.trim || '', goal].join('|');
+  var items = [];   /* [{name, benefit, detail}] */
+
+  function card(html) {
+    var stage = document.createElement('div');
+    stage.className = 'stage';
+    stage.innerHTML = '<span class="dot"></span>' + html;
+    return stage;
+  }
+  function renderSkeleton() {
+    recsWrap.querySelectorAll('.stage').forEach(function (el) { el.remove(); });
+    for (var i = 0; i < 2; i++) {
+      recsWrap.appendChild(card(
+        '<div class="scard skel" aria-hidden="true">' +
+        '<div class="skelline w40"></div><div class="skelline w70"></div><div class="skelline w55"></div></div>'
+      ));
+    }
+  }
+
+  var CHECK_SVG = '<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" ' +
+    'style="display:inline-block;vertical-align:-1px"><path d="M4 12.5 L10 18.5 L20 6.5" fill="none" ' +
+    'stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function mappedName() {
+    var m = CarBox.get('mappedMod');
+    for (var i = 0; i < items.length; i++) if (items[i].name === m) return m;
+    return items.length ? items[0].name : null;
+  }
+  function paintMapped() {
+    var m = mappedName();
+    recsWrap.querySelectorAll('.scard').forEach(function (el) {
+      var isOn = el.getAttribute('data-name') === m;
+      el.classList.toggle('mapped', isOn);
+      var btn = el.querySelector('.addmap');
+      if (btn) {
+        btn.classList.toggle('onmap', isOn);
+        btn.innerHTML = isOn ? 'On map ' + CHECK_SVG : 'Add to map';
+      }
+    });
+  }
+
+  function openDetail(mod) {
+    UI.sheet({
+      title: mod.name,
+      label: mod.name,
+      build: function (body) {
+        var meta = document.createElement('div');
+        meta.className = 'sheetrow';
+        meta.innerHTML = '<div class="rowtop">Estimated</div>';
+        var mtx = document.createElement('div');
+        mtx.className = 'rowtx';
+        mtx.textContent = clean(mod.benefit);
+        meta.appendChild(mtx);
+        body.appendChild(meta);
+        var row = document.createElement('div');
+        row.className = 'sheetrow';
+        var tx = document.createElement('div');
+        tx.className = 'rowtx';
+        tx.textContent = clean(mod.detail);   /* paragraph: what it is, what it does, why this car */
+        row.appendChild(tx);
+        body.appendChild(row);
+      }
+    });
+  }
+
+  function renderRecs() {
+    recsWrap.querySelectorAll('.stage').forEach(function (el) { el.remove(); });
+    items.forEach(function (mod) {
+      var stage = card(
+        '<div class="scard" data-name="' + mod.name.replace(/"/g, '&quot;') + '" role="button" tabindex="0" data-press>' +
+        '<span class="schip">RECOMMENDED</span>' +
+        '<div class="stitle"></div>' +
+        '<div class="smeta"></div>' +
+        '<button class="addmap">Add to map</button></div>'
+      );
+      stage.querySelector('.stitle').textContent = mod.name;
+      stage.querySelector('.smeta').textContent = clean(mod.benefit);
+      var sc = stage.querySelector('.scard');
+      sc.addEventListener('click', function (e) {
+        if (e.target.closest('.addmap')) return;
+        openDetail(mod);
+      });
+      sc.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') openDetail(mod);
+      });
+      stage.querySelector('.addmap').addEventListener('click', function () {
+        CarBox.set('mappedMod', mod.name);
+        var b = this;
+        b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+        paintMapped();
+        loadShops();   /* swap the map section to this mod's shops */
+      });
+      recsWrap.appendChild(stage);
+    });
+    if (!CarBox.get('mappedMod') || mappedName() !== CarBox.get('mappedMod')) {
+      CarBox.set('mappedMod', mappedName());
+    }
+    paintMapped();
+  }
+
+  /* ── LOCAL FALLBACK recommender ──
+     Used ONLY when the API proxy is unreachable or has no key yet, so the
+     page never shows a broken/empty state. Rules-based: goal + aspiration
+     (turbo/supercharged/NA/EV) + drivetrain pick 2 safe, generic mods.
+     Detail strings deliberately contain no em or en dashes. */
+  function localRecs() {
+    var s = vehicle.specs || {};
+    var eng = String(s.engine || '').toLowerCase();
+    var ev = /electric/.test(eng);
+    var boosted = /turbo|supercharg/.test(eng);
+    var carTag = vehicle.year + ' ' + vehicle.make + ' ' + vehicle.model;
+    function R(name, benefit, detail) { return { name: name, benefit: benefit, detail: detail }; }
+    if (goal === 'Better handling') {
+      return [
+        R('Coilover suspension kit', 'Sharper turn-in and adjustable ride height, roughly $1,200-2,200',
+          'A coilover kit replaces the factory springs and shocks with height and damping adjustable units. It lowers the center of gravity, reduces body roll, and lets you fine tune how firm the car feels. For a ' + carTag + ' chasing better handling, it is the single biggest step because every corner input gets more precise while stock comfort stays available at softer settings.'),
+        R('Performance summer tires', 'The biggest grip gain per dollar, roughly $600-1,100 a set',
+          'Tires are the only part of the car touching the road, so a set of modern performance summer tires transforms grip, braking distance, and steering feel at once. They are safe, reversible, and work with all stock components. On a ' + carTag + ' this is the first upgrade any handling focused build should make before touching anything else.')
+      ];
+    }
+    if (goal === 'Show car looks') {
+      return [
+        R('Aftermarket wheel setup', 'A complete stance change, roughly $1,400-2,600 with tires',
+          'A well chosen set of aftermarket wheels in the right width and offset changes the whole character of the car more than any other visual mod. It keeps everything bolt-on and reversible. For a ' + carTag + ' it is the highest impact way to make the car look finished and intentional at a show or on the street.'),
+        R('Paint correction and ceramic coating', 'Deep gloss that lasts years, roughly $600-1,200',
+          'Paint correction machine polishes the clear coat to remove swirls and haze, then a ceramic coating seals that finish so it beads water and resists grime. The car looks wet and freshly detailed all the time. On a ' + carTag + ' built to be seen, flawless paint is the base layer every other cosmetic mod sits on.')
+      ];
+    }
+    if (goal === 'Track ready') {
+      return [
+        R('Track brake pads and fluid', 'Fade-free braking all session, roughly $400-800',
+          'High temperature brake pads and racing brake fluid keep the pedal firm lap after lap where stock parts overheat and fade. It is the first safety critical upgrade for any track day. A ' + carTag + ' will stop harder and more consistently, which is worth more lap time than adding power and keeps you safe when everything else gets hot.'),
+        R('200TW track tires', 'Seconds off your lap time, roughly $800-1,400 a set',
+          'A 200 treadwear tire is street legal but built for circuit grip, with stiffer sidewalls and a compound that comes alive with heat. It is the fastest single change you can make to lap times. For a ' + carTag + ' heading to the track, grip from the tires makes the power, brakes, and suspension all work better together.')
+      ];
+    }
+    /* More power (default) */
+    if (ev) {
+      return [
+        R('Lightweight flow-formed wheels', 'Quicker acceleration feel, roughly $1,200-2,000',
+          'An electric motor already delivers instant torque, so shedding rotating mass is the cleanest way to make the car feel faster. Lighter wheels reduce the energy needed to spin up, improving both acceleration response and range slightly. On a ' + carTag + ' this keeps the powertrain untouched (and the warranty intact) while making every launch feel sharper.'),
+        R('High-grip summer tires', 'Puts the torque to the ground, roughly $700-1,200 a set',
+          'Electric cars often overpower their factory efficiency tires. A performance summer tire converts the instant torque into real forward motion instead of wheelspin and shortens braking distances too. For a ' + carTag + ' it is the safest and most effective way to use the power it already has.')
+      ];
+    }
+    if (boosted) {
+      return [
+        R('ECU flash tune', 'Meaningful gains on a boosted engine, roughly $500-900',
+          'A flash tune rewrites the factory engine calibration to raise boost and optimize fuel and timing within safe limits. Because the ' + carTag + ' is already running forced induction, the hardware headroom is there and a reputable tune unlocks it. It is the best power per dollar available for this platform when done by an experienced shop on a dyno.'),
+        R('Cat-back exhaust system', 'Freer flow and real sound, roughly $800-1,500',
+          'A cat-back exhaust replaces the restrictive rear section of the factory system with larger, smoother piping. It releases a modest amount of power, sheds weight, and gives the car a genuine performance voice. Paired with a tune on a boosted ' + carTag + ' it helps the whole system breathe and sets up any future hardware upgrades.')
+      ];
+    }
+    return [
+      R('Cold air intake', 'Better breathing and response, roughly $300-450',
+        'A cold air intake replaces the factory airbox with a freer flowing filter that draws cooler, denser air. On a naturally aspirated engine the gains are honest but modest, and throttle response and sound both improve immediately. For a ' + carTag + ' it is the right first step because it is affordable, reversible, and works with the stock computer safely.'),
+      R('Cat-back exhaust system', 'Flow, sound, and less weight, roughly $700-1,400',
+        'A cat-back exhaust swaps the muffler and rear piping for a straighter, larger diameter path. It frees a few horsepower, cuts weight, and gives the car a cleaner exhaust note without drone when sized correctly. Combined with an intake it lets a naturally aspirated ' + carTag + ' breathe at both ends, which is the sensible power recipe without touching internals.')
+    ];
+  }
+
+  function initRecs() {
+    var cached = CarBox.get('recs');
+    if (cached && cached.key === recsKey && cached.source === 'api' && cached.items && cached.items.length === 2) {
+      items = cached.items;      /* fresh cache for this exact car+goal: no re-call */
+      renderRecs();
+      return;
+    }
+    if (cached && cached.key === recsKey && cached.items && cached.items.length === 2) {
+      items = cached.items;      /* fallback cache: show instantly, still retry the API */
+      renderRecs();
+    } else {
+      renderSkeleton();
+    }
+    api('/api/recommend', {
+      make: vehicle.make, model: vehicle.model, year: vehicle.year,
+      trim: vehicle.trim || '', specs: vehicle.specs || {}, goal: goal
+    }, 20000).then(function (data) {
+      if (data && data.recommendations && data.recommendations.length === 2) {
+        items = data.recommendations.map(function (m) {
+          return { name: m.name, benefit: clean(m.benefit), detail: clean(m.detail) };
+        });
+        CarBox.set('recs', { key: recsKey, items: items, source: 'api' });
+        renderRecs();
+        loadShops();
+      } else { throw new Error('bad payload'); }
+    }).catch(function () {
+      /* FALLBACK: proxy down or key missing — never show a broken state */
+      if (!items.length) {
+        items = localRecs();
+        CarBox.set('recs', { key: recsKey, items: items, source: 'local' });
+        renderRecs();
+        loadShops();
+      }
+    });
+  }
+
+  /* ════════ WHERE TO GET IT DONE (Parts C + D) ════════ */
+  var mapzone = $('mapzone'), mapsub = $('mapsub');
+  var shops = [];
+
   function fmtDist(mi) {
     return CarBox.get('units') === 'km'
       ? (mi * 1.60934).toFixed(1) + ' km'
       : mi + ' mi';
   }
-  function shopMeta(s) { return s.rate + ' ★ · ' + fmtDist(s.dist) + ' · from ' + CarBox.fmtMoney(s.from); }
-  function dirToast() { UI.toast('Opens in Maps at launch'); }
-
-  document.querySelector('.shoprow .srate').textContent = shopMeta(SHOPS[0]);
-  document.querySelector('.shoprow .directions').addEventListener('click', dirToast);
-
-  /* pin drops in with a bounce when the map card scrolls into view */
-  var pin = document.querySelector('.pinpulse');
-  if (pin && !UI.reduced() && 'IntersectionObserver' in window) {
-    pin.style.opacity = '0';
-    var pinIO = new IntersectionObserver(function (ents) {
-      ents.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        pin.style.opacity = '';
-        pin.classList.add('pindrop');
-        pinIO.disconnect();
-      });
-    }, { threshold: 0.4 });
-    pinIO.observe(document.querySelector('.mapcard'));
+  function shopMeta(s) {
+    return s.rating + ' ★ (' + (s.ratingCount || 0) + ') · ' + fmtDist(s.distanceMiles) + ' · ' + s.priceEstimate;
+  }
+  /* real directions: deep link into the maps app (Google Maps universal URL) */
+  function openDirections(s) {
+    var url = s.mapsUrl || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s.name));
+    var w = null;
+    try { w = window.open(url, '_blank'); } catch (e) {}
+    if (!w) location.href = url;
   }
 
-  /* condensing header */
-  UI.condense('Upgrades');
+  function setSub(txt) { mapsub.textContent = txt; }
+  function zone(html) { mapzone.innerHTML = html; }
 
-  document.querySelector('.seeall').addEventListener('click', function () {
+  function renderLocked() {
+    var m = mappedName();
+    setSub(m ? m : 'Nearby shops');
+    zone('<div class="maplock">' +
+      '<img src="assets/badge_lock.png" alt="">' +
+      '<div class="lktx">Allow location access to see real shops near you that can do this mod, with live ratings, distances, and price estimates.</div>' +
+      '<button class="lkbtn" id="lockAllow">Allow location</button></div>');
+    $('lockAllow').addEventListener('click', function () {
+      if (!navigator.geolocation) { UI.toast('Location isn’t available on this device'); return; }
+      var b = this; b.disabled = true; b.textContent = 'Requesting…';
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        CarBox.set('locationGranted', true);
+        CarBox.set('location', { lat: pos.coords.latitude, lng: pos.coords.longitude });
+        loadShops();
+      }, function () {
+        b.disabled = false; b.textContent = 'Allow location';
+        UI.toast('Location was denied — check your device settings');
+      }, { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 });
+    });
+  }
+
+  function renderLoading() {
+    var m = mappedName();
+    setSub(m ? m + ' · finding shops near you…' : 'Finding shops…');
+    zone('<div class="mapwrap"><img class="mapimg" src="assets/map_shops.png" alt="Map of nearby shops"></div>' +
+      '<div class="shopskel"><div class="skelline w70"></div><div class="skelline w55"></div>' +
+      '<div class="skelline w70"></div><div class="skelline w40"></div></div>');
+  }
+
+  function renderError() {
+    var m = mappedName();
+    setSub(m || 'Nearby shops');
+    zone('<div class="mapmsg">Couldn’t reach the shop service. Check that the CarBox API proxy is running, then try again.' +
+      '<button class="retry" id="shopRetry">Try again</button></div>');
+    $('shopRetry').addEventListener('click', loadShops);
+  }
+
+  function renderEmpty() {
+    var m = mappedName();
+    setSub(m || 'Nearby shops');
+    zone('<div class="mapmsg">No shops for this mod found near you yet. Try again later or widen your search from a bigger city.</div>');
+  }
+
+  function renderShops() {
+    var m = mappedName();
+    setSub(m + ' · ' + shops.length + ' shop' + (shops.length === 1 ? '' : 's') + ' near you');
+    var html = '<div class="mapwrap"><img class="mapimg" src="assets/map_shops.png" alt="Map of nearby shops">' +
+      '<span class="pinpulse" style="left:47%;top:42%" aria-hidden="true"></span></div>';
+    zone(html);
+    var first = shops[0];
+    var row = document.createElement('div');
+    row.className = 'shoprow';
+    row.innerHTML = '<div><div class="sname"></div><div class="srate"></div></div>' +
+      '<button class="directions">Directions</button>';
+    row.querySelector('.sname').textContent = first.name;
+    row.querySelector('.srate').textContent = shopMeta(first);
+    row.querySelector('.directions').addEventListener('click', function () { openDirections(first); });
+    mapzone.appendChild(row);
+    if (shops.length > 1) {
+      var btn = document.createElement('button');
+      btn.className = 'seeall';
+      btn.textContent = 'See all ' + shops.length + ' shops';
+      btn.addEventListener('click', seeAllSheet);
+      mapzone.appendChild(btn);
+    }
+    var pin = mapzone.querySelector('.pinpulse');
+    if (pin && !UI.reduced()) pin.classList.add('pindrop');
+  }
+
+  function seeAllSheet() {
     UI.sheet({
       title: 'Shops near you',
       label: 'Shops near you',
       build: function (body) {
-        SHOPS.forEach(function (s) {
+        shops.forEach(function (s) {
           var row = document.createElement('div');
           row.className = 'sheetrow rowflex';
           var left = document.createElement('div');
@@ -277,13 +506,37 @@ document.addEventListener('DOMContentLoaded', function () {
           btn.className = 'directions';
           btn.textContent = 'Directions';
           btn.setAttribute('aria-label', 'Directions to ' + s.name);
-          btn.addEventListener('click', dirToast);
+          btn.addEventListener('click', function () { openDirections(s); });
           row.appendChild(left); row.appendChild(btn);
           body.appendChild(row);
         });
+        var note = document.createElement('div');
+        note.className = 'sheet-note';
+        note.textContent = 'Ratings live from Google · prices are estimates';
+        body.appendChild(note);
       }
     });
-  });
+  }
+
+  /* live call every time — ratings/distances must be current, so no caching */
+  function loadShops() {
+    var m = mappedName();
+    if (!m) { setSub(''); zone(''); return; }
+    if (!CarBox.get('locationGranted') || !CarBox.get('location')) { renderLocked(); return; }
+    renderLoading();
+    var loc = CarBox.get('location');
+    api('/api/shops', { lat: loc.lat, lng: loc.lng, modName: m }, 15000)
+      .then(function (data) {
+        shops = (data && data.shops) || [];
+        if (!shops.length) renderEmpty(); else renderShops();
+      })
+      .catch(renderError);
+  }
+
+  /* ── boot ── */
+  initRecs();
+  loadShops();
+  UI.condense('Upgrades');
 });
 </script>
 </body>

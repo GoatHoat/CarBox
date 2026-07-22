@@ -29,7 +29,8 @@ document.addEventListener('DOMContentLoaded', function () {
      else at step 6 (default = the grey Chiron sprite, same as Settings). */
   var A = { firstName: '', lastName: '', email: '', password: '',
             username: '', tag: '', birthday: '', make: '', model: '', year: '',
-            presetId: 'body_suv', hue: null, shade: 1 };
+            presetId: 'body_suv', hue: null, shade: 1,
+            locationGranted: false, location: null };
 
   var $ = function (id) { return document.getElementById(id); };
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -50,9 +51,9 @@ document.addEventListener('DOMContentLoaded', function () {
   applyOb('light');                                            /* re-assert after ui.js init */
   themeBtn.addEventListener('click', function () { applyOb(obTheme === 'dark' ? 'light' : 'dark'); });
 
-  /* progress bar fills across steps 2..7 */
+  /* progress bar fills across steps 2..8 */
   function paintProgress() {
-    var frac = current <= 1 ? 0 : Math.min(1, (current - 1) / 6);
+    var frac = current <= 1 ? 0 : Math.min(1, (current - 1) / 7);
     fill.style.width = (frac * 100) + '%';
   }
 
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
       s.classList.remove('active', 'fwd', 'back');
       if (+s.getAttribute('data-step') === n) s.classList.add('active', reduced ? '' : dir);
     });
-    head.hidden = (n === 1 || n === 7);
+    head.hidden = (n === 1 || n === 8);
     paintProgress();
     window.scrollTo(0, 0);
   }
@@ -352,7 +353,44 @@ document.addEventListener('DOMContentLoaded', function () {
     show(6, 'fwd');
   });
 
-  /* ─── Step 6: Terms & Privacy ─── */
+  /* ─── Step 6: Location (for real nearby shops on Upgrades) ───
+     Asks the OS for geolocation right here. Declining NEVER blocks signup;
+     Upgrades offers a re-request later. Inside the Expo WebView this needs the
+     native permission bridged (geolocationEnabled + Info.plist string — see
+     CLAUDE.md "Expo shell" note). */
+  var locErr = $('ob-loc-err');
+  var locAllow = $('ob-loc-allow'), locSkip = $('ob-loc-skip');
+  locAllow.addEventListener('click', function () {
+    if (!navigator.geolocation) {
+      locErr.textContent = 'Location isn’t available on this device';
+      locErr.classList.add('show');
+      return;
+    }
+    locAllow.disabled = true;
+    locAllow.textContent = 'Requesting…';
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        A.locationGranted = true;
+        A.location = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        show(7, 'fwd');
+      },
+      function () {
+        /* denied or failed: continue anyway, they can grant later on Upgrades */
+        locAllow.disabled = false;
+        locAllow.textContent = 'Allow location access';
+        A.locationGranted = false; A.location = null;
+        if (window.UI && UI.toast) UI.toast('You can allow this later from Upgrades');
+        show(7, 'fwd');
+      },
+      { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 }
+    );
+  });
+  locSkip.addEventListener('click', function () {
+    A.locationGranted = false; A.location = null;
+    show(7, 'fwd');
+  });
+
+  /* ─── Step 7: Terms & Privacy ─── */
   var LEGAL = {
     terms: 'CarBox Terms of Service (placeholder)\n\n' +
       'These are placeholder Terms of Service for the CarBox prototype. The owner will replace this copy with real, legally reviewed terms before launch.\n\n' +
@@ -412,6 +450,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     /* the appearance choices from the customizer */
     CarBox.set('car', { presetId: A.presetId, hue: A.hue, shade: A.shade });
+    /* location consent from step 6 (Upgrades uses this for real nearby shops) */
+    CarBox.set('locationGranted', A.locationGranted);
+    CarBox.set('location', A.location);
 
     /* fresh account: a real new signup starts with an empty garage — clear the
        Bugatti demo activity so the whole app reflects THIS car, not the seeds.
@@ -428,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function () {
     CarBox.set('nextService', { title: 'First service', due: 5000 });
 
     CarBox.set('onboardingComplete', true);
-    show(7, 'fwd');
+    show(8, 'fwd');
     var delay = reduced ? 700 : 1500;
     setTimeout(function () { location.replace('index.html?v=' + Date.now()); }, delay);
   });

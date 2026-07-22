@@ -1,0 +1,13 @@
+{
+  "name": "carbox-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CarBox backend proxy: AI mod recommendations + live nearby shops. Keys live here, never in the client.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

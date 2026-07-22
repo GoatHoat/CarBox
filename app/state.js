@@ -46,6 +46,12 @@ window.CarBox = (function () {
     liked: false,
     goal: 'More power',
     planItems: [],
+    /* Upgrades: AI recommendations cached per (car+goal) so we don't re-call
+       the API every visit — {key:'make|model|year|trim|goal', items:[...], source:'ai'|'local'} */
+    recs: null,
+    mappedMod: null,        /* name of the recommendation whose shops show on the map */
+    locationGranted: false, /* user allowed location during onboarding (or later on Upgrades) */
+    location: null,         /* last known {lat, lng} when granted */
     notifications: [
       { id: 'oil', type: 'service', text: 'Oil change due in 400 mi', unread: true },
       { id: 'n-c1', type: 'comment', ref: 'c1', user: '@TurboTom', text: 'That exhaust note must be insane.', unread: false },

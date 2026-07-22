@@ -22,6 +22,7 @@ export default function App() {
         source={{ uri: CARBOX_URL }}
         style={{ flex: 1, backgroundColor: bg }}
         cacheEnabled={false}
+        geolocationEnabled={true}   /* Android: bridge navigator.geolocation to the native permission */
         originWhitelist={['*']}
         allowsBackForwardNavigationGestures
         setSupportMultipleWindows={false}
