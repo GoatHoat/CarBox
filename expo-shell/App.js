@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, Linking } from 'react-native';
 import { WebView } from 'react-native-webview';
-// Native save/share for the PDF export. Install once:
+// Native save/share for the PDF export. Installed via:
 //   npx expo install expo-file-system expo-sharing
-// (Both are bundled in Expo Go, so no dev-client rebuild is needed to test.)
-import * as FileSystem from 'expo-file-system';
+// (Both ship in Expo Go, so no dev-client rebuild is needed to test.)
+// NOTE: SDK 54's expo-file-system v19 moved the classic writeAsStringAsync/
+// cacheDirectory API to the /legacy entry point — use it so those exist.
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 
 // LAN address of the static server started with:
