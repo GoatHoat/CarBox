@@ -747,11 +747,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* CarBox API proxy base (same host, port 8787; override via carbox.apiBase) */
+  /* CarBox API proxy base — the deployed backend project (override via carbox.apiBase,
+     e.g. localStorage.setItem('carbox.apiBase','http://localhost:8787') for local dev).
+     Used by Delete Account (/api/delete-account), so it must reach the live backend. */
   function apiBase() {
     try { var s = localStorage.getItem('carbox.apiBase'); if (s) return s.replace(/\/+$/, ''); } catch (e) {}
-    if (location.protocol === 'http:' || location.protocol === 'https:') return location.protocol + '//' + location.hostname + ':8787';
-    return 'http://localhost:8787';
+    return 'https://carboxserver.vercel.app';
   }
   bindRow('signout', function () {
     confirmSheet({
