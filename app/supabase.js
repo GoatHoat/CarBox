@@ -66,7 +66,10 @@
     sb.from('user_state').select('data').eq('user_id', user.id).maybeSingle().then(function (res) {
       var row = res && res.data;
       if (res && res.error) { pushState(); return; }
-      if (!row || !row.data) { pushState(); return; }  /* nothing stored yet -> seed cloud from local */
+      /* Only adopt a cloud row that is a REAL, completed garage. An empty or
+         half-written {} would blank the app and could churn reloads; in that
+         case seed the cloud from local instead. */
+      if (!row || !row.data || !row.data.onboardingComplete) { pushState(); return; }
       setLocal(row.data);
       if (window.CarBox && CarBox.reload) CarBox.reload();
       location.reload();                                 /* re-hydrate pages from pulled data (once) */
@@ -80,7 +83,16 @@
       var local = localState();
       if (session && session.user) {
         window.CARBOX_USER = session.user;   /* lets uploads.js switch photos to real cloud Storage */
-        pullOnce(session.user);
+        /* Adopt cloud state ONLY on a fresh device with no local garage yet
+           (e.g. logging in on a new phone). If THIS device already finished
+           onboarding, do NOT overwrite its local state or hard-reload under the
+           user — that clobbers good local data with a possibly older cloud copy
+           and interrupts taps (the page reloading a second or two after load
+           feels like "nothing works / can't switch tabs"). Just sync upward.
+           A proper two-way merge is a future improvement; for now the device
+           you're actively using always wins. */
+        if (local && local.onboardingComplete) { pushState(); }
+        else { pullOnce(session.user); }
         return;
       }
 
