@@ -65,6 +65,42 @@
     display:flex;align-items:center;justify-content:center;padding:0;
   }
   @media (prefers-reduced-motion: reduce){ .carbtn.justadded{animation:none} }
+
+  /* back arrow (top-left) on the car detail view */
+  .detailback{
+    position:absolute;top:0;left:0;z-index:25;background:none;border:none;cursor:pointer;
+    padding:6px 10px 6px 0;display:flex;align-items:center;min-height:44px;
+  }
+  .detailback img{width:30px}
+  /* cards home */
+  .garage-lbl{font-family:'DM Serif Display',serif;font-size:26px;color:var(--tx,#141210);margin:4px 2px 12px}
+  .carcards{display:flex;flex-direction:column;gap:12px}
+  .carcard{
+    display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+    background:var(--card);border-radius:20px;box-shadow:var(--shadow);border:2px solid transparent;
+    padding:10px 15px;cursor:pointer;min-height:94px;
+    transition:transform 90ms ease-out;
+  }
+  .carcard.active{border-color:#6E5A46}
+  .carcard .cc-sprite{width:116px;flex:none;pointer-events:none}
+  .carcard .cc-info{min-width:0;flex:1}
+  .carcard .cc-name{font-family:'League Spartan',sans-serif;font-size:18px;font-weight:700;color:var(--tx,#141311);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .carcard .cc-sub{font-size:13.5px;font-weight:500;color:var(--mut,#9A928B);margin-top:3px}
+  .carcard.locked{opacity:.5}
+  .carcard.locked .cc-sub{color:#B3402F}
+  .addcard{
+    display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:94px;
+    background:transparent;border:2px dashed var(--mut,#C2B6AA);border-radius:20px;cursor:pointer;
+    color:var(--mut,#8D8579);font-family:'League Spartan',sans-serif;font-weight:700;font-size:16px;
+  }
+  .addcard .cc-plus{font-size:30px;line-height:1}
+  @keyframes cardin{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+  .carcard.justadded{animation:cardin .4s cubic-bezier(.3,1.4,.4,1)}
+  @keyframes viewInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+  @keyframes viewInLeft{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:none}}
+  #detailView.slidein{animation:viewInRight .28s cubic-bezier(.3,1.4,.4,1)}
+  #cardsView.slidein{animation:viewInLeft .28s cubic-bezier(.3,1.4,.4,1)}
+  @media (prefers-reduced-motion: reduce){ .carcard.justadded,#detailView.slidein,#cardsView.slidein{animation:none} }
 </style>
 <script defer src="state.js"></script>
 <script defer src="config.js"></script>
@@ -86,6 +122,7 @@
 <div class="phone">
 
   <div class="toprow">
+    <button class="detailback" id="detailBack" aria-label="Back to garage" hidden><img src="assets/icon_back.png" alt=""></button>
     <div class="notif" id="notifpill" role="button" tabindex="0" data-press>
       <span id="notiftext">Oil change due in 400 mi</span>
       <img src="assets/icon_warning.png" alt="">
@@ -107,6 +144,14 @@
     </div>
   </div>
 
+  <!-- CARDS VIEW: one horizontal card per car + an add-car card -->
+  <div id="cardsView" hidden>
+    <div class="garage-lbl">Your garage</div>
+    <div id="carCards" class="carcards"></div>
+  </div>
+
+  <!-- DETAIL VIEW: the single-car garage (what it looked like before) -->
+  <div id="detailView">
   <div class="hero"><img class="i-sprite" src="assets/sprite_chiron.png" alt="Bugatti Chiron pixel art"></div>
   <h1 class="cartitle serif">Bugatti Chiron</h1>
   <div class="caryear serif">2026</div>
@@ -128,6 +173,7 @@
     <button class="actbtn" id="likebtn" aria-label="Like"><img class="i-thumb" src="assets/icon_thumb.png" alt=""></button>
     <button class="actbtn" id="commentbtn" aria-label="Comments"><img class="i-comment" src="assets/icon_comment.png" alt=""></button>
     <button class="actbtn" id="sharebtn" aria-label="Share"><img class="i-share" src="assets/icon_share.png" alt=""></button>
+  </div>
   </div>
 
   <nav class="nav" data-active="0">
@@ -171,58 +217,97 @@ document.addEventListener('DOMContentLoaded', function () {
   /* computed advised-service line for the ACTIVE car (Part C). Returns null when
      there's no meaningful reminder or the Settings "Service reminders" toggle is off. */
   function serviceLine() { return CarBox.serviceReminderText(); }
-  function hydrate() {
+  /* ── two-level Garage: a cards HOME (all your cars + an add card) and the
+     single-car DETAIL view. Free / single-car users go straight to detail;
+     Pro (or a lapsed user with extra cars) get the cards home. ── */
+  var cardsView = document.getElementById('cardsView');
+  var detailView = document.getElementById('detailView');
+  var detailBack = document.getElementById('detailBack');
+  var carCards = document.getElementById('carCards');
+  var pillEl = document.getElementById('notifpill');
+  var currentView = null;
+
+  function useCards() { return CarBox.get('isPro') || CarBox.cars().length > 1; }
+
+  function hydrateShared() {
+    var prof = CarBox.get('profile');
+    document.querySelector('.pname').textContent = prof.name;
+    document.querySelector('.phandle').textContent = prof.handle;
+    paintBadge();
+  }
+  function hydrateDetail() {
     var vehicle = CarBox.get('vehicle');
     document.querySelector('.cartitle').textContent = vehicle.name;
     document.querySelector('.caryear').textContent = String(vehicle.year);
     paintSpecs(vehicle);
-    var prof = CarBox.get('profile');
-    document.querySelector('.pname').textContent = prof.name;
-    document.querySelector('.phandle').textContent = prof.handle;
     UI.carSprite(document.querySelector('.i-sprite'));
-    /* pill shows the computed service reminder; hidden when reminders off / none */
     var line = serviceLine();
-    var pillEl = document.getElementById('notifpill');
     if (line) { document.getElementById('notiftext').textContent = line; pillEl.style.display = ''; }
     else { pillEl.style.display = 'none'; }
-    paintCarSwitcher();
-    paintBadge();
   }
-  /* ── multi-car switcher (Part B): round car buttons + "+" in the icon stack.
-     Shown only for Pro users, or for lapsed users who still hold extra cars
-     (those extras appear LOCKED with a resubscribe affordance — Part B3). ── */
-  var stack = document.querySelector('.iconstack');
-  function tintCarBtn(img, ap) {
+  function tintInto(img, ap) {
     ap = ap || { presetId: 'body_suv', hue: null, shade: 1 };
     UI.tintSprite('assets/' + ap.presetId + '.png', ap.hue, ap.shade, function (url) { img.src = url; });
   }
-  function paintCarSwitcher(justAddedId) {
-    stack.querySelectorAll('.carbtn, .addcarbtn').forEach(function (b) { b.remove(); });
+  function renderCards(justAddedId) {
+    carCards.innerHTML = '';
     var pro = CarBox.get('isPro');
     var list = CarBox.cars();
-    if (!pro && list.length <= 1) return;          /* free single-car: no switcher */
     var activeId = CarBox.activeCarId();
     list.forEach(function (c, i) {
-      var locked = !pro && i > 0;                   /* lapsed: only the first car is usable */
-      var b = document.createElement('button');
-      b.className = 'carbtn' + (c.id === activeId ? ' active' : '') + (locked ? ' locked' : '') +
+      var locked = !pro && i > 0;   /* lapsed: only the first car is usable */
+      var v = c.vehicle || {};
+      var card = document.createElement('button');
+      card.className = 'carcard' + (c.id === activeId ? ' active' : '') + (locked ? ' locked' : '') +
         (c.id === justAddedId ? ' justadded' : '');
-      b.setAttribute('aria-label', (c.vehicle && c.vehicle.name) || 'Car');
-      var img = document.createElement('img'); img.alt = ''; b.appendChild(img);
-      tintCarBtn(img, c.appearance);
-      b.addEventListener('click', function () {
+      card.setAttribute('data-press', '');
+      var img = document.createElement('img'); img.className = 'cc-sprite'; img.alt = '';
+      tintInto(img, c.appearance);
+      var info = document.createElement('div'); info.className = 'cc-info';
+      var nm = document.createElement('div'); nm.className = 'cc-name'; nm.textContent = v.name || 'Car';
+      var sub = document.createElement('div'); sub.className = 'cc-sub';
+      sub.textContent = locked ? 'Resubscribe to access' : (String(v.year || '') + ' · ' + CarBox.fmtMiles(v.mileage || 0));
+      info.appendChild(nm); info.appendChild(sub);
+      card.appendChild(img); card.appendChild(info);
+      card.addEventListener('click', function () {
         if (locked) { UI.toast('Resubscribe to CarBox Pro to use this car'); if (window.Pro) Pro.open(); return; }
-        if (c.id === CarBox.activeCarId()) return;
         CarBox.setActiveCar(c.id);
-        hydrate();                                  /* re-render the whole Garage to this car */
+        showDetail(true);
       });
-      stack.appendChild(b);
+      carCards.appendChild(card);
     });
-    var add = document.createElement('button');
-    add.className = 'addcarbtn'; add.setAttribute('aria-label', 'Add a car'); add.textContent = '+';
-    add.addEventListener('click', onAddCar);
-    stack.appendChild(add);
+    /* add-car card (same size); hidden only when a Pro user is already at 3 */
+    if (!(pro && list.length >= CarBox.maxCars())) {
+      var add = document.createElement('button');
+      add.className = 'addcard'; add.setAttribute('aria-label', 'Add a car');
+      add.innerHTML = '<span class="cc-plus">+</span> Add a car';
+      add.addEventListener('click', onAddCar);
+      carCards.appendChild(add);
+    }
   }
+  function showCards(animate, justAddedId) {
+    currentView = 'cards';
+    hydrateShared();
+    renderCards(justAddedId);
+    detailView.hidden = true; cardsView.hidden = false; detailBack.hidden = true;
+    pillEl.style.display = 'none';
+    if (animate && !UI.reduced()) { cardsView.classList.remove('slidein'); void cardsView.offsetWidth; cardsView.classList.add('slidein'); }
+    window.scrollTo(0, 0);
+  }
+  function showDetail(fromCards, animate) {
+    currentView = 'detail';
+    hydrateShared(); hydrateDetail();
+    cardsView.hidden = true; detailView.hidden = false; detailBack.hidden = !fromCards;
+    if (animate !== false && !UI.reduced()) { detailView.classList.remove('slidein'); void detailView.offsetWidth; detailView.classList.add('slidein'); }
+    window.scrollTo(0, 0);
+  }
+  function hydrate() {
+    if (currentView === 'detail') { hydrateShared(); hydrateDetail(); if (useCards()) renderCards(); }
+    else if (currentView === 'cards') { showCards(false); }
+    else if (useCards()) showCards(false);      /* first load: Pro/multi-car -> cards home */
+    else showDetail(false, false);              /* first load: free single car -> detail */
+  }
+
   function onAddCar() {
     if (!CarBox.get('isPro')) { if (window.Pro) Pro.open(); return; }   /* free/lapsed -> paywall */
     if (CarBox.cars().length >= CarBox.maxCars()) { UI.toast('You’ve reached 3 cars'); return; }
@@ -249,15 +334,27 @@ document.addEventListener('DOMContentLoaded', function () {
           });
           CarBox.setActiveCar(id);
           sh.close();
-          hydrate();
-          paintCarSwitcher(id);                     /* animate the new button in */
+          showCards(true, id);                        /* back to the cards home, new card animated in */
         });
         body.appendChild(addBtn);
       }
     });
   }
-  /* upgrading unlocks the switcher live */
-  document.addEventListener('carbox-pro', function () { hydrate(); });
+
+  /* back arrow + swipe-right return to the cards home */
+  detailBack.addEventListener('click', function () { if (useCards()) showCards(true); });
+  (function () {
+    var sx = null, sy = null;
+    detailView.addEventListener('pointerdown', function (e) { sx = e.clientX; sy = e.clientY; });
+    detailView.addEventListener('pointerup', function (e) {
+      if (sx === null) return;
+      var dx = e.clientX - sx, dy = e.clientY - sy; sx = null;
+      if (useCards() && !detailBack.hidden && dx > 70 && Math.abs(dy) < 50) showCards(true);
+    });
+  })();
+
+  /* going Pro switches the home to the cards view */
+  document.addEventListener('carbox-pro', function () { showCards(true); });
 
   hydrate();
   window.addEventListener('pageshow', function (e) { if (e.persisted) { CarBox.reload(); hydrate(); } });
