@@ -182,19 +182,35 @@ window.CarBoxPDF = (function () {
     present(doc, fname, caption);
   }
 
-  /* share on device (share sheet), else download the blob (web) */
+  function inApp() { return !!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage); }
+
+  /* Save/share the PDF.
+     - Native (Expo WebView): hand the base64 PDF to the shell, which writes it to
+       a file and opens the native share sheet (expo-file-system + expo-sharing).
+       We must NOT navigate the WebView to a blob: URL — WKWebView would replace
+       the whole app with a PDF viewer the user can't back out of.
+     - Web browser: Web Share with a file, else a normal download link. */
   function downloadOrShare(blob, fname) {
+    if (inApp()) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'savePdf', name: fname, dataUrl: reader.result }));
+          if (window.UI) UI.toast('Opening share sheet…');
+        } catch (e) { if (window.UI) UI.toast('Could not export the PDF'); }
+      };
+      reader.onerror = function () { if (window.UI) UI.toast('Could not export the PDF'); };
+      reader.readAsDataURL(blob);
+      return;
+    }
     try {
       if (navigator.canShare) {
         var file = new File([blob], fname, { type: 'application/pdf' });
-        if (navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: 'CarBox history' }).catch(function () {});
-          return;
-        }
+        if (navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'CarBox history' }).catch(function () {}); return; }
       }
     } catch (e) {}
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = fname;
+    a.href = URL.createObjectURL(blob); a.download = fname; a.rel = 'noopener';
     document.body.appendChild(a); a.click();
     setTimeout(function () { document.body.removeChild(a); try { URL.revokeObjectURL(a.href); } catch (e) {} }, 1500);
   }
@@ -216,12 +232,22 @@ window.CarBoxPDF = (function () {
         note.className = 'sheet-note'; note.style.marginTop = '0';
         note.textContent = caption + ' — ready to save.';
         body.appendChild(note);
-        var frame = document.createElement('iframe');
-        frame.src = url; frame.title = 'PDF preview';
-        frame.style.cssText = 'width:100%;height:44vh;border:none;border-radius:12px;background:#fff;margin-top:10px;box-shadow:var(--shadow)';
-        body.appendChild(frame);
+        if (!inApp()) {
+          /* live preview only in a real browser (WKWebView PDF-in-iframe is unreliable) */
+          var frame = document.createElement('iframe');
+          frame.src = url; frame.title = 'PDF preview';
+          frame.style.cssText = 'width:100%;height:44vh;border:none;border-radius:12px;background:#fff;margin-top:10px;box-shadow:var(--shadow)';
+          body.appendChild(frame);
+        } else {
+          var card = document.createElement('div');
+          card.style.cssText = 'margin-top:12px;padding:26px 16px;text-align:center;border-radius:16px;' +
+            'background:var(--surface,#F5F3F4);box-shadow:var(--shadow);color:var(--mut,#8D8579);' +
+            'font-family:\'League Spartan\',sans-serif;font-weight:600;font-size:14.5px;line-height:1.4';
+          card.textContent = 'Your PDF is ready. Tap Save & Share to send it to Files, Mail, AirDrop, or print.';
+          body.appendChild(card);
+        }
         var dl = document.createElement('button');
-        dl.textContent = ('share' in navigator) ? 'Download / Share PDF' : 'Download PDF';
+        dl.textContent = inApp() ? 'Save & Share PDF' : (('share' in navigator) ? 'Download / Share PDF' : 'Download PDF');
         dl.style.cssText = PRIMARY;
         dl.addEventListener('click', function () { downloadOrShare(blob, fname); });
         body.appendChild(dl);
