@@ -178,21 +178,60 @@ window.CarBoxPDF = (function () {
     }
 
     var fname = ('CarBox_' + (v.name || 'car') + '_history').replace(/[^a-z0-9_]+/gi, '_') + '.pdf';
+    var caption = (v.name || 'Car') + ' history · ' + entries.length + ' entr' + (entries.length === 1 ? 'y' : 'ies');
+    present(doc, fname, caption);
+  }
 
-    /* share on device if possible, else download (web) */
+  /* share on device (share sheet), else download the blob (web) */
+  function downloadOrShare(blob, fname) {
     try {
-      var blob = doc.output('blob');
       if (navigator.canShare) {
         var file = new File([blob], fname, { type: 'application/pdf' });
         if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: (v.name || 'CarBox') + ' history' });
+          navigator.share({ files: [file], title: 'CarBox history' }).catch(function () {});
           return;
         }
       }
-      doc.save(fname);
-    } catch (e) {
-      try { doc.save(fname); } catch (e2) { if (window.UI) UI.toast('Could not create the PDF'); }
-    }
+    } catch (e) {}
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = fname;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { document.body.removeChild(a); try { URL.revokeObjectURL(a.href); } catch (e) {} }, 1500);
+  }
+
+  /* preview sheet with a Back button + a Download / Share button */
+  function present(doc, fname, caption) {
+    var blob = doc.output('blob');
+    var url = URL.createObjectURL(blob);
+    if (!(window.UI && UI.sheet)) { downloadOrShare(blob, fname); return; }
+    var PRIMARY = 'width:100%;margin-top:12px;background:var(--brown-warm);color:#FBF8F4;border:none;' +
+      'border-radius:999px;cursor:pointer;padding:12px 0;font-family:\'League Spartan\',sans-serif;font-weight:600;font-size:16px;box-shadow:var(--shadow)';
+    var GHOST = 'width:100%;margin-top:6px;background:transparent;color:var(--tx,#141210);border:none;cursor:pointer;' +
+      'padding:11px 0;font-family:\'League Spartan\',sans-serif;font-weight:600;font-size:15px';
+    var sh = UI.sheet({
+      title: 'Vehicle history',
+      label: 'Vehicle history PDF',
+      build: function (body) {
+        var note = document.createElement('div');
+        note.className = 'sheet-note'; note.style.marginTop = '0';
+        note.textContent = caption + ' — ready to save.';
+        body.appendChild(note);
+        var frame = document.createElement('iframe');
+        frame.src = url; frame.title = 'PDF preview';
+        frame.style.cssText = 'width:100%;height:44vh;border:none;border-radius:12px;background:#fff;margin-top:10px;box-shadow:var(--shadow)';
+        body.appendChild(frame);
+        var dl = document.createElement('button');
+        dl.textContent = ('share' in navigator) ? 'Download / Share PDF' : 'Download PDF';
+        dl.style.cssText = PRIMARY;
+        dl.addEventListener('click', function () { downloadOrShare(blob, fname); });
+        body.appendChild(dl);
+        var back = document.createElement('button');
+        back.textContent = 'Back'; back.style.cssText = GHOST;
+        back.addEventListener('click', function () { sh.close(); });
+        body.appendChild(back);
+      },
+      onClose: function () { try { URL.revokeObjectURL(url); } catch (e) {} }
+    });
   }
 
   return { exportActiveCar: exportActiveCar };
