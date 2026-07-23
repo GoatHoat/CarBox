@@ -29,13 +29,10 @@ window.Pro = (function () {
         '<img class="pro-spark s6" src="assets/sparkle.png" alt="">' +
       '</div>' +
       '<h2 class="serif pro-title">CarBox Pro</h2>' +
-      '<div class="pro-benefit"><img src="assets/pro_car.png" alt=""><div>' +
-        '<div class="pb-top">Your real car, in pixels</div>' +
-        '<div class="pb-sub">Updates as you mod it</div></div></div>' +
       '<div class="pro-benefit"><img src="assets/pro_trophy.png" alt=""><div>' +
         '<div class="pb-top">All upgrade goals unlocked</div></div></div>' +
       '<div class="pro-benefit"><img src="assets/pro_garage.png" alt=""><div>' +
-        '<div class="pb-top">Unlimited cars</div></div></div>' +
+        '<div class="pb-top">Up to 3 cars in your garage</div></div></div>' +
       '<div class="pro-benefit"><img src="assets/pro_doc.png" alt=""><div>' +
         '<div class="pb-top">PDF history export for resale</div></div></div>' +
       '<div class="pro-prices">' +

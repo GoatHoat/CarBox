@@ -1,12 +1,11 @@
 /* POST /api/shops
    Body:  { lat, lng, modName }
-   Reply: { shops: [ { name, distanceMiles, rating, ratingCount, ratingSource,
-                       priceEstimate, mapsUrl } ] }
+   Reply: { shops: [ { name, distanceMiles, mapsUrl } ] }
 
-   Live data: Google Places Nearby Search (ratings come straight from the
-   current Places response, not cached by us). Distance is computed here from
-   the user's coords. Price is an ESTIMATE (LLM if ANTHROPIC_API_KEY is set,
-   heuristic table otherwise) and is labeled as such by the client. */
+   Uses Google Places Nearby Search to FIND relevant shops near the user and
+   their location; distance is computed here from the user's coords. We do NOT
+   fetch ratings or generate price estimates — just name, distance, and a Google
+   Maps link for directions. */
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -50,37 +49,6 @@ function searchKeyword(modName) {
   return 'car performance shop';
 }
 
-/* fallback price estimate (installed) when no LLM key is configured */
-function heuristicPrice(modName) {
-  var m = String(modName || '').toLowerCase();
-  if (/turbo kit|supercharg/.test(m)) return '$4,500-7,500 est.';
-  if (/tune|ecu|flash/.test(m)) return '$500-900 est.';
-  if (/exhaust|downpipe|header/.test(m)) return '$800-1,800 est.';
-  if (/coilover|suspension/.test(m)) return '$1,200-2,200 est.';
-  if (/intake/.test(m)) return '$300-500 est.';
-  if (/intercooler/.test(m)) return '$700-1,200 est.';
-  if (/wheel|tire/.test(m)) return '$1,200-2,500 est.';
-  if (/brake/.test(m)) return '$900-2,000 est.';
-  return '$400-1,500 est.';
-}
-
-async function llmPrices(modName, shops, key) {
-  var MODEL = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
-  var user = 'Mod: ' + modName + '\nShops: ' + shops.map(function (s) { return s.name; }).join('; ') +
-    '\nFor each shop, estimate a realistic installed price range for this mod in USD. ' +
-    'Answer ONLY JSON: {"prices":["$X-Y est.", ...]} with one entry per shop, same order. No dash characters other than the hyphen in ranges.';
-  var r = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-    body: JSON.stringify({ model: MODEL, max_tokens: 300, messages: [{ role: 'user', content: user }] })
-  });
-  if (!r.ok) throw new Error('anthropic ' + r.status);
-  var data = await r.json();
-  var text = (data.content && data.content[0] && data.content[0].text) || '';
-  var a = text.indexOf('{'), b = text.lastIndexOf('}');
-  return JSON.parse(text.slice(a, b + 1)).prices || [];
-}
-
 module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') { cors(res); res.statusCode = 204; return res.end(); }
   if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
@@ -97,7 +65,7 @@ module.exports = async function handler(req, res) {
   if (!isFinite(lat) || !isFinite(lng)) return send(res, 400, { error: 'lat, lng required' });
 
   try {
-    /* LIVE Places lookup on every call — ratings are as current as Google has */
+    /* Places Nearby Search just to FIND relevant shops + their location */
     var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json' +
       '?location=' + lat + ',' + lng +
       '&radius=24000' +                                   /* ~15 miles */
@@ -110,15 +78,13 @@ module.exports = async function handler(req, res) {
       return send(res, 502, { error: 'places status ' + data.status });
     }
     var results = (data.results || [])
-      .filter(function (p) { return p.business_status === 'OPERATIONAL' && p.rating; })
+      .filter(function (p) { return p.business_status === 'OPERATIONAL' && p.geometry && p.geometry.location; })
       .map(function (p) {
         var plat = p.geometry.location.lat, plng = p.geometry.location.lng;
         return {
           name: p.name,
           distanceMiles: Math.round(haversineMiles(lat, lng, plat, plng) * 10) / 10,
-          rating: p.rating,
-          ratingCount: p.user_ratings_total || 0,
-          ratingSource: 'Google',
+          /* Google Maps directions link (opened externally by the client) */
           mapsUrl: 'https://www.google.com/maps/dir/?api=1&destination=' +
             encodeURIComponent(plat + ',' + plng) +
             '&destination_place_id=' + encodeURIComponent(p.place_id)
@@ -126,19 +92,6 @@ module.exports = async function handler(req, res) {
       })
       .sort(function (a, b) { return a.distanceMiles - b.distanceMiles; })
       .slice(0, 5);
-
-    /* price estimates: LLM when available, heuristic otherwise */
-    var akey = process.env.ANTHROPIC_API_KEY;
-    if (akey && results.length) {
-      try {
-        var prices = await llmPrices(modName, results, akey);
-        results.forEach(function (s, i) { s.priceEstimate = prices[i] || heuristicPrice(modName); });
-      } catch (e) {
-        results.forEach(function (s) { s.priceEstimate = heuristicPrice(modName); });
-      }
-    } else {
-      results.forEach(function (s) { s.priceEstimate = heuristicPrice(modName); });
-    }
 
     return send(res, 200, { shops: results });
   } catch (e) {

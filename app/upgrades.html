@@ -435,10 +435,11 @@ document.addEventListener('DOMContentLoaded', function () {
       ? (mi * 1.60934).toFixed(1) + ' km'
       : mi + ' mi';
   }
-  function shopMeta(s) {
-    return s.rating + ' ★ (' + (s.ratingCount || 0) + ') · ' + fmtDist(s.distanceMiles) + ' · ' + s.priceEstimate;
-  }
-  /* real directions: deep link into the maps app (Google Maps universal URL) */
+  function shopMeta(s) { return fmtDist(s.distanceMiles); }   /* just the distance now */
+  /* Open the shop's Google Maps page in the EXTERNAL system browser / Maps app.
+     NOTE for the Expo shell: it must route http(s) links out of the WebView —
+     e.g. in `onShouldStartLoadWithRequest`, for http/https targets call
+     Linking.openURL(url) and return false so this opens in the system browser. */
   function openDirections(s) {
     var url = s.mapsUrl || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s.name));
     var w = null;
@@ -454,7 +455,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setSub(m ? m : 'Nearby shops');
     zone('<div class="maplock">' +
       '<img src="assets/badge_lock.png" alt="">' +
-      '<div class="lktx">Allow location access to see real shops near you that can do this mod, with live ratings, distances, and price estimates.</div>' +
+      '<div class="lktx">Allow location access to find nearby shops that can do this mod and get directions to them.</div>' +
       '<button class="lkbtn" id="lockAllow">Allow location</button></div>');
     $('lockAllow').addEventListener('click', function () {
       if (!navigator.geolocation) { UI.toast('Location isn’t available on this device'); return; }
@@ -501,11 +502,15 @@ document.addEventListener('DOMContentLoaded', function () {
     var first = shops[0];
     var row = document.createElement('div');
     row.className = 'shoprow';
+    row.setAttribute('role', 'button'); row.setAttribute('tabindex', '0');
+    row.setAttribute('data-press', ''); row.style.cursor = 'pointer';
     row.innerHTML = '<div><div class="sname"></div><div class="srate"></div></div>' +
       '<button class="directions">Directions</button>';
     row.querySelector('.sname').textContent = first.name;
     row.querySelector('.srate').textContent = shopMeta(first);
-    row.querySelector('.directions').addEventListener('click', function () { openDirections(first); });
+    /* tapping the shop opens its Google Maps page externally */
+    row.addEventListener('click', function () { openDirections(first); });
+    row.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDirections(first); } });
     mapzone.appendChild(row);
     if (shops.length > 1) {
       var btn = document.createElement('button');
@@ -526,6 +531,8 @@ document.addEventListener('DOMContentLoaded', function () {
         shops.forEach(function (s) {
           var row = document.createElement('div');
           row.className = 'sheetrow rowflex';
+          row.setAttribute('role', 'button'); row.setAttribute('tabindex', '0');
+          row.setAttribute('data-press', ''); row.style.cursor = 'pointer';
           var left = document.createElement('div');
           var nm = document.createElement('div'); nm.className = 'rowtop'; nm.textContent = s.name;
           var mt = document.createElement('div'); mt.className = 'rowtx'; mt.textContent = shopMeta(s);
@@ -534,19 +541,20 @@ document.addEventListener('DOMContentLoaded', function () {
           btn.className = 'directions';
           btn.textContent = 'Directions';
           btn.setAttribute('aria-label', 'Directions to ' + s.name);
-          btn.addEventListener('click', function () { openDirections(s); });
+          row.addEventListener('click', function () { openDirections(s); });   /* tap opens maps externally */
+          row.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDirections(s); } });
           row.appendChild(left); row.appendChild(btn);
           body.appendChild(row);
         });
         var note = document.createElement('div');
         note.className = 'sheet-note';
-        note.textContent = 'Ratings live from Google · prices are estimates';
+        note.textContent = 'Tap a shop to open directions in Maps.';
         body.appendChild(note);
       }
     });
   }
 
-  /* live call every time — ratings/distances must be current, so no caching */
+  /* live call every time — distances are relative to the user, so no caching */
   function loadShops() {
     var m = mappedName();
     if (!m) { setSub(''); zone(''); return; }
