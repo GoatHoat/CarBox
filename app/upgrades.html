@@ -482,7 +482,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function renderError() {
     var m = mappedName();
     setSub(m || 'Nearby shops');
-    zone('<div class="mapmsg">Couldn’t reach the shop service. Check that the CarBox API proxy is running, then try again.' +
+    zone('<div class="mapmsg">Couldn’t load nearby shops right now. Please check your connection and try again.' +
       '<button class="retry" id="shopRetry">Try again</button></div>');
     $('shopRetry').addEventListener('click', loadShops);
   }

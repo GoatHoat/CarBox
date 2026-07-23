@@ -403,22 +403,25 @@ document.addEventListener('DOMContentLoaded', function () {
     show(7, 'fwd');
   });
 
-  /* ─── Step 7: Terms & Privacy ─── */
+  /* ─── Step 7: Terms & Privacy ───
+     Short in-app summaries; the FULL canonical documents are the bundled
+     privacy.html + terms.html (linked below the checkboxes). Keep the two in
+     sync if the hosted docs change. */
   var LEGAL = {
-    terms: 'CarBox Terms of Service (placeholder)\n\n' +
-      'These are placeholder Terms of Service for the CarBox prototype. The owner will replace this copy with real, legally reviewed terms before launch.\n\n' +
-      '1. Your garage. You are responsible for the accuracy of the vehicle, build, and maintenance information you add to CarBox.\n\n' +
-      '2. Acceptable use. Do not misuse the service, attempt to disrupt it, or upload content you do not have the rights to share.\n\n' +
-      '3. Prototype status. CarBox is an early build. Features may change and data may be reset during development.\n\n' +
-      '4. No warranty. The service is provided “as is” without warranties of any kind to the extent permitted by law.\n\n' +
-      '5. Contact. Questions about these terms can be directed to the CarBox team once support channels are live.',
-    privacy: 'CarBox Privacy Policy (placeholder)\n\n' +
-      'This is placeholder Privacy Policy copy for the CarBox prototype. The owner will replace it with a real policy before launch.\n\n' +
-      '1. What we store. In this prototype, the details you enter during signup are stored locally on your device only.\n\n' +
-      '2. No server. There is currently no backend; your information is not transmitted to or held on CarBox servers.\n\n' +
-      '3. Your control. You can clear your data at any time by resetting the app’s local storage.\n\n' +
-      '4. Future changes. When accounts and cloud sync launch, this policy will be updated to describe exactly what is collected and why.\n\n' +
-      '5. Contact. Privacy questions can be directed to the CarBox team once support channels are live.'
+    terms: 'CarBox Terms of Service — summary\n\n' +
+      '1. Your account. You must be 16 or older. Keep your login private; you are responsible for activity on your account.\n\n' +
+      '2. Your garage. You are responsible for the accuracy of the vehicle, build, and maintenance information you add.\n\n' +
+      '3. Mod suggestions. Upgrade recommendations and price figures are informational estimates, not professional mechanical advice. Always confirm work with a qualified shop, and check that modifications are legal where you drive.\n\n' +
+      '4. CarBox Pro. Pro is an auto-renewing subscription billed through your App Store account. Cancel anytime in your App Store subscription settings.\n\n' +
+      '5. Acceptable use. Do not misuse the service, disrupt it, or upload content you do not have rights to share. Content that is abusive or unlawful may be removed.\n\n' +
+      '6. No warranty. The service is provided "as is" to the extent permitted by law.\n\n' +
+      'Read the full Terms below — the full document is the one that applies.',
+    privacy: 'CarBox Privacy Policy — summary\n\n' +
+      '1. What we collect. Your account email and name, your vehicle details, log entries and photos you add, and (only if you allow it) your approximate location to find nearby shops.\n\n' +
+      '2. How it is used. To run your garage, sync it to your account, generate upgrade suggestions for your car, and find shops near you. We do not sell your personal information.\n\n' +
+      '3. Where it lives. Your data is stored on your device and, when you are signed in, in your CarBox account in the cloud.\n\n' +
+      '4. Your control. Location is optional and can be turned off in system settings. You can delete your account and its data anytime in Settings.\n\n' +
+      'Read the full Privacy Policy below — the full document is the one that applies.'
   };
   var legalBox = $('ob-legalbox'), legalSeg = $('ob-legalseg');
   var agreeTerms = $('ob-agree-terms'), agreePrivacy = $('ob-agree-privacy'), finish = $('ob-finish');
@@ -434,16 +437,31 @@ document.addEventListener('DOMContentLoaded', function () {
     b.addEventListener('click', function () { showDoc(b.getAttribute('data-doc')); });
   });
   showDoc('terms');
-  /* link the sign-up screen to the REAL hosted legal docs (config.js CARBOX_LEGAL) */
+  /* "Read the full Terms / Privacy Policy": load the full document INTO the
+     scroll box. We never navigate away here — that would discard the signup
+     answers held in memory. On failure (e.g. offline) the summary stays. */
   (function () {
     var L = window.CARBOX_LEGAL || {};
-    function wire(a, url) {
-      if (!a) return;
-      if (url && url.indexOf('REPLACE') < 0) { a.href = url; }
-      else { a.href = '#'; a.addEventListener('click', function (e) { e.preventDefault(); if (window.UI && UI.toast) UI.toast('Link not configured yet'); }); }
+    function tab(which) {
+      legalSeg.classList.toggle('privacy', which === 'privacy');
+      legalSeg.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-doc') === which); });
     }
-    wire($('ob-terms-link'), L.TERMS_URL);
-    wire($('ob-privacy-link'), L.PRIVACY_URL);
+    function wire(a, url, which) {
+      if (!a) return;
+      a.href = url || '#';
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (!url || url.indexOf('REPLACE') >= 0) { if (window.UI && UI.toast) UI.toast('Link not configured yet'); return; }
+        fetch(url).then(function (r) { return r.text(); }).then(function (html) {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          var card = doc.querySelector('.card') || doc.body;
+          legalBox.textContent = card.textContent.replace(/\n{3,}/g, '\n\n').trim();
+          legalBox.scrollTop = 0; tab(which);
+        }).catch(function () { if (window.UI && UI.toast) UI.toast('The full document is also in Settings after signup'); });
+      });
+    }
+    wire($('ob-terms-link'), L.TERMS_URL, 'terms');
+    wire($('ob-privacy-link'), L.PRIVACY_URL, 'privacy');
   })();
   function refreshFinish() {
     var ok = agreeTerms.checked && agreePrivacy.checked;

@@ -15,16 +15,22 @@ window.CARBOX_CONFIG = {
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjeWRwYmd1aXl4bWRjbGt4dm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NTQ1NDEsImV4cCI6MjEwMDMzMDU0MX0.mcODGv7byrOBpuTCzeXg6RGhqP8IE5zQFzxuQH1gquQ'
 };
 
+/* ── Dev mode ──
+   true  = shows the DEV rows in Settings (Redo onboarding, Switch to Pro/Base).
+   false = hides every dev affordance. MUST be false for the App Store build —
+   a reviewer finding a payment-bypass toggle is an automatic rejection. */
+window.CARBOX_DEV = true;
+
 /* ── Legal + support links (REQUIRED for App Store review) ──
-   Host your Privacy Policy + Terms of Service publicly and paste the URLs here.
-   The Privacy Policy must describe what CarBox collects: account email, vehicle
-   data, entry photos, and approximate location (only for nearby-shop search).
-   Leave the REPLACE_ values and the app shows "not configured yet" instead of a
-   dead link. APPSTORE_URL is your app's App Store page (for "Rate CarBox"). */
+   privacy.html + terms.html ship inside the app, so these links always work.
+   App Store Connect additionally needs a PUBLIC https URL for the Privacy
+   Policy — host the same two files anywhere public and paste that URL into the
+   App Privacy section there (the in-app links can stay as the bundled pages).
+   APPSTORE_URL is your app's store page ("Rate CarBox" stays hidden until set). */
 window.CARBOX_LEGAL = {
-  PRIVACY_URL: 'https://REPLACE_WITH_YOUR_PRIVACY_POLICY_URL',
-  TERMS_URL: 'https://REPLACE_WITH_YOUR_TERMS_OF_SERVICE_URL',
-  SUPPORT_EMAIL: 'REPLACE_WITH_YOUR_SUPPORT_EMAIL',
+  PRIVACY_URL: 'https://carbox-one.vercel.app/privacy.html',
+  TERMS_URL: 'https://carbox-one.vercel.app/terms.html',
+  SUPPORT_EMAIL: 'carbox.app@outlook.com',
   APPSTORE_URL: 'https://REPLACE_WITH_YOUR_APP_STORE_URL'
 };
 

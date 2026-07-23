@@ -43,7 +43,14 @@ window.Pro = (function () {
           '<div class="pp-name">Annual</div><div class="pp-amt">$39.99/yr</div></button>' +
       '</div>' +
       '<button class="pro-cta">Start free week</button>' +
-      '<div class="pro-micro">Cancel anytime</div>';
+      /* App Store guideline 3.1.2: disclose the auto-renewing terms + link legal.
+         (Prices shown match the App Store Connect products; a real build should
+         populate them from StoreKit via the RevenueCat bridge — see billing.js.) */
+      '<div class="pro-micro">7-day free trial, then $4.99/month or $39.99/year for the plan you pick. ' +
+        'Subscription automatically renews unless canceled at least 24 hours before the period ends. ' +
+        'Manage or cancel anytime in your App Store settings. ' +
+        '<a href="#" class="pro-legal" data-doc="terms">Terms</a> &middot; ' +
+        '<a href="#" class="pro-legal" data-doc="privacy">Privacy</a></div>';
 
     document.body.appendChild(scrim);
     document.body.appendChild(card);
@@ -95,6 +102,16 @@ window.Pro = (function () {
         p.classList.add('sel');
         var amt = p.querySelector('.pp-amt');
         amt.classList.remove('pop'); void amt.offsetWidth; amt.classList.add('pop');
+      });
+    });
+    /* Terms / Privacy links in the disclosure open the bundled legal pages */
+    card.querySelectorAll('.pro-legal').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var L = window.CARBOX_LEGAL || {};
+        var url = a.getAttribute('data-doc') === 'privacy' ? L.PRIVACY_URL : L.TERMS_URL;
+        if (url && url.indexOf('REPLACE') < 0) { close(); location.href = url; }
+        else if (window.UI) UI.toast('Link not configured yet');
       });
     });
 

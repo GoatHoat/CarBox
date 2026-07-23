@@ -31,8 +31,14 @@
       sb.auth.getUser().then(function (r) {
         var user = r && r.data && r.data.user;
         if (!user) return;
+        /* never sync the plaintext signup password to the cloud (auth handles it) */
+        var data = localState();
+        if (data && data.account && data.account.password) {
+          data = JSON.parse(JSON.stringify(data));
+          delete data.account.password;
+        }
         sb.from('user_state').upsert({
-          user_id: user.id, data: localState(), updated_at: new Date().toISOString()
+          user_id: user.id, data: data, updated_at: new Date().toISOString()
         }).then(function () {}, function () {});
       });
     }, 800);

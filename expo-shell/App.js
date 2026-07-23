@@ -10,11 +10,11 @@ import { WebView } from 'react-native-webview';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 
-// LAN address of the static server started with:
-//   cd app; python -m http.server 8000 --bind 0.0.0.0
-// Phone must be on the same Wi-Fi network as this machine.
-const CARBOX_URL = 'http://10.0.0.19:8000/index.html';
-const CARBOX_ORIGIN = (CARBOX_URL.match(/^https?:\/\/[^/]+/) || ['http://10.0.0.19:8000'])[0];
+// Production: the app is hosted on Vercel (HTTPS), so it loads for any user on
+// any network. (For local dev against a LAN static server, temporarily swap this
+// to e.g. 'http://10.0.0.19:8000/index.html'.)
+const CARBOX_URL = 'https://carbox-one.vercel.app/index.html';
+const CARBOX_ORIGIN = (CARBOX_URL.match(/^https?:\/\/[^/]+/) || ['https://carbox-one.vercel.app'])[0];
 const LIGHT = '#F4F4F4';
 const DARK = '#1D1C1C'; // must match --page-bg in style.css dark theme so safe areas blend in
 

@@ -800,31 +800,38 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /* DEV: flip Pro on/off for testing Pro-gated features (remove before ship) */
-  function paintProToggle() {
-    $('proToggleTx').textContent = CarBox.get('isPro') ? 'Switch to Base (Pro is ON)' : 'Switch to Pro';
-  }
-  paintProToggle();
-  bindRow('proToggle', function () {
-    var next = !CarBox.get('isPro');
-    CarBox.set('isPro', next);
-    if (next) document.dispatchEvent(new CustomEvent('carbox-pro'));
+  /* DEV rows — visible ONLY while config.js CARBOX_DEV is true. The App Store
+     build MUST ship with CARBOX_DEV=false: a toggle that grants Pro without
+     payment is an automatic App Review rejection (guideline 3.1.1). */
+  if (window.CARBOX_DEV) {
+    var paintProToggle = function () {
+      $('proToggleTx').textContent = CarBox.get('isPro') ? 'Switch to Base (Pro is ON)' : 'Switch to Pro';
+    };
     paintProToggle();
-    paintPlan();
-    UI.toast(next ? 'CarBox Pro ON (dev)' : 'CarBox Pro OFF (dev)');
-  });
-  /* DEV: re-run the sign-up flow (remove before ship) */
-  bindRow('redoOnboarding', function () {
-    confirmSheet({
-      title: 'Redo onboarding',
-      message: 'Restart the sign-up flow. When you finish, your garage resets to the new car with an empty log. App preferences (theme, units, currency) are kept.',
-      confirmLabel: 'Restart sign-up',
-      onConfirm: function () {
-        CarBox.set('onboardingComplete', false);
-        location.replace('onboarding.html?v=' + Date.now());
-      }
+    bindRow('proToggle', function () {
+      var next = !CarBox.get('isPro');
+      CarBox.set('isPro', next);
+      if (next) document.dispatchEvent(new CustomEvent('carbox-pro'));
+      paintProToggle();
+      paintPlan();
+      UI.toast(next ? 'CarBox Pro ON (dev)' : 'CarBox Pro OFF (dev)');
     });
-  });
+    bindRow('redoOnboarding', function () {
+      confirmSheet({
+        title: 'Redo onboarding',
+        message: 'Restart the sign-up flow. When you finish, your garage resets to the new car with an empty log. App preferences (theme, units, currency) are kept.',
+        confirmLabel: 'Restart sign-up',
+        onConfirm: function () {
+          CarBox.set('onboardingComplete', false);
+          location.replace('onboarding.html?v=' + Date.now());
+        }
+      });
+    });
+  } else {
+    var r1 = $('redoOnboarding'), r2 = $('proToggle');
+    if (r1) r1.remove();
+    if (r2) r2.remove();
+  }
 
   /* ════ CARBOX PRO ════ */
   function paintPlan() {
@@ -859,6 +866,8 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.legal').forEach(function (row) {
     var label = (row.querySelector('.stx') || {}).textContent ? row.querySelector('.stx').textContent.trim() : '';
     var L = window.CARBOX_LEGAL || {};
+    /* hide "Rate CarBox" until the App Store URL exists (no dead link) */
+    if (label === 'Rate CarBox' && (!L.APPSTORE_URL || L.APPSTORE_URL.indexOf('REPLACE') >= 0)) { row.style.display = 'none'; return; }
     var fn = function () {
       if (label === 'Privacy Policy') openExternal(L.PRIVACY_URL);
       else if (label === 'Terms of Use') openExternal(L.TERMS_URL);
