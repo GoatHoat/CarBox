@@ -1,2 +1,6 @@
 expo-shell/node_modules/
 expo-shell/.expo/
+
+# FUSE temp artifacts
+.fuse_hidden*
+**/.fuse_hidden*
