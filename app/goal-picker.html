@@ -219,12 +219,10 @@ document.addEventListener('DOMContentLoaded', function () {
     var pro = CarBox.get('isPro');
     var locked = CarBox.get('goalLocked');
     var current = CarBox.get('goal');
-    /* Free + already used the one-time choice: can't change goal/budget without Pro. */
-    if (!pro && locked) {
-      if (selected !== current) { UI.toast('Changing your goal needs CarBox Pro'); Pro.open(); return; }
-      location.href = 'upgrades.html'; return;
-    }
-    /* Pro (free changes) OR free first-time: pick the budget, then commit. */
+    /* Free + already locked: switching GOALS needs Pro, but they can still open
+       the budget step to set/adjust the budget for their current goal. */
+    if (!pro && locked && selected !== current) { UI.toast('Changing your goal needs CarBox Pro'); Pro.open(); return; }
+    /* everyone else: pick/adjust the budget, then commit. */
     openBudget(!pro && !locked, function (budget) {
       CarBox.set('goal', selected);
       CarBox.set('budget', budget);

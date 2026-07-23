@@ -175,13 +175,11 @@ document.addEventListener('DOMContentLoaded', function () {
   var $ = function (id) { return document.getElementById(id); };
 
   /* ── API proxy base (keys live server-side, see /server/README.md).
-     Default: same host as the page on port 8787 (the local proxy). Override
-     once with localStorage.setItem('carbox.apiBase','https://your-deploy'). ── */
+     Default: the deployed Vercel backend. Override for local dev with
+     localStorage.setItem('carbox.apiBase','http://localhost:8787'). ── */
   var API_BASE = (function () {
     try { var s = localStorage.getItem('carbox.apiBase'); if (s) return s.replace(/\/+$/, ''); } catch (e) {}
-    if (location.protocol === 'http:' || location.protocol === 'https:')
-      return location.protocol + '//' + location.hostname + ':8787';
-    return 'http://localhost:8787';
+    return 'https://carboxserver.vercel.app';
   })();
   function api(path, payload, timeoutMs) {
     var ctl = ('AbortController' in window) ? new AbortController() : null;
@@ -217,8 +215,8 @@ document.addEventListener('DOMContentLoaded', function () {
     return 'Under ' + CarBox.fmtMoney(b.max);
   }
   var budgetLine = $('budgetline');
-  if (budget) { budgetLine.textContent = 'Budget: ' + budgetText(budget); budgetLine.style.display = ''; }
-  else { budgetLine.style.display = 'none'; }
+  budgetLine.style.display = '';   /* always visible so budget is easy to set/change */
+  budgetLine.textContent = budget ? ('Budget: ' + budgetText(budget) + '  ·  Change') : 'Set a budget for better picks →';
   budgetLine.addEventListener('click', function () { location.href = 'goal-picker.html'; });
 
   /* ════════ AI RECOMMENDATIONS (Part B) ════════ */

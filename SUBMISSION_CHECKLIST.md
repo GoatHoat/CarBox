@@ -93,8 +93,10 @@ The `/server` folder holds the proxy that keeps keys server-side. Deploy it and 
   for geolocation + file/photo access + inline media.
 - **Legal**: in-app Privacy/Terms/Support/Rate links + onboarding links read from `CARBOX_LEGAL`
   (placeholders until you host the docs).
-- **Dev affordances removed**: "Switch to Pro/Base", "Redo onboarding", and the 5-tap debug sheet
-  are gone. (Harmless dead `.devrow` CSS remains; optional to delete.)
+- **Dev affordances**: the 5-tap debug sheet is gone. Two DEV-tagged testing buttons remain in
+  Settings → Account by owner request — **"Redo onboarding"** and **"Switch to Pro / Switch to Base"**
+  (flip the entitlement locally). **[BLOCKS]** Delete these two `.devrow` rows (HTML + their handlers
+  in `settings.html`) before submitting — nothing that bypasses payments or onboarding may ship.
 - **UGC safety**: comments have **Report**, **Block**, **Delete-your-own**, and a basic profanity
   filter. **Decision:** there is no cross-user social feed in v1 — comments are per-car/local and the
   public garage page shows only the owner's own data — so no un-moderated third-party content ships.
