@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
     { id: 'body_coupe4', label: '4-door coupe' },
     { id: 'body_sedan', label: 'Sedan' }
   ];
-  var SHADES = [1, 0.82, 0.64, 0.47, 0.32];   /* darkness levels for the DARKNESS row */
+  var SHADE_MIN = 0.3;   /* darkness slider: shade 1 (light) .. SHADE_MIN (darkest) */
   var preview = $('ob-carprev'), painter = null;
   function drawPreview() { if (painter) painter.paint(preview, A.hue, A.shade); }
   function loadBase(cb) {
@@ -297,23 +297,36 @@ document.addEventListener('DOMContentLoaded', function () {
       monoRow.appendChild(sw);
     }
   })();
-  /* DARKNESS row: darkens the chosen colour toward black (A.shade multiplier) */
-  var shadeRow = $('ob-shadeRow');
+  /* DARKNESS slider: darkens the chosen colour toward black (A.shade multiplier) */
+  var shadeSlider = $('ob-shadeSlider'), shadeKnob = $('ob-shadeKnob');
   function paintShade() {
-    shadeRow.querySelectorAll('.ob-monoswatch').forEach(function (sw, k) {
-      sw.classList.toggle('sel', (A.shade || 1) === SHADES[k]);
-    });
+    var s = typeof A.shade === 'number' ? A.shade : 1;
+    var t = Math.max(0, Math.min(1, (1 - s) / (1 - SHADE_MIN)));
+    shadeKnob.style.left = (t * 100) + '%';
+    shadeSlider.setAttribute('aria-valuenow', String(Math.round(t * 100)));
   }
-  SHADES.forEach(function (s, k) {
-    var sw = document.createElement('button');
-    sw.type = 'button'; sw.className = 'ob-monoswatch';
-    var v = Math.round(s * 200);
-    sw.style.background = 'rgb(' + v + ',' + v + ',' + v + ')';
-    sw.setAttribute('aria-label', k === 0 ? 'No darkening' : 'Darker level ' + k);
-    sw.addEventListener('click', function () {
-      A.shade = s; paintShade(); drawPreview(); pulsePreview();
-    });
-    shadeRow.appendChild(sw);
+  function shadeFromEvent(e) {
+    var r = shadeSlider.getBoundingClientRect();
+    var x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+    return 1 - (x / r.width) * (1 - SHADE_MIN);
+  }
+  function applyShade(s) { A.shade = s; paintShade(); drawPreview(); }
+  var sDrag = false, sPending = null, sRaf = false;
+  shadeSlider.addEventListener('pointerdown', function (e) {
+    sDrag = true; shadeKnob.classList.add('drag'); shadeSlider.setPointerCapture(e.pointerId); applyShade(shadeFromEvent(e));
+  });
+  shadeSlider.addEventListener('pointermove', function (e) {
+    if (!sDrag) return;
+    sPending = shadeFromEvent(e);
+    if (!sRaf) { sRaf = true; requestAnimationFrame(function () { sRaf = false; if (sPending !== null) applyShade(sPending); }); }
+  });
+  shadeSlider.addEventListener('pointerup', function (e) {
+    if (!sDrag) return; sDrag = false; shadeKnob.classList.remove('drag'); applyShade(shadeFromEvent(e)); pulsePreview();
+  });
+  shadeSlider.addEventListener('keydown', function (e) {
+    var s = typeof A.shade === 'number' ? A.shade : 1;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); applyShade(Math.min(1, s + 0.05)); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); applyShade(Math.max(SHADE_MIN, s - 0.05)); }
   });
   paintShade();
 

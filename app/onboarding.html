@@ -167,6 +167,10 @@
     transform:translate(-50%,-50%);pointer-events:none;
     transition:transform .2s cubic-bezier(.3,1.4,.4,1);
   }
+  .ob-shadeslider{
+    position:relative;flex:1;height:34px;border-radius:999px;cursor:pointer;touch-action:none;
+    background:linear-gradient(to right,#d8d2cc,#171310);
+  }
   .ob-hueknob.drag{transform:translate(-50%,-50%) scale(1.25)}
   .ob-hueknob.off{opacity:.45}
   .ob-greychip{
@@ -339,7 +343,7 @@
       </div>
       <div class="ob-monorow" id="ob-monoRow" role="group" aria-label="Monotone colors"></div>
       <div class="ob-mini">DARKNESS</div>
-      <div class="ob-monorow" id="ob-shadeRow" role="group" aria-label="Darkness"></div>
+      <div class="ob-huewrap"><div class="ob-shadeslider" id="ob-shadeSlider" role="slider" aria-label="Darkness" aria-valuemin="0" aria-valuemax="100" tabindex="0"><span class="ob-hueknob" id="ob-shadeKnob"></span></div></div>
 
       <div class="ob-err" id="ob-car-err"></div>
       <button class="ob-btn" id="ob-car-next" disabled>Continue</button>

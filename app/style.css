@@ -574,6 +574,10 @@ button,.tab,[data-press],input,textarea,.switch,.seg{touch-action:manipulation}
 }
 .cf-hueknob.drag{transform:translate(-50%,-50%) scale(1.25)}
 .cf-hueknob.off{opacity:.45}
+.cf-shadeslider{
+  position:relative;flex:1;height:34px;border-radius:999px;cursor:pointer;touch-action:none;
+  background:linear-gradient(to right,#d8d2cc,#171310);
+}
 .cf-monorow{display:flex;gap:7px;margin-top:10px}
 .cf-monoswatch{
   flex:1;height:30px;min-width:0;border-radius:999px;border:none;cursor:pointer;padding:0;

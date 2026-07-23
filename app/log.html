@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
 <script defer src="ui.js"></script>
+<script defer src="uploads.js"></script>
 <script defer src="nav.js"></script>
 <link rel="prefetch" href="index.html">
 <link rel="prefetch" href="upgrades.html">
@@ -116,11 +117,18 @@
   /* thumbnails shown on a timeline card that has photos */
   .cardthumbs{display:flex;gap:6px;margin-top:8px}
   .cardthumbs img{width:48px;height:48px;object-fit:cover;border-radius:10px}
-  .photothumbs{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
-  .photothumbs img{
-    width:56px;height:56px;object-fit:cover;border-radius:12px;
-    animation:pop .3s cubic-bezier(.3,1.4,.4,1);
+  .photothumbs{display:flex;gap:9px;margin-top:9px;flex-wrap:wrap}
+  .pthumb{position:relative;width:56px;height:56px;animation:pop .3s cubic-bezier(.3,1.4,.4,1)}
+  .pthumb img{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
+  .pdel{
+    position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;
+    border:2px solid var(--sheet-bg,#F7EEE7);background:#17130F;color:#fff;
+    font-size:13px;line-height:17px;padding:0;cursor:pointer;display:none;
   }
+  .photothumbs.delmode .pdel{display:block}
+  @keyframes pjiggle{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+  .photothumbs.delmode .pthumb{animation:pjiggle .32s ease-in-out infinite}
+  @media (prefers-reduced-motion: reduce){ .photothumbs.delmode .pthumb{animation:none} }
   @media (prefers-reduced-motion: reduce){
     .newcard{opacity:1;transform:none}
     .flash,.fab,.photothumbs img,.le-arrow{animation:none}
@@ -385,23 +393,57 @@ document.addEventListener('DOMContentLoaded', function () {
   $('photobox').addEventListener('keydown', function (e) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickPhotos(); }
   });
-  photoInput.addEventListener('change', function () {
-    var thumbs = $('photothumbs');
-    var skipped = 0;
-    Array.prototype.forEach.call(photoInput.files, function (file) {
-      if (thumbs.children.length >= 3) { skipped++; return; }   /* 3-photo limit */
-      pickedFiles.push(file);
-      var img = document.createElement('img');
-      img.alt = '';
-      img.src = URL.createObjectURL(file);
-      thumbs.appendChild(img);
-    });
-    photoInput.value = '';   /* let the same file be picked again after a delete */
-    if (skipped > 0) UI.toast('You can add up to 3 photos');
-    var n = thumbs.children.length;
+  /* pickedFiles: [{file, url}]. Render from it so deleting a thumb stays in sync. */
+  var thumbsEl = $('photothumbs');
+  var delMode = false;
+  function updatePhotoLabel() {
+    var n = pickedFiles.length;
     $('photolabel').textContent = n >= 3
       ? '3 photos added (max)'
       : (n ? n + ' photo' + (n > 1 ? 's' : '') + ' added' : 'Add photos');
+  }
+  function renderThumbs() {
+    thumbsEl.innerHTML = '';
+    pickedFiles.forEach(function (p, i) {
+      var w = document.createElement('div'); w.className = 'pthumb';
+      var img = document.createElement('img'); img.alt = ''; img.src = p.url; w.appendChild(img);
+      var x = document.createElement('button');
+      x.className = 'pdel'; x.type = 'button'; x.textContent = '×'; x.setAttribute('aria-label', 'Remove photo');
+      x.addEventListener('click', function (e) {
+        e.stopPropagation();
+        try { URL.revokeObjectURL(p.url); } catch (e2) {}
+        pickedFiles.splice(i, 1);
+        if (!pickedFiles.length) delMode = false;
+        renderThumbs(); updatePhotoLabel();
+      });
+      w.appendChild(x);
+      thumbsEl.appendChild(w);
+    });
+    thumbsEl.classList.toggle('delmode', delMode && pickedFiles.length > 0);
+  }
+  photoInput.addEventListener('change', function () {
+    var skipped = 0;
+    Array.prototype.forEach.call(photoInput.files, function (file) {
+      if (pickedFiles.length >= 3) { skipped++; return; }   /* 3-photo limit */
+      pickedFiles.push({ file: file, url: URL.createObjectURL(file) });
+    });
+    photoInput.value = '';   /* let the same file be picked again after a delete */
+    if (skipped > 0) UI.toast('You can add up to 3 photos');
+    renderThumbs(); updatePhotoLabel();
+  });
+  /* press-and-hold the thumbnails to reveal a delete X on each (iOS style) */
+  var holdTimer = null;
+  thumbsEl.addEventListener('pointerdown', function () {
+    if (!pickedFiles.length) return;
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(function () { delMode = true; renderThumbs(); }, 450);
+  });
+  ['pointerup', 'pointercancel', 'pointerleave', 'pointermove'].forEach(function (ev) {
+    thumbsEl.addEventListener(ev, function () { clearTimeout(holdTimer); });
+  });
+  /* tapping anywhere outside the thumbnails exits delete mode */
+  document.addEventListener('pointerdown', function (e) {
+    if (delMode && (!e.target.closest || !e.target.closest('#photothumbs'))) { delMode = false; renderThumbs(); }
   });
 
   function makeCard(entry) {
@@ -529,7 +571,7 @@ document.addEventListener('DOMContentLoaded', function () {
       photos: []
     };
     entry.id = 'u' + Date.now().toString(36);
-    var files = pickedFiles.slice(0, 3);   /* 3-photo limit */
+    var files = pickedFiles.slice(0, 3).map(function (p) { return p.file; });   /* 3-photo limit */
 
     /* commit once photos (if any) are compressed */
     function finalize() {
@@ -537,29 +579,45 @@ document.addEventListener('DOMContentLoaded', function () {
       CarBox.set('entries', entries);   /* store recomputes nextService from the log */
       paintReminder();                  /* a new maintenance entry updates the reminder live */
 
-      /* mileage sanity: a newer, higher odometer updates the vehicle */
-      if (entry.miles > vehicle.mileage) {
-        vehicle.mileage = entry.miles;
-        CarBox.set('vehicle', vehicle);
-        document.querySelector('.loghead .miles').textContent = CarBox.fmtMiles(vehicle.mileage);
-      }
+      /* odometer is derived by the store from the log; reflect the new value */
+      var nv = CarBox.get('vehicle');
+      vehicle.mileage = nv.mileage;
+      document.querySelector('.loghead .miles').textContent = CarBox.fmtMiles(nv.mileage);
 
       ['f-title', 'f-cost', 'f-miles', 'f-date', 'f-notes'].forEach(function (id) { $(id).value = ''; });
-      $('photothumbs').innerHTML = '';
-      $('photolabel').textContent = 'Add photos';
+      pickedFiles.forEach(function (p) { try { URL.revokeObjectURL(p.url); } catch (e) {} });
       pickedFiles = [];
+      delMode = false;
+      renderThumbs();
+      updatePhotoLabel();
       closeSheet();
       insertCard();
     }
 
     if (!files.length) { finalize(); return; }
-    var out = new Array(files.length), done = 0;
-    files.forEach(function (f, i) {
-      compressPhoto(f, function (url) {
-        out[i] = url;
-        if (++done === files.length) { entry.photos = out.filter(Boolean); finalize(); }
+    if (window.CarBoxUploads && CarBoxUploads.available()) {
+      /* REAL persistence: upload to Supabase Storage, save the public URLs.
+         The entry is saved even if some photos fail (failed ones are dropped). */
+      UI.toast('Uploading photos…');
+      CarBoxUploads.put(files, { carId: CarBox.activeCarId(), entryId: entry.id }, null).then(function (res) {
+        var urls = res.filter(function (r) { return r && r.ok; }).map(function (r) { return r.url; });
+        entry.photos = urls;
+        var failed = res.length - urls.length;
+        if (failed > 0) UI.toast(failed + ' photo' + (failed > 1 ? 's' : '') + ' failed to upload');
+        finalize();
       });
-    });
+    } else {
+      /* LOCAL fallback until the Supabase wire-up (window.sb + a session) lands:
+         compress to small data URLs so photos still show on this device. This is
+         local-only, not cloud and not synced; the Supabase path above replaces it. */
+      var out = new Array(files.length), done = 0;
+      files.forEach(function (f, i) {
+        compressPhoto(f, function (url) {
+          out[i] = url;
+          if (++done === files.length) { entry.photos = out.filter(Boolean); finalize(); }
+        });
+      });
+    }
 
     /* FLIP: existing cards slide down, the new card drops in on top */
     function insertCard() { setTimeout(function () {

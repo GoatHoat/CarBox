@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CarBox — Supabase connection test</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 20px;line-height:1.5}
+  h1{font-size:20px}
+  .box{border-radius:12px;padding:16px 18px;margin-top:16px;font-size:15px}
+  .ok{background:#e7f7ec;border:1px solid #34c759;color:#0a5a2a}
+  .bad{background:#fdecec;border:1px solid #ff3b30;color:#7a1410}
+  .wait{background:#f2f2f2;border:1px solid #ccc;color:#333}
+  code{background:#00000010;padding:1px 5px;border-radius:4px}
+  pre{white-space:pre-wrap;word-break:break-word;font-size:13px}
+</style>
+</head>
+<body>
+  <h1>CarBox → Supabase connection test</h1>
+  <p>This page checks three things: the keys in <code>config.js</code>, that the Supabase
+     library loads, and that your database tables exist. Open it in your browser (or Expo).</p>
+  <div id="result" class="box wait">Testing…</div>
+
+  <!-- 1) your keys -->
+  <script src="config.js"></script>
+  <!-- 2) the Supabase client library is loaded below with a CDN fallback -->
+  <script>
+  (function () {
+    var el = document.getElementById('result');
+    function show(cls, html) { el.className = 'box ' + cls; el.innerHTML = html; }
+
+    var cfg = window.CARBOX_CONFIG || {};
+    if (!cfg.SUPABASE_URL || cfg.SUPABASE_URL.indexOf('PASTE') === 0) {
+      show('bad', '❌ config.js has no Project URL. Paste it from Supabase → Project Settings → API.');
+      return;
+    }
+
+    /* Load the Supabase library. Local bundled copy first (no internet needed),
+       then CDNs as a fallback. */
+    var CDNS = [
+      'vendor/supabase.js',
+      'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+      'https://unpkg.com/@supabase/supabase-js@2',
+      'https://esm.sh/@supabase/supabase-js@2?bundle'
+    ];
+    function loadNext(i) {
+      if (window.supabase && window.supabase.createClient) return runTest();
+      if (i >= CDNS.length) {
+        show('bad', '❌ Could not load the Supabase library from any CDN.<br><br>' +
+          'This is a NETWORK issue, not a Supabase issue. Likely causes:<br>' +
+          '• the device/network is blocking cdn.jsdelivr.net, unpkg.com and esm.sh<br>' +
+          '• no internet where this file was opened<br>' +
+          '• opened inside a WebView that blocks remote scripts<br><br>' +
+          'Try opening this file in a normal desktop browser (Chrome/Safari) on regular Wi-Fi. ' +
+          'In the real app, Claude Code will bundle the library so no CDN is needed at runtime.');
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = CDNS[i];
+      s.onload = function () { runTest(); };
+      s.onerror = function () { loadNext(i + 1); };
+      document.head.appendChild(s);
+    }
+
+    var started = false;
+    function runTest() {
+      if (started) return; started = true;
+      if (!window.supabase || !window.supabase.createClient) { started = false; return loadNext(99); }
+    var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+
+    /* Selecting from a table proves: keys work AND the schema ran.
+       With RLS + no login, anon gets an empty list back (that's expected and
+       still counts as connected). A "relation does not exist" error means the
+       schema SQL hasn't been run yet. */
+    sb.from('cars').select('id').limit(1).then(function (res) {
+      if (res.error) {
+        if (/relation .* does not exist|Could not find the table/i.test(res.error.message)) {
+          show('bad', '⚠️ Connected to Supabase, but your tables are missing.<br><br>' +
+            'Run <code>supabase_schema.sql</code> in Supabase → SQL Editor, then reload this page.<br><br>' +
+            '<pre>' + res.error.message + '</pre>');
+        } else {
+          show('bad', '❌ Connected, but the query errored:<br><br><pre>' + res.error.message + '</pre>');
+        }
+        return;
+      }
+      show('ok', '✅ Connected! Your keys are correct and the <code>cars</code> table exists.<br><br>' +
+        'Supabase is reachable and the schema is in place. You can now run the wire-up prompt.');
+    }, function (err) {
+      show('bad', '❌ Could not reach Supabase.<br><br><pre>' + (err && err.message ? err.message : err) + '</pre>');
+    });
+    }
+
+    loadNext(0);
+  })();
+  </script>
+</body>
+</html>

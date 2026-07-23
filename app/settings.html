@@ -117,6 +117,10 @@
       hsl(0,75%,55%),hsl(60,75%,55%),hsl(120,70%,45%),hsl(180,70%,45%),
       hsl(240,75%,58%),hsl(300,75%,55%),hsl(360,75%,55%));
   }
+  .shadeslider{
+    position:relative;flex:1;height:34px;border-radius:999px;cursor:pointer;touch-action:none;
+    background:linear-gradient(to right,#d8d2cc,#171310);
+  }
   .hueknob{
     position:absolute;top:50%;left:0;width:26px;height:26px;border-radius:50%;
     background:#FDFDFC;box-shadow:0 2px 8px rgba(0,0,0,.35);
@@ -204,7 +208,7 @@
         </div>
         <div class="monorow" id="monoRow" role="group" aria-label="Monotone colors"></div>
         <div class="sec-mini">DARKNESS</div>
-        <div class="monorow" id="shadeRow" role="group" aria-label="Darkness"></div>
+        <div class="huewrap"><div class="shadeslider" id="shadeSlider" role="slider" aria-label="Darkness" aria-valuemin="0" aria-valuemax="100" tabindex="0"><span class="hueknob" id="shadeKnob"></span></div></div>
         <div class="field"><div class="flab">Car name</div><input id="f-name" type="text" autocomplete="off"></div>
         <div class="fieldrow">
           <div class="field"><div class="flab">Year</div><input id="f-year" inputmode="numeric" autocomplete="off"></div>
@@ -340,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function () {
     { id: 'body_coupe4', label: '4-door coupe' },
     { id: 'body_sedan', label: 'Sedan' }
   ];
-  var SHADES = [1, 0.82, 0.64, 0.47, 0.32];   /* darkness levels for the SHADE row */
+  var SHADE_MIN = 0.3;   /* darkness slider: shade 1 (light) .. SHADE_MIN (darkest) */
   var car = CarBox.get('car') || { presetId: 'body_suv', hue: null, shade: 1 };
   if (typeof car.shade !== 'number') car.shade = 1;
   var vehicle = CarBox.get('vehicle');
@@ -454,29 +458,39 @@ document.addEventListener('DOMContentLoaded', function () {
       monoRow.appendChild(sw);
     }
   })();
-  /* DARKNESS row: darkens the chosen colour toward black (car.shade multiplier) */
-  var shadeRow = $('shadeRow');
+  /* DARKNESS slider: darkens the chosen colour toward black (car.shade multiplier) */
+  var shadeSlider = $('shadeSlider'), shadeKnob = $('shadeKnob');
   function paintShade() {
-    shadeRow.querySelectorAll('.monoswatch').forEach(function (sw, k) {
-      sw.classList.toggle('sel', (car.shade || 1) === SHADES[k]);
-    });
+    var s = typeof car.shade === 'number' ? car.shade : 1;
+    var t = Math.max(0, Math.min(1, (1 - s) / (1 - SHADE_MIN)));
+    shadeKnob.style.left = (t * 100) + '%';
+    shadeSlider.setAttribute('aria-valuenow', String(Math.round(t * 100)));
   }
-  SHADES.forEach(function (s, k) {
-    var sw = document.createElement('button');
-    sw.type = 'button';
-    sw.className = 'monoswatch';
-    var v = Math.round(s * 200);
-    sw.style.background = 'rgb(' + v + ',' + v + ',' + v + ')';
-    sw.setAttribute('aria-label', k === 0 ? 'No darkening' : 'Darker level ' + k);
-    sw.addEventListener('click', function () {
-      car.shade = s;
-      saveCar();
-      paintShade();
-      drawPreview();
-      pulsePreview();
-      refreshHeadSprite();
-    });
-    shadeRow.appendChild(sw);
+  function shadeFromEvent(e) {
+    var r = shadeSlider.getBoundingClientRect();
+    var x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+    return 1 - (x / r.width) * (1 - SHADE_MIN);
+  }
+  function applyShade(s, persist) {
+    car.shade = s; paintShade(); drawPreview();
+    if (persist) { saveCar(); refreshHeadSprite(); }
+  }
+  var sDrag = false, sPending = null, sRaf = false;
+  shadeSlider.addEventListener('pointerdown', function (e) {
+    sDrag = true; shadeKnob.classList.add('drag'); shadeSlider.setPointerCapture(e.pointerId); applyShade(shadeFromEvent(e), false);
+  });
+  shadeSlider.addEventListener('pointermove', function (e) {
+    if (!sDrag) return;
+    sPending = shadeFromEvent(e);
+    if (!sRaf) { sRaf = true; requestAnimationFrame(function () { sRaf = false; if (sPending !== null) applyShade(sPending, false); }); }
+  });
+  shadeSlider.addEventListener('pointerup', function (e) {
+    if (!sDrag) return; sDrag = false; shadeKnob.classList.remove('drag'); applyShade(shadeFromEvent(e), true); pulsePreview();
+  });
+  shadeSlider.addEventListener('keydown', function (e) {
+    var s = typeof car.shade === 'number' ? car.shade : 1;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); applyShade(Math.min(1, s + 0.05), true); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); applyShade(Math.max(SHADE_MIN, s - 0.05), true); }
   });
   paintShade();
 

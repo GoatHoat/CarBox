@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
 <script defer src="ui.js"></script>
+<script defer src="uploads.js"></script>
 <script defer src="nav.js"></script>
 <link rel="prefetch" href="log.html">
 <style>
@@ -125,17 +126,6 @@
     <p id="e-notes">—</p>
   </div>
 
-  <div class="psrow">
-    <div class="col">
-      <div class="pslab">PART</div>
-      <div class="psval" id="e-part">—</div>
-    </div>
-    <div class="col">
-      <div class="pslab">SHOP</div>
-      <div class="psval" id="e-shop">—</div>
-    </div>
-  </div>
-
   <div class="ebtns">
     <button id="e-edit">Edit</button>
     <button id="e-share">Share</button>
@@ -222,8 +212,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('e-meta').textContent = parts.join(' · ');
     renderPhotos();
     document.getElementById('e-notes').textContent = entry.notes || 'No notes yet.';
-    document.getElementById('e-part').textContent = entry.part || '—';
-    document.getElementById('e-shop').textContent = entry.shop || '—';
   }
   renderDetail();
 
@@ -295,10 +283,6 @@ document.addEventListener('DOMContentLoaded', function () {
         body.appendChild(fDate.wrap);
         var fNotes = field('Notes', entry.notes || '', { textarea: true });
         body.appendChild(fNotes.wrap);
-        var fPart = field('Part', entry.part || '');
-        body.appendChild(fPart.wrap);
-        var fShop = field('Shop', entry.shop || '');
-        body.appendChild(fShop.wrap);
 
         /* photos editor */
         var pmini = document.createElement('div'); pmini.className = 'emini'; pmini.textContent = 'PHOTOS (UP TO 3)';
@@ -332,13 +316,24 @@ document.addEventListener('DOMContentLoaded', function () {
           files = files.slice(0, Math.max(0, room));
           fileInp.value = '';
           if (!files.length) return;
-          var out = new Array(files.length), done = 0;
-          files.forEach(function (f, i) {
-            compressPhoto(f, function (url) {
-              out[i] = url;
-              if (++done === files.length) { draft.photos = draft.photos.concat(out.filter(Boolean)).slice(0, 3); renderDraftPhotos(); }
+          if (window.CarBoxUploads && CarBoxUploads.available()) {
+            UI.toast('Uploading photos…');
+            CarBoxUploads.put(files, { carId: CarBox.activeCarId(), entryId: entry.id }, null).then(function (res) {
+              var urls = res.filter(function (r) { return r && r.ok; }).map(function (r) { return r.url; });
+              var failed = res.length - urls.length;
+              if (failed > 0) UI.toast(failed + ' photo' + (failed > 1 ? 's' : '') + ' failed to upload');
+              draft.photos = draft.photos.concat(urls).slice(0, 3); renderDraftPhotos();
             });
-          });
+          } else {
+            /* local fallback until Supabase auth is wired (see uploads.js) */
+            var out = new Array(files.length), done = 0;
+            files.forEach(function (f, i) {
+              compressPhoto(f, function (url) {
+                out[i] = url;
+                if (++done === files.length) { draft.photos = draft.photos.concat(out.filter(Boolean)).slice(0, 3); renderDraftPhotos(); }
+              });
+            });
+          }
         });
         renderDraftPhotos();
 
@@ -351,8 +346,6 @@ document.addEventListener('DOMContentLoaded', function () {
           entry.miles = num(fMiles.input.value);
           entry.date = fDate.input.value ? fmtDate(fDate.input.value) : entry.date;
           entry.notes = fNotes.input.value.trim();
-          entry.part = fPart.input.value.trim();
-          entry.shop = fShop.input.value.trim();
           entry.photos = draft.photos.slice(0, 3);
           persist();          /* recomputes nextService if this is a maintenance entry */
           renderDetail();

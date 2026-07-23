@@ -17,7 +17,6 @@ window.CarForm = (function () {
     { id: 'body_coupe4', label: '4-door coupe' },
     { id: 'body_sedan', label: 'Sedan' }
   ];
-  var SHADES = [1, 0.82, 0.64, 0.47, 0.32];
   var PLACEHOLDER_SPECS = { engine: '', horsepower: '', torque: '', transmission: '', drivetrain: '', accel: '' };
 
   function el(tag, cls, html) {
@@ -56,7 +55,8 @@ window.CarForm = (function () {
         'aria-valuemin="0" aria-valuemax="360" tabindex="0"><span class="cf-hueknob"></span></div></div>' +
       '<div class="cf-monorow cf-mono" role="group" aria-label="Monotone colors"></div>' +
       '<div class="cf-mini">DARKNESS</div>' +
-      '<div class="cf-monorow cf-shade" role="group" aria-label="Darkness"></div>';
+      '<div class="cf-huewrap"><div class="cf-shadeslider" role="slider" aria-label="Darkness" ' +
+        'aria-valuemin="0" aria-valuemax="100" tabindex="0"><span class="cf-hueknob cf-shadeknob"></span></div></div>';
 
     var make = container.querySelector('.cf-make');
     var model = container.querySelector('.cf-model');
@@ -157,18 +157,38 @@ window.CarForm = (function () {
         monoRow.appendChild(sw);
       })(k);
     }
+    /* DARKNESS is a slider: left = no darkening (shade 1), right = darkest (SHADE_MIN) */
+    var SHADE_MIN = 0.3;
+    var shadeSlider = container.querySelector('.cf-shadeslider');
+    var shadeKnob = container.querySelector('.cf-shadeknob');
     function paintShade() {
-      shadeRow.querySelectorAll('.cf-monoswatch').forEach(function (sw, i) {
-        sw.classList.toggle('sel', (A.shade || 1) === SHADES[i]);
-      });
+      var s = typeof A.shade === 'number' ? A.shade : 1;
+      var t = Math.max(0, Math.min(1, (1 - s) / (1 - SHADE_MIN)));
+      shadeKnob.style.left = (t * 100) + '%';
+      shadeSlider.setAttribute('aria-valuenow', String(Math.round(t * 100)));
     }
-    SHADES.forEach(function (s, i) {
-      var v = Math.round(s * 200);
-      var sw = el('button', 'cf-monoswatch'); sw.type = 'button';
-      sw.style.background = 'rgb(' + v + ',' + v + ',' + v + ')';
-      sw.setAttribute('aria-label', i === 0 ? 'No darkening' : 'Darker level ' + i);
-      sw.addEventListener('click', function () { A.shade = s; paintShade(); draw(); pulse(); });
-      shadeRow.appendChild(sw);
+    function shadeFromEvent(e) {
+      var r = shadeSlider.getBoundingClientRect();
+      var x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+      return 1 - (x / r.width) * (1 - SHADE_MIN);
+    }
+    function applyShade(s) { A.shade = s; paintShade(); draw(); }
+    var sDrag = false, sPending = null, sRaf = false;
+    shadeSlider.addEventListener('pointerdown', function (e) {
+      sDrag = true; shadeKnob.classList.add('drag'); shadeSlider.setPointerCapture(e.pointerId); applyShade(shadeFromEvent(e));
+    });
+    shadeSlider.addEventListener('pointermove', function (e) {
+      if (!sDrag) return;
+      sPending = shadeFromEvent(e);
+      if (!sRaf) { sRaf = true; requestAnimationFrame(function () { sRaf = false; if (sPending !== null) applyShade(sPending); }); }
+    });
+    shadeSlider.addEventListener('pointerup', function (e) {
+      if (!sDrag) return; sDrag = false; shadeKnob.classList.remove('drag'); applyShade(shadeFromEvent(e)); pulse();
+    });
+    shadeSlider.addEventListener('keydown', function (e) {
+      var s = typeof A.shade === 'number' ? A.shade : 1;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); applyShade(Math.min(1, s + 0.05)); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); applyShade(Math.max(SHADE_MIN, s - 0.05)); }
     });
 
     var dragging = false, pendingHue = null, rafQueued = false;

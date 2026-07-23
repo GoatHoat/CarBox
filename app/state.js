@@ -16,8 +16,8 @@ window.CarBox = (function () {
   var PER_CAR = {
     vehicle: 'vehicle', car: 'appearance', entries: 'entries',
     planItems: 'planItems', goal: 'goal', goalLocked: 'goalLocked',
-    nextService: 'nextService', stats: 'stats', likes: 'likes',
-    liked: 'liked', comments: 'comments'
+    budget: 'budget', nextService: 'nextService', stats: 'stats',
+    likes: 'likes', liked: 'liked', comments: 'comments'
   };
 
   function clone(v) { return v == null ? v : JSON.parse(JSON.stringify(v)); }
@@ -45,6 +45,21 @@ window.CarBox = (function () {
     return { title: 'Oil change', interval: interval };
   }
 
+  /* Mileage is DERIVED: the car's odometer = max(baseMileage, highest entry
+     mileage). So logging a higher-mileage entry raises it, and DELETING the
+     entry that set it drops the odometer back down. baseMileage is the non-log
+     floor (0 for a new garage, the seed value for the demo). */
+  function recomputeMileage(car) {
+    var v = car.vehicle || {};
+    var maxE = 0;
+    (car.entries || []).forEach(function (e) { if (typeof e.miles === 'number' && e.miles > maxE) maxE = e.miles; });
+    if (v.baseMileage === undefined) {
+      /* first time: if current odometer exceeds any entry, that excess is the floor */
+      v.baseMileage = (typeof v.mileage === 'number' && v.mileage > maxE) ? v.mileage : 0;
+    }
+    v.mileage = Math.max(v.baseMileage || 0, maxE);
+  }
+
   /* Anchor to the owner's actual last maintenance entry (highest-mileage 'maint'),
      else the current odometer (0 for a brand-new empty garage). */
   function computeNextService(car) {
@@ -65,7 +80,7 @@ window.CarBox = (function () {
     return {
       id: 'car-demo',
       vehicle: {
-        name: 'Bugatti Chiron', make: 'Bugatti', model: 'Chiron', year: 2026, trim: '', mileage: 82410,
+        name: 'Bugatti Chiron', make: 'Bugatti', model: 'Chiron', year: 2026, trim: '', mileage: 82410, baseMileage: 82410,
         specs: {
           engine: '8.0L quad-turbo W16', horsepower: '1,479 hp (1,500 PS)',
           torque: '1,180 lb-ft', transmission: '7-speed dual-clutch',
@@ -91,6 +106,7 @@ window.CarBox = (function () {
       planItems: [],
       goal: 'More power',
       goalLocked: false,
+      budget: null,   /* {min, max} spend target for the goal; max null = no cap */
       nextService: { title: 'Oil change', due: 82800, interval: 5000 },
       stats: { baseInvested: 48200, baseCount: 31 },
       likes: 412, liked: false,
@@ -143,6 +159,7 @@ window.CarBox = (function () {
       planItems: raw.planItems || [],
       goal: raw.goal || 'More power',
       goalLocked: !!raw.goalLocked,
+      budget: raw.budget || null,
       nextService: raw.nextService || null,
       stats: raw.stats || { baseInvested: 0, baseCount: 0 },
       likes: typeof raw.likes === 'number' ? raw.likes : 0,
@@ -177,6 +194,7 @@ window.CarBox = (function () {
       if (!Array.isArray(c.comments)) c.comments = [];
       if (!c.stats) c.stats = { baseInvested: 0, baseCount: 0 };
       if (typeof c.goalLocked !== 'boolean') c.goalLocked = false;
+      if (c.budget === undefined) c.budget = null;
       if (c.vehicle && c.vehicle.trim === undefined) c.vehicle.trim = '';
     });
     if (!findCar(state, state.activeCarId)) state.activeCarId = state.cars[0].id;
@@ -193,8 +211,8 @@ window.CarBox = (function () {
       }
     } catch (e) { /* ignore */ }
 
-    /* recompute each car's advised service from its own log (Part C) */
-    state.cars.forEach(function (c) { c.nextService = computeNextService(c); });
+    /* derive odometer + advised service for each car from its own log */
+    state.cars.forEach(function (c) { recomputeMileage(c); c.nextService = computeNextService(c); });
     return state;
   }
 
@@ -222,8 +240,8 @@ window.CarBox = (function () {
     if (PER_CAR.hasOwnProperty(key)) {
       var car = active();
       car[PER_CAR[key]] = clone(value);
-      /* keep advised service current whenever the log or the car itself changes */
-      if (key === 'entries' || key === 'vehicle') car.nextService = computeNextService(car);
+      /* keep odometer + advised service current whenever the log/car changes */
+      if (key === 'entries' || key === 'vehicle') { recomputeMileage(car); car.nextService = computeNextService(car); }
     } else {
       state[key] = clone(value);
     }
@@ -259,6 +277,7 @@ window.CarBox = (function () {
     if (typeof carObj.liked !== 'boolean') carObj.liked = false;
     if (!carObj.goal) carObj.goal = 'More power';
     if (typeof carObj.goalLocked !== 'boolean') carObj.goalLocked = false;
+    if (carObj.budget === undefined) carObj.budget = null;
     if (carObj.vehicle && carObj.vehicle.trim === undefined) carObj.vehicle.trim = '';
     carObj.nextService = computeNextService(carObj);
     state.cars.push(carObj);

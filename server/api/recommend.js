@@ -14,7 +14,8 @@ var SYSTEM_PROMPT = [
   'Hard rules:',
   '- Exactly 2 recommendations. Never label them "Stage 1", "Stage 2", or any stage/tier/phase numbering. Each is titled with the mod\'s real name (e.g. "Cold air intake", "ECU flash tune", "Coilover suspension kit").',
   '- Recommendations must be realistic and SAFE for this exact car and goal. Never recommend a turbo/boost tune on a naturally aspirated engine unless you are recommending adding forced induction itself and the platform commonly supports it. Never recommend engine tunes on EVs (suggest EV-appropriate mods instead). Respect drivetrain (no "add AWD" style suggestions) and the car\'s existing power level.',
-  '- "benefit" is one short line: estimated gain and rough parts cost, e.g. "+15-25 hp, roughly $350 in parts". Keep estimates honest for this platform; use ranges.',
+  '- BUDGET: the user gives a maximum budget for this goal. EACH recommendation\'s realistic total cost (parts plus install) MUST fit within that cap on its own, so they can afford either one. Never suggest something above the cap. If the cap is very low, recommend the best genuinely affordable option(s) that fit and keep the estimates honest; it is fine if the two are modest.',
+  '- "benefit" is one short line: estimated gain and rough parts cost, e.g. "+15-25 hp, roughly $350 in parts". Keep estimates honest for this platform and within budget; use ranges.',
   '- "detail" is one paragraph (3-5 sentences) explaining what the mod is, what it does to the car, and why it is the right choice for this specific car and this goal.',
   '- CRITICAL STYLE RULE: the "detail" paragraph must NOT contain the em dash character or the en dash character anywhere. Do not use "—" and do not use "–". Use commas, periods, or parentheses instead. Plain hyphens inside compound words (like "bolt-on") are fine.',
   '',
@@ -61,6 +62,11 @@ module.exports = async function handler(req, res) {
   if (!v.make || !v.model || !v.year) return send(res, 400, { error: 'make, model, year required' });
 
   var specs = v.specs || {};
+  var b = v.budget || null;
+  var budgetLine = b
+    ? 'Budget cap per mod: $' + (b.max != null ? b.max : (b.min || 0)) +
+      (b.max == null && b.min ? ' or more available' : '') + ' (each recommendation must fit within this)'
+    : 'Budget cap per mod: not specified (keep costs sensible)';
   var user = [
     'Car: ' + v.year + ' ' + v.make + ' ' + v.model + (v.trim ? ' (' + v.trim + ')' : ''),
     'Engine: ' + (specs.engine || 'unknown'),
@@ -70,8 +76,9 @@ module.exports = async function handler(req, res) {
     'Drivetrain: ' + (specs.drivetrain || 'unknown'),
     '0-60 mph: ' + (specs.accel || 'unknown'),
     'Owner goal: ' + (v.goal || 'More power'),
+    budgetLine,
     '',
-    'Recommend exactly 2 mods as specified.'
+    'Recommend exactly 2 mods as specified, both within the budget cap.'
   ].join('\n');
 
   try {
