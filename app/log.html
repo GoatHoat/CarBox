@@ -113,6 +113,9 @@
   }
   @keyframes lebounce{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
 
+  /* thumbnails shown on a timeline card that has photos */
+  .cardthumbs{display:flex;gap:6px;margin-top:8px}
+  .cardthumbs img{width:48px;height:48px;object-fit:cover;border-radius:10px}
   .photothumbs{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
   .photothumbs img{
     width:56px;height:56px;object-fit:cover;border-radius:12px;
@@ -382,8 +385,8 @@ document.addEventListener('DOMContentLoaded', function () {
   photoInput.addEventListener('change', function () {
     var thumbs = $('photothumbs');
     Array.prototype.forEach.call(photoInput.files, function (file) {
-      if (thumbs.children.length >= 6) return;
-      pickedFiles.push(file);            /* kept in memory for the upload point below */
+      if (thumbs.children.length >= 3) return;   /* 3-photo limit (matches the card layout) */
+      pickedFiles.push(file);
       var img = document.createElement('img');
       img.alt = '';
       img.src = URL.createObjectURL(file);
@@ -408,6 +411,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (entry.date) parts.push(entry.date);
     meta.textContent = parts.join(' · ');
     card.appendChild(chip); card.appendChild(title); card.appendChild(meta);
+    /* the entry's own photos (up to 3) as small thumbnails on the card */
+    var photos = (entry.photos || []).slice(0, 3);
+    if (photos.length) {
+      var thumbs = document.createElement('div');
+      thumbs.className = 'cardthumbs';
+      photos.forEach(function (src) {
+        var im = document.createElement('img'); im.src = src; im.alt = ''; thumbs.appendChild(im);
+      });
+      card.appendChild(thumbs);
+    }
     card.setAttribute('data-press', '');
     card.setAttribute('data-id', entry.id);
     card.setAttribute('role', 'link');
@@ -462,6 +475,28 @@ document.addEventListener('DOMContentLoaded', function () {
   try { sessionStorage.setItem('carbox.statsUp', '1'); } catch (e) {}
 
   function num(v) { var n = parseInt(String(v).replace(/[^0-9]/g, ''), 10); return isNaN(n) ? 0 : n; }
+
+  /* Compress a picked photo to a small JPEG data URL (max 1000px, q~0.72) so a
+     few images per entry stay tiny in localStorage. NOTE (Part E): for real
+     cloud storage, upload the original File objects (pickedFiles) instead and
+     store the returned URLs; the entry.photos shape stays the same. */
+  function compressPhoto(file, cb) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        var max = 1000, w = img.width, h = img.height;
+        if (w > max || h > max) { var s = max / Math.max(w, h); w = Math.round(w * s); h = Math.round(h * s); }
+        var c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        try { cb(c.toDataURL('image/jpeg', 0.72)); } catch (e) { cb(null); }
+      };
+      img.onerror = function () { cb(null); };
+      img.src = reader.result;
+    };
+    reader.onerror = function () { cb(null); };
+    reader.readAsDataURL(file);
+  }
   /* desktop browsers need a nudge to open the picker; iOS opens its wheel on focus */
   $('f-date').addEventListener('click', function () {
     if (this.showPicker) { try { this.showPicker(); } catch (e) {} }
@@ -483,34 +518,46 @@ document.addEventListener('DOMContentLoaded', function () {
       miles: num($('f-miles').value),
       date: formatISO($('f-date').value || todayISO()),
       notes: $('f-notes').value.trim(),
-      photos: []   /* URLs, filled by the upload step below once storage exists */
+      photos: []
     };
-    /* ── PHOTO UPLOAD INTEGRATION POINT (Part E) ──
-       `pickedFiles` holds the chosen File objects. When cloud storage exists,
-       upload them here and assign the returned URLs to entry.photos BEFORE the
-       CarBox.set('entries', ...) below, e.g.:
-           entry.photos = await CarBoxUploads.put(pickedFiles);
-       We do NOT base64-inline them into localStorage (keeps the store small). */
     entry.id = 'u' + Date.now().toString(36);
-    entries.unshift(entry);
-    CarBox.set('entries', entries);   /* store recomputes nextService from the log */
-    paintReminder();                  /* a new maintenance entry updates the reminder live */
+    var files = pickedFiles.slice(0, 3);   /* 3-photo limit */
 
-    /* mileage sanity: a newer, higher odometer updates the vehicle */
-    if (entry.miles > vehicle.mileage) {
-      vehicle.mileage = entry.miles;
-      CarBox.set('vehicle', vehicle);
-      document.querySelector('.loghead .miles').textContent = CarBox.fmtMiles(vehicle.mileage);
+    /* commit once photos (if any) are compressed */
+    function finalize() {
+      entries.unshift(entry);
+      CarBox.set('entries', entries);   /* store recomputes nextService from the log */
+      paintReminder();                  /* a new maintenance entry updates the reminder live */
+
+      /* mileage sanity: a newer, higher odometer updates the vehicle */
+      if (entry.miles > vehicle.mileage) {
+        vehicle.mileage = entry.miles;
+        CarBox.set('vehicle', vehicle);
+        document.querySelector('.loghead .miles').textContent = CarBox.fmtMiles(vehicle.mileage);
+      }
+
+      ['f-title', 'f-cost', 'f-miles', 'f-date', 'f-notes'].forEach(function (id) { $(id).value = ''; });
+      $('photothumbs').innerHTML = '';
+      $('photolabel').textContent = 'Add photos';
+      pickedFiles = [];
+      closeSheet();
+      insertCard();
     }
 
-    ['f-title', 'f-cost', 'f-miles', 'f-date', 'f-notes'].forEach(function (id) { $(id).value = ''; });
-    $('photothumbs').innerHTML = '';
-    $('photolabel').textContent = 'Add photos';
-    pickedFiles = [];
-    closeSheet();
+    if (!files.length) { finalize(); return; }
+    var out = new Array(files.length), done = 0;
+    files.forEach(function (f, i) {
+      compressPhoto(f, function (url) {
+        out[i] = url;
+        if (++done === files.length) { entry.photos = out.filter(Boolean); finalize(); }
+      });
+    });
 
     /* FLIP: existing cards slide down, the new card drops in on top */
-    setTimeout(function () {
+    function insertCard() { setTimeout(function () {
+      /* first-entry case: drop the "No entries yet" state and restore the rail */
+      var emptyEl = timeline.querySelector('.logempty');
+      if (emptyEl) { emptyEl.remove(); rail.style.display = ''; }
       var olds = Array.prototype.slice.call(timeline.querySelectorAll('.entry'));
       var firsts = olds.map(function (el) { return el.getBoundingClientRect().top; });
       var fresh = makeCard(entry);
@@ -536,7 +583,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       });
       updateStats(true);
-    }, 220);
+    }, 220); }
   });
 
   /* hydrate header + reminder from state */

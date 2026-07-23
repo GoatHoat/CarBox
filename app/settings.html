@@ -286,6 +286,10 @@
       <div class="stx">Redo onboarding</div>
       <span class="devtag">TEMP</span>
     </div>
+    <div class="setrow rowbtn devrow" id="proToggle" role="button" tabindex="0" aria-label="Toggle Pro">
+      <div class="stx" id="proToggleTx">Switch to Pro</div>
+      <span class="devtag">TEMP</span>
+    </div>
   </div>
 
   <div class="sec-label">CarBox Pro</div>
@@ -748,6 +752,20 @@ document.addEventListener('DOMContentLoaded', function () {
         location.replace('onboarding.html?v=' + Date.now());
       }
     });
+  });
+
+  /* TEMP dev shortcut: flip between Pro and Base to test Pro-gated features. */
+  function paintProToggle() {
+    $('proToggleTx').textContent = CarBox.get('isPro') ? 'Switch to Base (Pro is ON)' : 'Switch to Pro';
+  }
+  paintProToggle();
+  bindRow('proToggle', function () {
+    var next = !CarBox.get('isPro');
+    CarBox.set('isPro', next);
+    if (next) document.dispatchEvent(new CustomEvent('carbox-pro'));
+    paintProToggle();
+    paintPlan();
+    UI.toast(next ? 'CarBox Pro ON (dev)' : 'CarBox Pro OFF (dev)');
   });
 
   /* TEMP dev shortcut: re-run the sign-up flow. Finishing onboarding rewrites

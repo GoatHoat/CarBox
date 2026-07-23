@@ -76,7 +76,8 @@ window.CarBox = (function () {
       entries: [
         { id: 'e1', type: 'mod', title: 'Titanium exhaust install', cost: 12400, miles: 81900, date: 'Jun 30, 2026',
           notes: 'Akrapovic full system. Torqued manifold bolts to 22 Nm. Sourced from EuroParts, part #AK-CH-77.',
-          part: 'Akrapovic Evolution', shop: 'Apex Performance' },
+          part: 'Akrapovic Evolution', shop: 'Apex Performance',
+          photos: ['assets/photo_exhaust_1.jpg', 'assets/photo_exhaust_2.jpg', 'assets/photo_exhaust_3.jpg'] },
         { id: 'e2', type: 'maint', title: 'Oil change + inspection', cost: 620, miles: 80500, date: 'May 12, 2026',
           notes: 'Liqui Moly 5W-40, 9.2 L. Replaced drain plug washer, reset service indicator. All fluids topped.',
           part: 'Liqui Moly 5W-40', shop: 'Bugatti Service Center' },

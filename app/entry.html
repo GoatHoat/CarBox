@@ -35,10 +35,12 @@
   .etitle-hero h1{font-size:29px;color:var(--tx,#0E0E0E);line-height:1.08;margin-top:6px}
   .emeta{font-size:15.5px;font-weight:600;color:var(--meta);margin-top:4px}
 
-  .photos{
-    display:grid;grid-template-columns:1fr 81px;grid-template-rows:87px 87px;
-    gap:9px;margin-top:14px;
-  }
+  /* photos: render ONLY the entry's own photos (or nothing). The 3-photo grid
+     matches the original layout: one big on the left, two stacked on the right. */
+  .photos{display:grid;gap:9px;margin-top:14px}
+  .photos.n1{grid-template-columns:1fr;grid-template-rows:190px}
+  .photos.n2{grid-template-columns:1fr 1fr;grid-template-rows:130px}
+  .photos.n3{grid-template-columns:1fr 81px;grid-template-rows:87px 87px}
   .photos img{width:100%;height:100%;object-fit:cover;border-radius:16px}
   .photos .pbig{grid-row:1 / 3}
 
@@ -75,11 +77,7 @@
     <div class="emeta" id="e-meta">$12,400 &middot; 81,900 mi &middot; Jun 30, 2026</div>
   </div>
 
-  <div class="photos">
-    <img class="pbig" src="assets/photo_exhaust_1.jpg" alt="Entry photo">
-    <img src="assets/photo_exhaust_2.jpg" alt="Entry photo">
-    <img src="assets/photo_exhaust_3.jpg" alt="Entry photo">
-  </div>
+  <div class="photos" id="e-photos"></div>
 
   <div class="notescard">
     <h2>Notes</h2>
@@ -133,6 +131,21 @@ document.addEventListener('DOMContentLoaded', function () {
   if (entry.miles > 0) parts.push(CarBox.fmtMiles(entry.miles));
   if (entry.date) parts.push(entry.date);
   document.getElementById('e-meta').textContent = parts.join(' · ');
+
+  /* photos: only this entry's own images (up to 3); no photos -> no section */
+  var photosEl = document.getElementById('e-photos');
+  var photos = (entry.photos || []).slice(0, 3);
+  if (!photos.length) {
+    photosEl.remove();
+  } else {
+    photosEl.className = 'photos n' + photos.length;
+    photos.forEach(function (src, i) {
+      var img = document.createElement('img');
+      if (photos.length === 3 && i === 0) img.className = 'pbig';
+      img.src = src; img.alt = 'Entry photo';
+      photosEl.appendChild(img);
+    });
+  }
 
   document.getElementById('e-notes').textContent = entry.notes || 'No notes yet.';
   document.getElementById('e-part').textContent = entry.part || '—';
