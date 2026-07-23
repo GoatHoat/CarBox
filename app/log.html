@@ -377,23 +377,31 @@ document.addEventListener('DOMContentLoaded', function () {
      point in the Save handler below (Part E, cloud storage). */
   var photoInput = $('photoinput');
   var pickedFiles = [];
-  function pickPhotos() { photoInput.click(); }
+  function pickPhotos() {
+    if ($('photothumbs').children.length >= 3) { UI.toast('You can add up to 3 photos'); return; }
+    photoInput.click();
+  }
   $('photobox').addEventListener('click', pickPhotos);
   $('photobox').addEventListener('keydown', function (e) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickPhotos(); }
   });
   photoInput.addEventListener('change', function () {
     var thumbs = $('photothumbs');
+    var skipped = 0;
     Array.prototype.forEach.call(photoInput.files, function (file) {
-      if (thumbs.children.length >= 3) return;   /* 3-photo limit (matches the card layout) */
+      if (thumbs.children.length >= 3) { skipped++; return; }   /* 3-photo limit */
       pickedFiles.push(file);
       var img = document.createElement('img');
       img.alt = '';
       img.src = URL.createObjectURL(file);
       thumbs.appendChild(img);
     });
+    photoInput.value = '';   /* let the same file be picked again after a delete */
+    if (skipped > 0) UI.toast('You can add up to 3 photos');
     var n = thumbs.children.length;
-    $('photolabel').textContent = n ? n + ' photo' + (n > 1 ? 's' : '') + ' added' : 'Add photos';
+    $('photolabel').textContent = n >= 3
+      ? '3 photos added (max)'
+      : (n ? n + ' photo' + (n > 1 ? 's' : '') + ' added' : 'Add photos');
   });
 
   function makeCard(entry) {

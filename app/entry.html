@@ -62,6 +62,47 @@
     padding:10px 0;color:var(--accent-tx,#776357);font-family:'League Spartan',sans-serif;font-weight:600;font-size:16.5px;
     min-height:44px;
   }
+
+  /* ── Edit entry sheet ── */
+  .ecats{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-top:2px;padding-bottom:2px}
+  .ecats::-webkit-scrollbar{display:none}
+  .ecat{
+    flex:none;background:var(--ctl,#D9D4D0);border:none;border-radius:999px;cursor:pointer;padding:7px 13px;
+    font-family:'League Spartan',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.04em;color:var(--tx2,#3E3A36);
+  }
+  .ecat.sel{background:var(--brown-warm);color:#FBF8F4}
+  .efield{background:var(--surface,#F5F3F4);border-radius:16px;box-shadow:var(--shadow);padding:8px 14px 9px;margin-top:9px}
+  .efield.invalid{box-shadow:var(--shadow),inset 0 0 0 1.5px #B3402F}
+  .efield .elab{font-size:12px;font-weight:600;color:var(--mut,#9B918F)}
+  .efield input,.efield textarea{
+    width:100%;border:none;background:transparent;outline:none;resize:none;
+    font-family:'League Spartan',sans-serif;font-size:16px;font-weight:600;color:var(--tx,#141210);margin-top:2px;padding:0;
+  }
+  .efield ::placeholder{color:var(--mut,#AEA6A3);opacity:1}
+  .efield input[type=date]{-webkit-appearance:none;appearance:none;min-height:22px;text-align:left}
+  .efield input[type=date]::-webkit-calendar-picker-indicator{display:none}
+  .efieldrow{display:flex;gap:9px}
+  .efieldrow .efield{flex:1;min-width:0}
+  .emini{font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--mut,#9B918F);margin-top:14px}
+  .ephotos{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .ephoto{position:relative;width:70px;height:70px;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+  .ephoto img{width:100%;height:100%;object-fit:cover}
+  .ephoto .del{
+    position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(20,16,14,.72);color:#fff;font-size:14px;line-height:20px;padding:0;
+  }
+  .eaddtile{
+    width:70px;height:70px;border-radius:12px;border:2px dashed #A5907E;background:transparent;cursor:pointer;
+    color:var(--mut,#9B918F);font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;
+  }
+  .esheetbtn{
+    width:100%;margin-top:14px;background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:12px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:16px;box-shadow:var(--shadow);
+  }
+  .edanger{
+    width:100%;margin-top:6px;background:transparent;border:none;cursor:pointer;color:#B3402F;
+    font-family:'League Spartan',sans-serif;font-weight:600;font-size:14.5px;padding:8px 0;
+  }
 </style>
 </head>
 <body>
@@ -116,28 +157,50 @@ document.addEventListener('DOMContentLoaded', function () {
   var entry = null;
   entries.forEach(function (e) { if (e.id === id) entry = e; });
   if (!entry) entry = entries[0];
+  if (!entry) { location.href = 'log.html'; return; }
 
   /* remember which card was opened so the log page can run the reverse morph */
   try { sessionStorage.setItem('carbox.lastEntry', entry.id); } catch (e) {}
 
-  var chip = document.getElementById('e-chip');
-  chip.className = 'echip ' + entry.type;
-  chip.textContent = CHIP_LABEL[entry.type] || 'MOD';
-  document.getElementById('e-title').textContent = entry.title;
-  document.title = 'CarBox — ' + entry.title;
+  function num(v) { var n = parseInt(String(v).replace(/[^0-9]/g, ''), 10); return isNaN(n) ? 0 : n; }
+  function toISO(dstr) {
+    if (!dstr) return '';
+    var d = new Date(dstr);
+    if (isNaN(d.getTime())) return '';
+    var mm = String(d.getMonth() + 1); if (mm.length < 2) mm = '0' + mm;
+    var dd = String(d.getDate()); if (dd.length < 2) dd = '0' + dd;
+    return d.getFullYear() + '-' + mm + '-' + dd;
+  }
+  function fmtDate(iso) {
+    if (!iso) return '';
+    var p = iso.split('-');
+    return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  /* same compressor the Add Entry sheet uses (max 1000px, q0.72 JPEG data URL) */
+  function compressPhoto(file, cb) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        var max = 1000, w = img.width, h = img.height;
+        if (w > max || h > max) { var s = max / Math.max(w, h); w = Math.round(w * s); h = Math.round(h * s); }
+        var c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        try { cb(c.toDataURL('image/jpeg', 0.72)); } catch (e) { cb(null); }
+      };
+      img.onerror = function () { cb(null); };
+      img.src = reader.result;
+    };
+    reader.onerror = function () { cb(null); };
+    reader.readAsDataURL(file);
+  }
 
-  var parts = [];
-  if (entry.cost > 0) parts.push(CarBox.fmtMoney(entry.cost));
-  if (entry.miles > 0) parts.push(CarBox.fmtMiles(entry.miles));
-  if (entry.date) parts.push(entry.date);
-  document.getElementById('e-meta').textContent = parts.join(' · ');
-
-  /* photos: only this entry's own images (up to 3); no photos -> no section */
-  var photosEl = document.getElementById('e-photos');
-  var photos = (entry.photos || []).slice(0, 3);
-  if (!photos.length) {
-    photosEl.remove();
-  } else {
+  function renderPhotos() {
+    var photosEl = document.getElementById('e-photos');
+    var photos = (entry.photos || []).slice(0, 3);
+    photosEl.innerHTML = '';
+    if (!photos.length) { photosEl.style.display = 'none'; return; }
+    photosEl.style.display = '';
     photosEl.className = 'photos n' + photos.length;
     photos.forEach(function (src, i) {
       var img = document.createElement('img');
@@ -146,25 +209,168 @@ document.addEventListener('DOMContentLoaded', function () {
       photosEl.appendChild(img);
     });
   }
+  function renderDetail() {
+    var chip = document.getElementById('e-chip');
+    chip.className = 'echip ' + entry.type;
+    chip.textContent = CHIP_LABEL[entry.type] || 'MOD';
+    document.getElementById('e-title').textContent = entry.title;
+    document.title = 'CarBox — ' + entry.title;
+    var parts = [];
+    if (entry.cost > 0) parts.push(CarBox.fmtMoney(entry.cost));
+    if (entry.miles > 0) parts.push(CarBox.fmtMiles(entry.miles));
+    if (entry.date) parts.push(entry.date);
+    document.getElementById('e-meta').textContent = parts.join(' · ');
+    renderPhotos();
+    document.getElementById('e-notes').textContent = entry.notes || 'No notes yet.';
+    document.getElementById('e-part').textContent = entry.part || '—';
+    document.getElementById('e-shop').textContent = entry.shop || '—';
+  }
+  renderDetail();
 
-  document.getElementById('e-notes').textContent = entry.notes || 'No notes yet.';
-  document.getElementById('e-part').textContent = entry.part || '—';
-  document.getElementById('e-shop').textContent = entry.shop || '—';
+  /* write the edited entry back into the active car's log */
+  function persist() {
+    var all = CarBox.get('entries').map(function (e) { return e.id === entry.id ? entry : e; });
+    CarBox.set('entries', all);
+  }
 
   document.getElementById('back').addEventListener('click', function () {
     if (document.referrer && document.referrer.indexOf(location.origin) === 0) history.back();
     else location.href = 'log.html';
   });
-
-  document.getElementById('e-edit').addEventListener('click', function () {
-    UI.toast('Coming soon');
-  });
   document.getElementById('e-share').addEventListener('click', function () {
-    var link = 'https://carbox.app/e/' + entry.id;
-    function done() { UI.toast('Link copied'); }
+    var dir = location.href.replace(/[?#].*$/, '').replace(/[^\/]*$/, '');
+    var link = dir + 'garage.html?car=' + encodeURIComponent(CarBox.activeCarId());
+    function done() { UI.toast('Garage link copied'); }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(link).then(done, done);
     } else done();
+  });
+
+  /* ── Edit entry: change any field + add/delete photos (up to 3) ── */
+  document.getElementById('e-edit').addEventListener('click', function () {
+    var sh = UI.sheet({
+      title: 'Edit entry',
+      label: 'Edit entry',
+      build: function (body) {
+        var draft = {
+          type: entry.type,
+          dateISO: toISO(entry.date),
+          photos: (entry.photos || []).slice(0, 3)
+        };
+        /* category chips */
+        var CATS = [['mod', 'MOD'], ['maint', 'MAINTENANCE'], ['repair', 'REPAIR'], ['cosmetic', 'COSMETIC']];
+        var cats = document.createElement('div'); cats.className = 'ecats';
+        CATS.forEach(function (c) {
+          var b = document.createElement('button');
+          b.className = 'ecat' + (c[0] === draft.type ? ' sel' : ''); b.textContent = c[1];
+          b.addEventListener('click', function () {
+            draft.type = c[0];
+            cats.querySelectorAll('.ecat').forEach(function (x) { x.classList.remove('sel'); });
+            b.classList.add('sel');
+          });
+          cats.appendChild(b);
+        });
+        body.appendChild(cats);
+
+        function field(lab, val, opts) {
+          opts = opts || {};
+          var f = document.createElement('div'); f.className = 'efield';
+          var l = document.createElement('div'); l.className = 'elab'; l.textContent = lab;
+          var inp = opts.textarea ? document.createElement('textarea') : document.createElement('input');
+          if (opts.textarea) inp.rows = 3; else inp.type = opts.type || 'text';
+          if (opts.inputmode) inp.setAttribute('inputmode', opts.inputmode);
+          inp.value = val;
+          if (opts.type === 'date') inp.addEventListener('click', function () { if (this.showPicker) { try { this.showPicker(); } catch (e) {} } });
+          f.appendChild(l); f.appendChild(inp);
+          return { wrap: f, input: inp };
+        }
+        var fTitle = field('Title', entry.title || '');
+        body.appendChild(fTitle.wrap);
+        var row = document.createElement('div'); row.className = 'efieldrow';
+        var fCost = field('Cost', entry.cost ? String(entry.cost) : '', { inputmode: 'numeric' });
+        var fMiles = field('Mileage', entry.miles ? String(entry.miles) : '', { inputmode: 'numeric' });
+        row.appendChild(fCost.wrap); row.appendChild(fMiles.wrap);
+        body.appendChild(row);
+        var fDate = field('Date', draft.dateISO, { type: 'date' });
+        body.appendChild(fDate.wrap);
+        var fNotes = field('Notes', entry.notes || '', { textarea: true });
+        body.appendChild(fNotes.wrap);
+        var fPart = field('Part', entry.part || '');
+        body.appendChild(fPart.wrap);
+        var fShop = field('Shop', entry.shop || '');
+        body.appendChild(fShop.wrap);
+
+        /* photos editor */
+        var pmini = document.createElement('div'); pmini.className = 'emini'; pmini.textContent = 'PHOTOS (UP TO 3)';
+        body.appendChild(pmini);
+        var pwrap = document.createElement('div'); pwrap.className = 'ephotos';
+        body.appendChild(pwrap);
+        var fileInp = document.createElement('input');
+        fileInp.type = 'file'; fileInp.accept = 'image/*'; fileInp.multiple = true; fileInp.hidden = true;
+        body.appendChild(fileInp);
+        function renderDraftPhotos() {
+          pwrap.innerHTML = '';
+          draft.photos.forEach(function (src, i) {
+            var cell = document.createElement('div'); cell.className = 'ephoto';
+            var im = document.createElement('img'); im.src = src; im.alt = ''; cell.appendChild(im);
+            var del = document.createElement('button');
+            del.className = 'del'; del.textContent = '×'; del.setAttribute('aria-label', 'Remove photo');
+            del.addEventListener('click', function () { draft.photos.splice(i, 1); renderDraftPhotos(); });
+            cell.appendChild(del); pwrap.appendChild(cell);
+          });
+          if (draft.photos.length < 3) {
+            var add = document.createElement('button');
+            add.className = 'eaddtile'; add.textContent = '+'; add.setAttribute('aria-label', 'Add photo');
+            add.addEventListener('click', function () { fileInp.click(); });
+            pwrap.appendChild(add);
+          }
+        }
+        fileInp.addEventListener('change', function () {
+          var files = Array.prototype.slice.call(fileInp.files);
+          var room = 3 - draft.photos.length;
+          if (files.length > room) UI.toast('You can add up to 3 photos');
+          files = files.slice(0, Math.max(0, room));
+          fileInp.value = '';
+          if (!files.length) return;
+          var out = new Array(files.length), done = 0;
+          files.forEach(function (f, i) {
+            compressPhoto(f, function (url) {
+              out[i] = url;
+              if (++done === files.length) { draft.photos = draft.photos.concat(out.filter(Boolean)).slice(0, 3); renderDraftPhotos(); }
+            });
+          });
+        });
+        renderDraftPhotos();
+
+        var save = document.createElement('button'); save.className = 'esheetbtn'; save.textContent = 'Save changes';
+        save.addEventListener('click', function () {
+          if (!fTitle.input.value.trim()) { fTitle.wrap.classList.add('invalid'); UI.toast('Give your entry a title'); return; }
+          entry.type = draft.type;
+          entry.title = fTitle.input.value.trim();
+          entry.cost = num(fCost.input.value);
+          entry.miles = num(fMiles.input.value);
+          entry.date = fDate.input.value ? fmtDate(fDate.input.value) : entry.date;
+          entry.notes = fNotes.input.value.trim();
+          entry.part = fPart.input.value.trim();
+          entry.shop = fShop.input.value.trim();
+          entry.photos = draft.photos.slice(0, 3);
+          persist();          /* recomputes nextService if this is a maintenance entry */
+          renderDetail();
+          sh.close();
+          UI.toast('Entry updated');
+        });
+        body.appendChild(save);
+
+        var del = document.createElement('button'); del.className = 'edanger'; del.textContent = 'Delete entry';
+        del.addEventListener('click', function () {
+          var all = CarBox.get('entries').filter(function (e) { return e.id !== entry.id; });
+          CarBox.set('entries', all);
+          sh.close();
+          location.href = 'log.html';
+        });
+        body.appendChild(del);
+      }
+    });
   });
 });
 </script>
