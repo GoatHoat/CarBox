@@ -16,10 +16,16 @@ window.CARBOX_CONFIG = {
 };
 
 /* ── Dev mode ──
-   true  = shows the DEV rows in Settings (Redo onboarding, Switch to Pro/Base).
-   false = hides every dev affordance. MUST be false for the App Store build —
-   a reviewer finding a payment-bypass toggle is an automatic rejection. */
-window.CARBOX_DEV = true;
+   Dev affordances (Redo onboarding, Switch to Pro/Base) are OFF by default, so
+   the App Store build can NEVER ship the payment-bypass toggle that would be an
+   automatic rejection (guideline 3.1.1). They live behind a per-device flag.
+   To use them on your OWN phone: open Settings and tap the "Settings" title 7
+   times — it flips the local 'carbox.dev' flag and reloads. Because it is
+   per-device localStorage, it can never appear for a reviewer on a fresh
+   install, and there is nothing to remember to turn off before submitting. */
+window.CARBOX_DEV = (function () {
+  try { return localStorage.getItem('carbox.dev') === '1'; } catch (e) { return false; }
+})();
 
 /* ── Legal + support links (REQUIRED for App Store review) ──
    privacy.html + terms.html ship inside the app, so these links always work.

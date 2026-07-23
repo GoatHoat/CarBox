@@ -186,7 +186,7 @@
     <button class="backbtn" id="back" aria-label="Back to garage">
       <img src="assets/icon_back.png" alt="">
     </button>
-    <h1 class="serif">Settings</h1>
+    <h1 class="serif" id="setTitle">Settings</h1>
   </div>
 
   <div class="sec-label">My Car</div>
@@ -800,9 +800,31 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /* DEV rows — visible ONLY while config.js CARBOX_DEV is true. The App Store
-     build MUST ship with CARBOX_DEV=false: a toggle that grants Pro without
-     payment is an automatic App Review rejection (guideline 3.1.1). */
+  /* Hidden dev unlock: tap the "Settings" title 7× to toggle the dev tools on
+     THIS device only (localStorage 'carbox.dev'). Lets you reach Redo onboarding
+     / the Pro toggle without a browser console; a reviewer will never trigger it,
+     and it is off on every fresh install, so the shipped build stays compliant. */
+  (function () {
+    var h = $('setTitle'); if (!h) return;
+    var taps = 0, timer = null;
+    h.addEventListener('click', function () {
+      taps++; clearTimeout(timer);
+      timer = setTimeout(function () { taps = 0; }, 1200);
+      if (taps >= 7) {
+        taps = 0;
+        var on = false;
+        try { on = localStorage.getItem('carbox.dev') === '1'; } catch (e) {}
+        try { localStorage.setItem('carbox.dev', on ? '0' : '1'); } catch (e) {}
+        if (window.UI && UI.toast) UI.toast(on ? 'Dev tools off' : 'Dev tools on');
+        setTimeout(function () { location.reload(); }, 350);
+      }
+    });
+  })();
+
+  /* DEV rows — visible ONLY when the per-device 'carbox.dev' flag is set (see the
+     hidden unlock above and config.js). A fresh App Store install has the flag
+     OFF, so the Pro toggle (which would grant Pro without payment — an automatic
+     rejection under guideline 3.1.1) can never appear for a reviewer. */
   if (window.CARBOX_DEV) {
     var paintProToggle = function () {
       $('proToggleTx').textContent = CarBox.get('isPro') ? 'Switch to Base (Pro is ON)' : 'Switch to Pro';

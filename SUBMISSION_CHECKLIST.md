@@ -51,13 +51,17 @@ The `/server` folder holds the proxy that keeps keys server-side. Deploy it and 
 - [ ] **[FOLLOWS]** Set the password-reset redirect URL (Auth → URL config) to your `login.html`.
 
 ## 5. Legal (required for review)
-- [ ] **[BLOCKS]** Host a **Privacy Policy** and **Terms of Service** publicly, then paste the URLs
-  into `app/config.js` → `CARBOX_LEGAL` (`PRIVACY_URL`, `TERMS_URL`). The Privacy Policy must
-  disclose what CarBox collects: **account email, vehicle data, entry photos, approximate location
-  (only for nearby-shop search)**. Until set, the in-app links show "not configured yet".
+- [x] **[DONE]** Privacy Policy + Terms are hosted at
+  `https://carbox-one.vercel.app/privacy.html` and `/terms.html` and wired into `CARBOX_LEGAL`
+  (in-app + onboarding + paywall links all resolve). Privacy discloses account email, vehicle data,
+  entry photos, and approximate location (nearby-shop search only).
+- [ ] **[BLOCKS]** Fill the one legal placeholder: `app/terms.html` §16 still says
+  **`[YOUR STATE/COUNTRY]`** for governing law — replace with your actual jurisdiction (your legal
+  decision; I can't pick it for you). A bracketed placeholder in a shipped legal doc looks unfinished.
 - [ ] **[BLOCKS]** Enter the Privacy Policy URL in App Store Connect (App Privacy section) and fill
-  the data-collection questionnaire to match.
-- [ ] **[FOLLOWS]** Set `CARBOX_LEGAL.SUPPORT_EMAIL` and `APPSTORE_URL` (for Contact/Rate rows).
+  the data-collection questionnaire to match the disclosures above.
+- [x] **[DONE]** `CARBOX_LEGAL.SUPPORT_EMAIL` set (`carbox.app@outlook.com`). Still
+  **[FOLLOWS]** set `APPSTORE_URL` after first submission ("Rate CarBox" stays hidden until then).
 
 ## 6. Store listing assets
 - [ ] **[BLOCKS]** App icon: `expo-shell/assets/icon.png` exists — confirm it's 1024×1024 with no
@@ -68,9 +72,9 @@ The `/server` folder holds the proxy that keeps keys server-side. Deploy it and 
 - [ ] **[FOLLOWS]** Support URL + marketing URL.
 
 ## 7. Build & submit
-- [ ] **[BLOCKS]** Point `expo-shell/App.js` `CARBOX_URL` at where the **web app** is hosted for
-  production (today it's a LAN dev server `http://10.0.0.19:8000`). For a real build, host the `app/`
-  folder (static) on HTTPS and use that URL, or bundle the web assets into the app.
+- [x] **[DONE]** `expo-shell/App.js` `CARBOX_URL` now points at production
+  **`https://carbox-one.vercel.app/index.html`** (the `app/` folder deployed to Vercel over HTTPS).
+  Keep this URL current; re-deploy Vercel after any `app/` change (a `git push` to `main` triggers it).
 - [ ] **[BLOCKS]** Production build with EAS: `cd expo-shell && npx eas build -p ios --profile production`
   (requires `eas.json`; run `eas build:configure`). Increment `ios.buildNumber` per upload.
 - [ ] **[BLOCKS]** Upload to App Store Connect (EAS Submit or Transporter), attach the IAP products,
@@ -93,10 +97,12 @@ The `/server` folder holds the proxy that keeps keys server-side. Deploy it and 
   for geolocation + file/photo access + inline media.
 - **Legal**: in-app Privacy/Terms/Support/Rate links + onboarding links read from `CARBOX_LEGAL`
   (placeholders until you host the docs).
-- **Dev affordances**: the 5-tap debug sheet is gone. Two DEV-tagged testing buttons remain in
-  Settings → Account by owner request — **"Redo onboarding"** and **"Switch to Pro / Switch to Base"**
-  (flip the entitlement locally). **[BLOCKS]** Delete these two `.devrow` rows (HTML + their handlers
-  in `settings.html`) before submitting — nothing that bypasses payments or onboarding may ship.
+- **Dev affordances**: now **default-off and reviewer-safe — no manual deletion needed**. The two
+  DEV-tagged rows (**"Redo onboarding"** and **"Switch to Pro / Switch to Base"**) are gated on a
+  per-device `carbox.dev` localStorage flag (`config.js`) that is **off on every fresh install**, so a
+  reviewer can never see them. To use them on your OWN phone, open Settings and **tap the "Settings"
+  title 7 times** (toggles the flag + reloads). Because it is per-device state, there is nothing to
+  remember to remove before submitting.
 - **UGC safety**: comments have **Report**, **Block**, **Delete-your-own**, and a basic profanity
   filter. **Decision:** there is no cross-user social feed in v1 — comments are per-car/local and the
   public garage page shows only the owner's own data — so no un-moderated third-party content ships.

@@ -19,7 +19,7 @@
       "buildNumber": "1",
       "config": { "usesNonExemptEncryption": false },
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "CarBox uses your location to find nearby shops that can perform your recommended mods, and to show real distances and prices. It is never shared.",
+        "NSLocationWhenInUseUsageDescription": "CarBox uses your location to find nearby shops that can perform your recommended mods and to show how far away they are. Your location is used only for this and is never shared.",
         "NSCameraUsageDescription": "CarBox uses the camera so you can take photos of your car and its mods to add to a log entry.",
         "NSPhotoLibraryUsageDescription": "CarBox lets you attach photos from your library to a build or maintenance log entry.",
         "NSPhotoLibraryAddUsageDescription": "CarBox can save photos you add to your garage back to your photo library.",
