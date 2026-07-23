@@ -94,6 +94,16 @@
     color:var(--mut,#8D8579);font-family:'League Spartan',sans-serif;font-weight:700;font-size:16px;
   }
   .addcard .cc-plus{font-size:30px;line-height:1}
+  /* press-and-hold a car card to reveal a delete X (Pro, 2+ cars) */
+  .ccdel{
+    position:absolute;top:-8px;right:-8px;width:26px;height:26px;border-radius:50%;
+    border:2px solid var(--card);background:#B3402F;color:#fff;font-size:15px;line-height:21px;
+    padding:0;cursor:pointer;display:none;z-index:5;
+  }
+  .carcards.delmode .carcard .ccdel{display:block}
+  @keyframes ccjiggle{0%,100%{transform:rotate(-.8deg)}50%{transform:rotate(.8deg)}}
+  .carcards.delmode .carcard{animation:ccjiggle .32s ease-in-out infinite}
+  @media (prefers-reduced-motion: reduce){ .carcards.delmode .carcard{animation:none} }
   @keyframes cardin{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
   .carcard.justadded{animation:cardin .4s cubic-bezier(.3,1.4,.4,1)}
   @keyframes viewInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
@@ -226,8 +236,36 @@ document.addEventListener('DOMContentLoaded', function () {
   var carCards = document.getElementById('carCards');
   var pillEl = document.getElementById('notifpill');
   var currentView = null;
+  var delMode = false;
 
   function useCards() { return CarBox.get('isPro') || CarBox.cars().length > 1; }
+  function exitDelMode() { if (delMode) { delMode = false; carCards.classList.remove('delmode'); } }
+  function confirmDeleteCar(c) {
+    var nm = (c.vehicle && c.vehicle.name) || 'this car';
+    var PRIMARY = 'width:100%;margin-top:12px;background:#B3402F;color:#fff;border:none;border-radius:999px;cursor:pointer;' +
+      'padding:12px 0;font-family:\'League Spartan\',sans-serif;font-weight:600;font-size:16px;box-shadow:var(--shadow)';
+    var GHOST = 'width:100%;margin-top:6px;background:transparent;color:var(--tx,#141210);border:none;cursor:pointer;' +
+      'padding:11px 0;font-family:\'League Spartan\',sans-serif;font-weight:600;font-size:15px';
+    var sh = UI.sheet({
+      title: 'Delete ' + nm + '?', label: 'Delete car',
+      build: function (body) {
+        var note = document.createElement('div');
+        note.className = 'sheet-note'; note.style.marginTop = '0';
+        note.textContent = 'This permanently removes ' + nm + ' and its entire log and photos from your garage. This cannot be undone.';
+        body.appendChild(note);
+        var del = document.createElement('button'); del.textContent = 'Delete ' + nm; del.style.cssText = PRIMARY;
+        del.addEventListener('click', function () {
+          CarBox.removeCar(c.id);
+          sh.close(); exitDelMode();
+          if (useCards()) { showCards(false); } else { showDetail(false, false); }
+        });
+        body.appendChild(del);
+        var cancel = document.createElement('button'); cancel.textContent = 'Cancel'; cancel.style.cssText = GHOST;
+        cancel.addEventListener('click', function () { sh.close(); });
+        body.appendChild(cancel);
+      }
+    });
+  }
 
   function hydrateShared() {
     var prof = CarBox.get('profile');
@@ -269,13 +307,20 @@ document.addEventListener('DOMContentLoaded', function () {
       sub.textContent = locked ? 'Resubscribe to access' : (String(v.year || '') + ' · ' + CarBox.fmtMiles(v.mileage || 0));
       info.appendChild(nm); info.appendChild(sub);
       card.appendChild(img); card.appendChild(info);
+      /* delete X (revealed by press-and-hold; only meaningful with 2+ cars) */
+      var del = document.createElement('button');
+      del.className = 'ccdel'; del.textContent = '×'; del.setAttribute('aria-label', 'Delete ' + (v.name || 'car'));
+      del.addEventListener('click', function (e) { e.stopPropagation(); confirmDeleteCar(c); });
+      card.appendChild(del);
       card.addEventListener('click', function () {
+        if (delMode) { exitDelMode(); return; }         /* in delete mode a tap just dismisses it */
         if (locked) { UI.toast('Resubscribe to CarBox Pro to use this car'); if (window.Pro) Pro.open(); return; }
         CarBox.setActiveCar(c.id);
         showDetail(true);
       });
       carCards.appendChild(card);
     });
+    carCards.classList.toggle('delmode', delMode && list.length > 1);
     /* add-car card (same size); hidden only when a Pro user is already at 3 */
     if (!(pro && list.length >= CarBox.maxCars())) {
       var add = document.createElement('button');
@@ -287,6 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   function showCards(animate, justAddedId) {
     currentView = 'cards';
+    delMode = false;
     hydrateShared();
     renderCards(justAddedId);
     detailView.hidden = true; cardsView.hidden = false; detailBack.hidden = true;
@@ -296,6 +342,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   function showDetail(fromCards, animate) {
     currentView = 'detail';
+    delMode = false; carCards.classList.remove('delmode');
     hydrateShared(); hydrateDetail();
     cardsView.hidden = true; detailView.hidden = false; detailBack.hidden = !fromCards;
     if (animate !== false && !UI.reduced()) { detailView.classList.remove('slidein'); void detailView.offsetWidth; detailView.classList.add('slidein'); }
@@ -340,6 +387,23 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
+
+  /* press-and-hold a car card to reveal delete X's; tap anywhere off to dismiss */
+  (function () {
+    var holdTimer = null;
+    carCards.addEventListener('pointerdown', function (e) {
+      if (CarBox.cars().length <= 1) return;                          /* can't delete your only car */
+      if (e.target.closest('.ccdel') || e.target.closest('.addcard')) return;
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(function () { delMode = true; carCards.classList.add('delmode'); }, 450);
+    });
+    ['pointerup', 'pointercancel', 'pointermove', 'pointerleave'].forEach(function (ev) {
+      carCards.addEventListener(ev, function () { clearTimeout(holdTimer); });
+    });
+    document.addEventListener('pointerdown', function (e) {
+      if (delMode && (!e.target.closest || !e.target.closest('#carCards'))) exitDelMode();
+    });
+  })();
 
   /* back arrow + swipe-right return to the cards home */
   detailBack.addEventListener('click', function () { if (useCards()) showCards(true); });

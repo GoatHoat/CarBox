@@ -31,14 +31,12 @@
   }
   function go(i) {
     i = Math.max(0, Math.min(tabs.length - 1, i));
-    setX(i * pillW(), true);
-    if (i === index) return;
+    if (i === index) { setX(i * pillW(), true); return; }
+    /* navigate IMMEDIATELY on tap — no waiting for the pill to slide. The
+       destination page already renders its nav pill at the correct tab, and the
+       directional View Transition (carbox.navdir) covers the visual hand-off. */
     navdir(i);
-    var href = tabs[i].getAttribute('href');
-    var done = false;
-    var leave = function () { if (!done) { done = true; location.href = href; } };
-    pill.addEventListener('transitionend', leave, { once: true });
-    setTimeout(leave, 550); /* fallback if transitionend never fires */
+    location.href = tabs[i].getAttribute('href');
   }
   /* drag release: the finger's momentum carries into the settle */
   function goWithVelocity(i, vel) {
