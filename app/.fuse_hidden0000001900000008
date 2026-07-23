@@ -5,15 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Upgrades</title>
 <style>html{background:#E9E9E9}</style>
-<script>(function(){try{var _st=(JSON.parse(localStorage.getItem('carbox.v1'))||{});var _sess=false;try{for(var _i=0;_i<localStorage.length;_i++){if(/^sb-.*-auth-token$/.test(localStorage.key(_i))){_sess=true;break}}}catch(e){}if(!_st.onboardingComplete&&!_sess){location.replace('onboarding.html');return}}catch(e){location.replace('onboarding.html');return}var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
+<script>(function(){try{if(!(JSON.parse(localStorage.getItem('carbox.v1'))||{}).onboardingComplete){location.replace('onboarding.html');return}}catch(e){location.replace('onboarding.html');return}var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
-<script defer src="config.js"></script>
-<script defer src="vendor/supabase.js"></script>
-<script defer src="supabase.js"></script>
 <script defer src="ui.js"></script>
 <script defer src="nav.js"></script>
 <link rel="prefetch" href="index.html">

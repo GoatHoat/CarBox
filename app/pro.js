@@ -101,21 +101,29 @@ window.Pro = (function () {
       });
     });
 
-    /* start free week: success moment, then unlock everywhere */
+    /* start free week: runs a REAL StoreKit purchase via CarBoxBilling (which
+       drives the Pro entitlement); falls back to the local flag only when no
+       native IAP bridge is present (dev/web preview). */
     card.querySelector('.pro-cta').addEventListener('click', function () {
       var btn = this;
       if (btn.disabled) return;
       btn.disabled = true;
-      CarBox.set('isPro', true);
-      btn.innerHTML =
-        '<svg class="checkdraw" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' +
-        '<path d="M4 12.5 L10 18.5 L20 6.5" fill="none" stroke="#FBF8F4" stroke-width="3" ' +
-        'stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      document.dispatchEvent(new CustomEvent('carbox-pro'));
-      setTimeout(function () {
-        close();
-        UI.toast('Welcome to CarBox Pro');
-      }, 700);
+      var plan = (card.querySelector('.pro-price.sel') || {}).getAttribute
+        ? card.querySelector('.pro-price.sel').getAttribute('data-plan') : 'annual';
+      var okMoment = function () {
+        btn.innerHTML =
+          '<svg class="checkdraw" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' +
+          '<path d="M4 12.5 L10 18.5 L20 6.5" fill="none" stroke="#FBF8F4" stroke-width="3" ' +
+          'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        setTimeout(function () { close(); UI.toast('Welcome to CarBox Pro'); }, 700);
+      };
+      var run = (window.CarBoxBilling && CarBoxBilling.purchase)
+        ? CarBoxBilling.purchase(plan)
+        : (CarBox.set('isPro', true), document.dispatchEvent(new CustomEvent('carbox-pro')), Promise.resolve(true));
+      Promise.resolve(run).then(function (active) {
+        if (active) okMoment();
+        else { btn.disabled = false; UI.toast('Purchase cancelled'); }
+      }, function () { btn.disabled = false; UI.toast('Purchase could not be completed'); });
     });
   }
 

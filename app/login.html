@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CarBox — Log in</title>
+<style>html{background:#E9E9E9}</style>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script defer src="state.js"></script>
+<script defer src="config.js"></script>
+<script defer src="vendor/supabase.js"></script>
+<script defer src="supabase.js"></script>
+<style>
+  .login{max-width:340px;margin:0 auto;padding:70px 22px 40px;font-family:'League Spartan',sans-serif}
+  .login h1{font-family:'DM Serif Display',serif;font-size:34px;color:var(--tx,#141210);text-align:center}
+  .login p{text-align:center;color:var(--warmgray,#7F7269);font-size:15px;margin-top:4px}
+  .fld{margin-top:16px}
+  .fld label{display:block;font-size:13px;font-weight:600;color:var(--mut,#8D8579);margin-bottom:5px}
+  .fld input{width:100%;box-sizing:border-box;padding:13px 14px;border-radius:12px;border:1.5px solid rgba(0,0,0,.14);
+    background:var(--surface,#F7F7F7);font-family:'League Spartan',sans-serif;font-size:16px;color:var(--tx,#141210)}
+  .err{color:#c0392b;font-size:13.5px;font-weight:600;margin-top:12px;min-height:18px;text-align:center}
+  .go{width:100%;margin-top:18px;background:var(--accent,#615142);color:#fff;border:none;border-radius:999px;
+    padding:14px 0;font-family:'League Spartan',sans-serif;font-weight:700;font-size:16px;cursor:pointer}
+  .go:disabled{opacity:.45;cursor:default}
+  .alt{text-align:center;margin-top:18px;font-size:14px;color:var(--warmgray,#7F7269)}
+  .alt a{color:var(--accent,#615142);font-weight:600;text-decoration:none}
+</style>
+</head>
+<body>
+  <div class="login">
+    <h1>Welcome back</h1>
+    <p>Log in to your CarBox garage</p>
+    <div class="fld"><label>Email</label><input id="email" type="email" autocomplete="email" inputmode="email"></div>
+    <div class="fld"><label>Password</label><input id="pass" type="password" autocomplete="current-password"></div>
+    <div class="err" id="err"></div>
+    <button class="go" id="go" disabled>Log in</button>
+    <div class="alt"><a href="#" id="forgot">Forgot password?</a></div>
+    <div class="alt">New here? <a href="onboarding.html">Create an account</a></div>
+  </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var email = document.getElementById('email'), pass = document.getElementById('pass');
+  var go = document.getElementById('go'), err = document.getElementById('err');
+  function valid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) && pass.value.length >= 1; }
+  function refresh() { go.disabled = !valid(); err.textContent = ''; }
+  email.addEventListener('input', refresh); pass.addEventListener('input', refresh);
+
+  go.addEventListener('click', function () {
+    if (!valid()) return;
+    if (!window.CarBoxAuth || !window.CarBoxAuth.available) {
+      err.textContent = 'Connection not configured yet.'; return;
+    }
+    go.disabled = true; err.style.color = ''; err.textContent = 'Logging in…';
+    CarBoxAuth.signIn(email.value.trim(), pass.value).then(function (res) {
+      if (res && res.error) { err.textContent = res.error.message || 'Login failed'; go.disabled = false; return; }
+      /* let the connector pull cloud state on the next load */
+      try { sessionStorage.removeItem('cbPulled'); } catch (e) {}
+      localStorage.setItem('cbSignedUp', '1');
+      err.style.color = 'var(--accent-tx,#5C7350)'; err.textContent = 'Success, loading your garage…';
+      location.replace('index.html');
+    }, function () { err.textContent = 'Network error'; go.disabled = false; });
+  });
+
+  /* Forgot password: sends a Supabase reset email */
+  document.getElementById('forgot').addEventListener('click', function (e) {
+    e.preventDefault();
+    var addr = email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(addr)) { err.style.color = ''; err.textContent = 'Enter your email above first, then tap Forgot password.'; return; }
+    if (!window.CarBoxAuth || !window.CarBoxAuth.resetPassword) { err.textContent = 'Connection not configured yet.'; return; }
+    err.style.color = ''; err.textContent = 'Sending reset link…';
+    CarBoxAuth.resetPassword(addr).then(function (res) {
+      if (res && res.error) { err.textContent = res.error.message || 'Could not send reset email'; return; }
+      err.style.color = 'var(--accent-tx,#5C7350)';
+      err.textContent = 'Check your email for a password reset link.';
+    }, function () { err.textContent = 'Network error'; });
+  });
+});
+</script>
+</body>
+</html>

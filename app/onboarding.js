@@ -434,6 +434,17 @@ document.addEventListener('DOMContentLoaded', function () {
     b.addEventListener('click', function () { showDoc(b.getAttribute('data-doc')); });
   });
   showDoc('terms');
+  /* link the sign-up screen to the REAL hosted legal docs (config.js CARBOX_LEGAL) */
+  (function () {
+    var L = window.CARBOX_LEGAL || {};
+    function wire(a, url) {
+      if (!a) return;
+      if (url && url.indexOf('REPLACE') < 0) { a.href = url; }
+      else { a.href = '#'; a.addEventListener('click', function (e) { e.preventDefault(); if (window.UI && UI.toast) UI.toast('Link not configured yet'); }); }
+    }
+    wire($('ob-terms-link'), L.TERMS_URL);
+    wire($('ob-privacy-link'), L.PRIVACY_URL);
+  })();
   function refreshFinish() {
     var ok = agreeTerms.checked && agreePrivacy.checked;
     finish.disabled = !ok;

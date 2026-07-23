@@ -11,9 +11,6 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
-<script defer src="config.js"></script>
-<script defer src="vendor/supabase.js"></script>
-<script defer src="supabase.js"></script>
 <script defer src="ui.js"></script>
 <style>
   .phone{padding-bottom:40px}

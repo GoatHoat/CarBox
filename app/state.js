@@ -36,13 +36,14 @@ window.CarBox = (function () {
     /* Electric: no oil. Advise tire rotation / brake inspection instead. */
     var isEV = /electric|\bev\b/.test(eng) || eng.indexOf('motor') >= 0 ||
       /electric/.test(dt) || (String(vehicle && vehicle.make).toLowerCase() === 'tesla');
-    if (isEV) return { title: 'Tire rotation / brake inspection', interval: 7500 };
-    /* Gas default 7,500 mi; shorten to 5,000 for boosted/high-output or older cars. */
+    if (isEV) return { title: 'Tire rotation / brake inspection', interval: 7500, intervalMonths: 12 };
+    /* Gas default 7,500 mi; shorten to 5,000 for boosted/high-output or older cars.
+       Time interval is 6 months either way (oil degrades on time too). */
     var boosted = /turbo|supercharg/.test(eng);
     var hp = parseInt(String(s.horsepower || '').replace(/[^0-9]/g, ''), 10) || 0;
     var year = (vehicle && vehicle.year) || 9999;
     var interval = (boosted || hp >= 400 || year < 2015) ? 5000 : 7500;
-    return { title: 'Oil change', interval: interval };
+    return { title: 'Oil change', interval: interval, intervalMonths: 6 };
   }
 
   /* Mileage is DERIVED: the car's odometer = max(baseMileage, highest entry
@@ -65,14 +66,48 @@ window.CarBox = (function () {
   function computeNextService(car) {
     var v = car.vehicle || {};
     var ci = computeServiceInterval(v);
-    var lastMaint = null;
+    var lastMaint = null, lastDate = null;
     (car.entries || []).forEach(function (e) {
       if (e.type === 'maint' && typeof e.miles === 'number' && e.miles > 0) {
-        if (lastMaint === null || e.miles > lastMaint) lastMaint = e.miles;
+        if (lastMaint === null || e.miles > lastMaint) { lastMaint = e.miles; lastDate = e.date || null; }
       }
     });
     var anchor = (lastMaint !== null) ? lastMaint : (v.mileage || 0);
-    return { title: ci.title, due: anchor + ci.interval, interval: ci.interval };
+    /* time-based due date, anchored to the last service date (if we have one) */
+    var dueDate = null;
+    if (lastDate) {
+      var d = new Date(lastDate);
+      if (!isNaN(d.getTime())) { d.setMonth(d.getMonth() + (ci.intervalMonths || 6)); dueDate = d.toISOString().slice(0, 10); }
+    }
+    return { title: ci.title, due: anchor + ci.interval, interval: ci.interval, intervalMonths: ci.intervalMonths || 6, dueDate: dueDate };
+  }
+
+  function monthsUntil(iso) {
+    if (!iso) return null;
+    var d = new Date(iso); if (isNaN(d.getTime())) return null;
+    var now = new Date();
+    var m = (d.getFullYear() - now.getFullYear()) * 12 + (d.getMonth() - now.getMonth());
+    if (d.getDate() < now.getDate()) m -= 1;
+    return m;
+  }
+  /* one text line for the advised service, honoring the reminders toggle and
+     "miles OR months, whichever first". Returns null when there's nothing to show. */
+  function serviceReminderText() {
+    if (!state.reminders) return null;
+    var car = active(); var ns = car.nextService || {}; var v = car.vehicle || {};
+    if (!ns.due) return null;
+    var dmi = ns.due - (v.mileage || 0);
+    var dmo = ns.dueDate ? monthsUntil(ns.dueDate) : null;
+    var overdue = dmi < 0 || (dmo !== null && dmo < 0);
+    if (overdue) {
+      var by = [];
+      if (dmi < 0) by.push(fmtMiles(-dmi));
+      if (dmo !== null && dmo < 0) by.push(Math.abs(dmo) + ' mo');
+      return ns.title + ' overdue by ' + by.join(' / ');
+    }
+    var inp = [fmtMiles(dmi)];
+    if (dmo !== null) inp.push('~' + dmo + ' mo');
+    return ns.title + ' due in ' + inp.join(' or ');
   }
 
   /* ── demo car (matches the approved mockups: Bugatti Chiron, 4 entries) ── */
@@ -145,7 +180,8 @@ window.CarBox = (function () {
     ],
     units: 'mi',
     reminders: true,
-    notifsOn: true
+    notifsOn: true,
+    blocked: []   /* handles the user has blocked (their comments are hidden) */
   };
 
   /* ── migration: wrap a legacy flat single-car store into cars[0] ── */
@@ -329,6 +365,7 @@ window.CarBox = (function () {
     cars: cars, activeCar: activeCar, activeCarId: activeCarId,
     setActiveCar: setActiveCar, addCar: addCar, removeCar: removeCar, maxCars: maxCars,
     /* service-interval helpers (also used by pages that surface reminders) */
-    computeServiceInterval: computeServiceInterval, computeNextService: computeNextService
+    computeServiceInterval: computeServiceInterval, computeNextService: computeNextService,
+    serviceReminderText: serviceReminderText
   };
 })();

@@ -11,11 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
-<script defer src="config.js"></script>
-<script defer src="vendor/supabase.js"></script>
-<script defer src="supabase.js"></script>
 <script defer src="ui.js"></script>
-<script defer src="billing.js"></script>
 <script defer src="pro.js"></script>
 <link rel="prefetch" href="index.html">
 <style>
@@ -289,6 +285,14 @@
     </div>
     <div class="setrow rowbtn danger" id="delacct" role="button" tabindex="0">
       <div class="stx">Delete account</div>
+    </div>
+    <div class="setrow rowbtn devrow" id="redoOnboarding" role="button" tabindex="0" aria-label="Redo onboarding">
+      <div class="stx">Redo onboarding</div>
+      <span class="devtag">TEMP</span>
+    </div>
+    <div class="setrow rowbtn devrow" id="proToggle" role="button" tabindex="0" aria-label="Toggle Pro">
+      <div class="stx" id="proToggleTx">Switch to Pro</div>
+      <span class="devtag">TEMP</span>
     </div>
   </div>
 
@@ -739,55 +743,56 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* CarBox API proxy base (same host, port 8787; override via carbox.apiBase) */
-  function apiBase() {
-    try { var s = localStorage.getItem('carbox.apiBase'); if (s) return s.replace(/\/+$/, ''); } catch (e) {}
-    if (location.protocol === 'http:' || location.protocol === 'https:') return location.protocol + '//' + location.hostname + ':8787';
-    return 'http://localhost:8787';
-  }
   bindRow('signout', function () {
     confirmSheet({
       title: 'Sign out',
-      message: 'You’ll be signed out of your CarBox account on this device. Your data stays safe in the cloud and returns when you log back in.',
+      message: 'You’ll be taken back to the sign-up screen. Your garage data stays on this device and is replaced when you finish signing up again.',
       confirmLabel: 'Sign out',
       onConfirm: function () {
-        var go = function () { location.replace((window.CarBoxAuth && CarBoxAuth.available) ? 'login.html' : 'onboarding.html?v=' + Date.now()); };
-        if (window.CarBoxAuth && CarBoxAuth.available) { try { CarBoxAuth.signOut().then(go, go); } catch (e) { go(); } }
-        else { CarBox.set('onboardingComplete', false); go(); }
+        CarBox.set('onboardingComplete', false);
+        location.replace('onboarding.html?v=' + Date.now());
       }
     });
   });
   bindRow('delacct', function () {
     confirmSheet({
       title: 'Delete account',
-      message: 'This permanently deletes your CarBox account, cars, entries, and photos from the server. This cannot be undone.',
-      confirmLabel: 'Delete my account',
+      message: 'This permanently erases your account, car, and every logged entry on this device. This can’t be undone.',
+      confirmLabel: 'Delete everything',
       danger: true,
       onConfirm: function () {
-        var wipeLocalAndLeave = function () {
-          try { localStorage.removeItem('carbox.v1'); } catch (e) {}
-          try { localStorage.removeItem('carbox_entries'); } catch (e) {}
-          try { localStorage.removeItem('cbSignedUp'); } catch (e) {}
-          try { sessionStorage.clear(); } catch (e) {}
-          location.replace('onboarding.html?v=' + Date.now());
-        };
-        /* logged in: delete server-side (auth user + cascaded rows) FIRST, then wipe local */
-        if (window.sb && window.sb.auth) {
-          UI.toast('Deleting your account…');
-          window.sb.auth.getSession().then(function (r) {
-            var s = r && r.data && r.data.session;
-            if (!s) { wipeLocalAndLeave(); return; }
-            fetch(apiBase() + '/api/delete-account', {
-              method: 'POST', headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ accessToken: s.access_token })
-            }).then(function (resp) {
-              if (resp.ok) { try { CarBoxAuth.signOut(); } catch (e) {} wipeLocalAndLeave(); }
-              else { UI.toast('Could not delete on the server. Please try again.'); }
-            }, function () { UI.toast('Network error. Please try again.'); });
-          }, wipeLocalAndLeave);
-        } else {
-          wipeLocalAndLeave();   /* local-only build (no backend session) */
-        }
+        try { localStorage.removeItem('carbox.v1'); } catch (e) {}
+        try { localStorage.removeItem('carbox_entries'); } catch (e) {}
+        location.replace('onboarding.html?v=' + Date.now());
+      }
+    });
+  });
+
+  /* TEMP dev shortcut: flip between Pro and Base to test Pro-gated features. */
+  function paintProToggle() {
+    $('proToggleTx').textContent = CarBox.get('isPro') ? 'Switch to Base (Pro is ON)' : 'Switch to Pro';
+  }
+  paintProToggle();
+  bindRow('proToggle', function () {
+    var next = !CarBox.get('isPro');
+    CarBox.set('isPro', next);
+    if (next) document.dispatchEvent(new CustomEvent('carbox-pro'));
+    paintProToggle();
+    paintPlan();
+    UI.toast(next ? 'CarBox Pro ON (dev)' : 'CarBox Pro OFF (dev)');
+  });
+
+  /* TEMP dev shortcut: re-run the sign-up flow. Finishing onboarding rewrites
+     the car + specs + appearance and resets the garage to a fresh account, so
+     the whole app reflects the new choices. Remove before ship. */
+  bindRow('redoOnboarding', function () {
+    confirmSheet({
+      title: 'Redo onboarding',
+      message: 'Restart the sign-up flow. When you finish, your garage resets to the new car — new specs, name, and appearance, with an empty log. App preferences (theme, units, currency) are kept.',
+      confirmLabel: 'Restart sign-up',
+      onConfirm: function () {
+        CarBox.set('onboardingComplete', false);
+        location.replace('onboarding.html?v=' + Date.now());
       }
     });
   });
@@ -804,42 +809,54 @@ document.addEventListener('DOMContentLoaded', function () {
     if (CarBox.get('isPro')) UI.toast('You’re on CarBox Pro');
     else Pro.open();
   });
-  bindRow('restore', function () {
-    UI.toast('Restoring purchases…');
-    var run = window.CarBoxBilling ? CarBoxBilling.restore() : Promise.resolve(!!CarBox.get('isPro'));
-    Promise.resolve(run).then(function (active) {
-      paintPlan();
-      UI.toast(active ? 'CarBox Pro restored' : 'No purchases to restore');
-    }, function () { UI.toast('Restore failed, please try again'); });
-  });
-  bindRow('managesub', function () {
-    if (window.CarBoxBilling) CarBoxBilling.manage();
-    else UI.toast('Manage your subscription in the App Store');
-  });
+  bindRow('restore', function () { UI.toast('CarBox Pro — coming soon'); });
+  bindRow('managesub', function () { UI.toast('CarBox Pro — coming soon'); });
 
   /* ════ ABOUT & LEGAL ════ */
-  function openExternal(url) {
-    if (!url || url.indexOf('REPLACE') >= 0) { UI.toast('Link not configured yet'); return; }
-    try { var w = window.open(url, '_blank'); if (!w) location.href = url; } catch (e) { location.href = url; }
-  }
   document.querySelectorAll('.legal').forEach(function (row) {
-    var label = (row.querySelector('.stx') || {}).textContent ? row.querySelector('.stx').textContent.trim() : '';
-    var L = window.CARBOX_LEGAL || {};
-    var fn = function () {
-      if (label === 'Privacy Policy') openExternal(L.PRIVACY_URL);
-      else if (label === 'Terms of Use') openExternal(L.TERMS_URL);
-      else if (label === 'Contact support') {
-        if (!L.SUPPORT_EMAIL || L.SUPPORT_EMAIL.indexOf('REPLACE') >= 0) UI.toast('Support email not set');
-        else location.href = 'mailto:' + L.SUPPORT_EMAIL;
-      } else if (label === 'Rate CarBox') openExternal(L.APPSTORE_URL);
-      else UI.toast('Opens at launch');
-    };
+    var fn = function () { UI.toast('Opens at launch'); };
     row.addEventListener('click', fn);
     row.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); }
     });
   });
 
+  /* version easter egg: 5 quick taps -> debug sheet */
+  var taps = 0, tapTimer = null;
+  $('versionRow').addEventListener('click', function () {
+    taps++;
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(function () { taps = 0; }, 1500);
+    if (taps >= 5) {
+      taps = 0;
+      var lsBytes = 0;
+      try { lsBytes = (localStorage.getItem('carbox.v1') || '').length; } catch (e) {}
+      UI.sheet({
+        title: 'Debug',
+        label: 'Debug info',
+        build: function (bodyEl) {
+          var lines = [
+            'entries: ' + CarBox.get('entries').length,
+            'plan items: ' + CarBox.get('planItems').length,
+            'likes: ' + CarBox.get('likes'),
+            'theme: ' + CarBox.get('theme') + ' · units: ' + CarBox.get('units') + ' · currency: ' + CarBox.get('currency'),
+            'car: ' + car.presetId + ' · hue: ' + (car.hue === null ? 'grey' : car.hue),
+            'state size: ' + lsBytes + ' bytes',
+            'images on page: ' + document.images.length
+          ];
+          lines.forEach(function (t) {
+            var row = document.createElement('div');
+            row.className = 'sheetrow';
+            var tx = document.createElement('div');
+            tx.className = 'rowtx';
+            tx.textContent = t;
+            row.appendChild(tx);
+            bodyEl.appendChild(row);
+          });
+        }
+      });
+    }
+  });
 });
 </script>
 </body>

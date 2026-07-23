@@ -5,21 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Log</title>
 <style>html{background:#E9E9E9}</style>
-<script>(function(){try{var _st=(JSON.parse(localStorage.getItem('carbox.v1'))||{});var _sess=false;try{for(var _i=0;_i<localStorage.length;_i++){if(/^sb-.*-auth-token$/.test(localStorage.key(_i))){_sess=true;break}}}catch(e){}if(!_st.onboardingComplete&&!_sess){location.replace('onboarding.html');return}}catch(e){location.replace('onboarding.html');return}var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
+<script>(function(){try{if(!(JSON.parse(localStorage.getItem('carbox.v1'))||{}).onboardingComplete){location.replace('onboarding.html');return}}catch(e){location.replace('onboarding.html');return}var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
-<script defer src="config.js"></script>
-<script defer src="vendor/supabase.js"></script>
-<script defer src="supabase.js"></script>
 <script defer src="ui.js"></script>
-<script defer src="billing.js"></script>
-<script defer src="pro.js"></script>
 <script defer src="uploads.js"></script>
-<script defer src="vendor/jspdf.umd.min.js"></script>
-<script defer src="pdf.js"></script>
 <script defer src="nav.js"></script>
 <link rel="prefetch" href="index.html">
 <link rel="prefetch" href="upgrades.html">
@@ -58,11 +51,6 @@
   .stat .lab{font-size:9.5px;font-weight:600;letter-spacing:.06em;color:var(--mut,#9A928B);text-transform:uppercase}
   .stat .val{font-size:15px;font-weight:600;color:var(--tx,#141311);line-height:1.15}
 
-  .exportbtn{
-    width:100%;margin-top:9px;background:transparent;border:2px solid var(--hairline);border-radius:14px;
-    cursor:pointer;padding:11px 0;color:var(--accent-tx,#776357);
-    font-family:'League Spartan',sans-serif;font-weight:600;font-size:14px;
-  }
   .timeline{position:relative;margin-top:9px;padding-bottom:4px}
   .timeline .rail{
     position:absolute;left:9px;top:30px;bottom:30px;width:3px;
@@ -247,8 +235,6 @@
       </div>
     </div>
   </div>
-
-  <button class="exportbtn" id="exportPdf">Export history (PDF)</button>
 
   <div class="timeline">
     <div class="rail"></div>
@@ -684,10 +670,11 @@ document.addEventListener('DOMContentLoaded', function () {
   remEl.style.cursor = 'pointer';
   /* computed advised service (Part C); hidden when the reminders toggle is off */
   function paintReminder() {
-    var txt = CarBox.serviceReminderText();   /* miles OR months, honors the toggle */
-    if (!txt) { remEl.style.display = 'none'; return; }
+    var on = CarBox.get('reminders');
+    var svc = CarBox.get('nextService');
+    if (!on || !svc || !svc.due) { remEl.style.display = 'none'; return; }
     remEl.style.display = '';
-    remEl.querySelector('span').textContent = 'Next: ' + txt;
+    remEl.querySelector('span').textContent = 'Next: ' + svc.title + ' @ ' + CarBox.fmtMiles(svc.due);
   }
   paintReminder();
   remEl.addEventListener('click', function () {
@@ -731,14 +718,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* condensing header once the timeline scrolls */
   UI.condense(vehicle.name);
-
-  /* Export history (PDF) — Pro-gated (real entitlement via billing, else local flag) */
-  $('exportPdf').addEventListener('click', function () {
-    var pro = window.CarBoxBilling ? CarBoxBilling.isPro() : CarBox.get('isPro');
-    if (!pro) { if (window.Pro) Pro.open(); return; }
-    if (window.CarBoxPDF) CarBoxPDF.exportActiveCar();
-    else UI.toast('PDF tool is still loading, try again');
-  });
 
   if (location.hash === '#add') openSheet();
 });

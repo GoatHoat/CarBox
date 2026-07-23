@@ -9,6 +9,7 @@ Upgrades page. Zero npm dependencies (plain Node 18+, uses built-in `fetch`).
 |---|---|---|
 | `POST /api/recommend` | `{make, model, year, trim, specs, goal}` | `{recommendations:[{name, benefit, detail} x2], source:"ai"}` |
 | `POST /api/shops` | `{lat, lng, modName}` | `{shops:[{name, distanceMiles, rating, ratingCount, ratingSource, priceEstimate, mapsUrl}]}` |
+| `POST /api/delete-account` | `{accessToken}` | `{ok:true}` — deletes the caller's Supabase Auth user (cascades their rows). Apple-required account deletion. |
 | `GET /api/health` | — | `{ok, anthropic, places}` (which keys are configured) |
 
 - `recommend` calls the Anthropic API (Claude). The system prompt enforces: exactly 2 mods,
@@ -25,6 +26,8 @@ Upgrades page. Zero npm dependencies (plain Node 18+, uses built-in `fetch`).
 | `ANTHROPIC_API_KEY` | for AI recs + LLM price estimates | Get one at console.anthropic.com. Without it `/api/recommend` returns 503 and the app falls back to its built-in rules-based recommender. |
 | `GOOGLE_MAPS_API_KEY` | for shops | Google Cloud key with **Places API** enabled. Without it `/api/shops` returns 503 and the app shows its error state. |
 | `ANTHROPIC_MODEL` | no | Defaults to `claude-sonnet-5` for recs (Haiku for price estimates). |
+| `SUPABASE_URL` | for account deletion | Your project URL, e.g. `https://xxxx.supabase.co`. |
+| `SUPABASE_SERVICE_ROLE_KEY` | for account deletion | The **service_role** key (Supabase → Project Settings → API). Server-side ONLY — never ship it in the app. Used by `/api/delete-account` to delete the Auth user. |
 | `PORT` | no | Local port, default `8787`. |
 
 ## Run locally (Windows PowerShell)

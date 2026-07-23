@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CarBox — Garage</title>
 <style>html{background:#E9E9E9}</style>
-<script>(function(){try{var _st=(JSON.parse(localStorage.getItem('carbox.v1'))||{});var _sess=false;try{for(var _i=0;_i<localStorage.length;_i++){if(/^sb-.*-auth-token$/.test(localStorage.key(_i))){_sess=true;break}}}catch(e){}if(!_st.onboardingComplete&&!_sess){location.replace('onboarding.html');return}}catch(e){location.replace('onboarding.html');return}var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
+<script>(function(){try{if(!(JSON.parse(localStorage.getItem('carbox.v1'))||{}).onboardingComplete){location.replace('onboarding.html');return}}catch(e){location.replace('onboarding.html');return}var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -67,11 +67,7 @@
   @media (prefers-reduced-motion: reduce){ .carbtn.justadded{animation:none} }
 </style>
 <script defer src="state.js"></script>
-<script defer src="config.js"></script>
-<script defer src="vendor/supabase.js"></script>
-<script defer src="supabase.js"></script>
 <script defer src="ui.js"></script>
-<script defer src="billing.js"></script>
 <script defer src="pro.js"></script>
 <script defer src="data/cars.js"></script>
 <script defer src="carform.js"></script>
@@ -170,7 +166,15 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   /* computed advised-service line for the ACTIVE car (Part C). Returns null when
      there's no meaningful reminder or the Settings "Service reminders" toggle is off. */
-  function serviceLine() { return CarBox.serviceReminderText(); }
+  function serviceLine() {
+    if (!CarBox.get('reminders')) return null;
+    var v = CarBox.get('vehicle'), ns = CarBox.get('nextService');
+    if (!ns || !ns.due) return null;
+    var diff = ns.due - (v.mileage || 0);
+    return diff >= 0
+      ? ns.title + ' due in ' + CarBox.fmtMiles(diff)
+      : ns.title + ' overdue by ' + CarBox.fmtMiles(-diff);
+  }
   function hydrate() {
     var vehicle = CarBox.get('vehicle');
     document.querySelector('.cartitle').textContent = vehicle.name;
@@ -325,20 +329,6 @@ document.addEventListener('DOMContentLoaded', function () {
     sub.appendChild(document.createTextNode(reply.text));
     return sub;
   }
-  /* ── basic content filter (UGC safety) ── */
-  var BAD_WORDS = ['fuck', 'shit', 'bitch', 'cunt', 'nigger', 'faggot', 'asshole', 'retard'];
-  function isClean(text) {
-    var t = ' ' + text.toLowerCase().replace(/[^a-z\s]/g, ' ') + ' ';
-    for (var i = 0; i < BAD_WORDS.length; i++) { if (t.indexOf(' ' + BAD_WORDS[i]) >= 0 || t.indexOf(BAD_WORDS[i]) >= 0) return false; }
-    return true;
-  }
-  function modBtn(label, danger) {
-    var b = document.createElement('button');
-    b.textContent = label;
-    b.style.cssText = 'background:none;border:none;cursor:pointer;padding:2px 0;margin-right:14px;' +
-      'font-family:inherit;font-weight:600;font-size:12.5px;color:' + (danger ? '#B3402F' : 'var(--mut,#8D8579)');
-    return b;
-  }
   document.getElementById('commentbtn').addEventListener('click', function () {
     UI.sheet({
       title: 'Comments',
@@ -346,10 +336,7 @@ document.addEventListener('DOMContentLoaded', function () {
       build: function (body) {
         function render() {
           body.innerHTML = '';
-          var me = CarBox.get('profile');
-          var blocked = CarBox.get('blocked') || [];
           CarBox.get('comments').forEach(function (c) {
-            if (blocked.indexOf(c.user) !== -1) return;   /* hide blocked users */
             var row = document.createElement('div');
             row.className = 'sheetrow';
             var top = document.createElement('div');
@@ -360,33 +347,6 @@ document.addEventListener('DOMContentLoaded', function () {
             tx.textContent = c.text;
             row.appendChild(top); row.appendChild(tx);
             if (c.reply) row.appendChild(replySub(c.reply));
-            /* moderation actions: delete your own; report/block others */
-            var acts = document.createElement('div');
-            acts.style.cssText = 'margin-top:7px';
-            if (c.user === me.handle) {
-              var del = modBtn('Delete', true);
-              del.addEventListener('click', function () {
-                var list = CarBox.get('comments').filter(function (x) { return x.id !== c.id; });
-                CarBox.set('comments', list); render();
-              });
-              acts.appendChild(del);
-            } else {
-              var rep = modBtn('Report');
-              rep.addEventListener('click', function () {
-                var list = CarBox.get('comments').filter(function (x) { return x.id !== c.id; });
-                CarBox.set('comments', list); render();
-                UI.toast('Reported. Thanks, we’ll review this.');
-              });
-              var blk = modBtn('Block');
-              blk.addEventListener('click', function () {
-                var bl = CarBox.get('blocked') || [];
-                if (bl.indexOf(c.user) === -1) bl.push(c.user);
-                CarBox.set('blocked', bl); render();
-                UI.toast('Blocked ' + c.user);
-              });
-              acts.appendChild(rep); acts.appendChild(blk);
-            }
-            row.appendChild(acts);
             body.appendChild(row);
           });
           var compose = document.createElement('div');
@@ -399,17 +359,15 @@ document.addEventListener('DOMContentLoaded', function () {
           send.addEventListener('click', function () {
             var text = input.value.trim();
             if (!text) return;
-            if (!isClean(text)) { UI.toast('Please keep comments respectful.'); return; }
-            var me2 = CarBox.get('profile');
+            var me = CarBox.get('profile');
             var comments = CarBox.get('comments');
             var id = 'c' + Date.now().toString(36);
-            comments.push({ id: id, user: me2.handle, text: text, reply: null });
+            comments.push({ id: id, user: me.handle, text: text, reply: null });
             CarBox.set('comments', comments);
             var notifs = CarBox.get('notifications');
-            notifs.push({ id: 'n-' + id, type: 'comment', ref: id, user: me2.handle, text: text, unread: true });
+            notifs.push({ id: 'n-' + id, type: 'comment', ref: id, user: me.handle, text: text, unread: true });
             CarBox.set('notifications', notifs);
             paintBadge();
-            input.value = '';
             render();
           });
           input.addEventListener('keydown', function (e) { if (e.key === 'Enter') send.click(); });

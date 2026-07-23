@@ -12,9 +12,6 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script defer src="state.js"></script>
-<script defer src="config.js"></script>
-<script defer src="vendor/supabase.js"></script>
-<script defer src="supabase.js"></script>
 <script defer src="ui.js"></script>
 <script defer src="data/cars.js"></script>
 <script defer src="onboarding.js"></script>
@@ -267,7 +264,6 @@
         <h1 class="serif ob-word">CarBox</h1>
         <p class="ob-tag">Your garage, your build, your story.</p>
         <button class="ob-btn" id="ob-start">Get Started</button>
-        <p class="ob-tag" style="margin-top:16px">Already have an account? <a href="login.html" style="color:var(--accent,#615142);font-weight:600;text-decoration:none">Log in</a></p>
       </div>
     </section>
 
@@ -380,10 +376,6 @@
       <div class="ob-legalbox" id="ob-legalbox" tabindex="0" aria-label="Legal text"></div>
       <label class="ob-check"><input type="checkbox" id="ob-agree-terms"><span>I have read and agree to the Terms of Service</span></label>
       <label class="ob-check"><input type="checkbox" id="ob-agree-privacy"><span>I have read and agree to the Privacy Policy</span></label>
-      <div class="ob-legallinks" style="font-size:12.5px;font-weight:600;color:var(--mut,#9B918F);margin:10px 2px 0;text-align:center">
-        Read the full <a id="ob-terms-link" target="_blank" rel="noopener" style="color:var(--accent-tx,#776357)">Terms</a>
-        and <a id="ob-privacy-link" target="_blank" rel="noopener" style="color:var(--accent-tx,#776357)">Privacy Policy</a>
-      </div>
       <button class="ob-btn ob-btn-disabled" id="ob-finish" disabled>Get Started</button>
     </section>
 

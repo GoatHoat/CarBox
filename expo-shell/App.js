@@ -22,7 +22,14 @@ export default function App() {
         source={{ uri: CARBOX_URL }}
         style={{ flex: 1, backgroundColor: bg }}
         cacheEnabled={false}
-        geolocationEnabled={true}   /* Android: bridge navigator.geolocation to the native permission */
+        geolocationEnabled={true}                    /* Android: bridge navigator.geolocation */
+        allowsInlineMediaPlayback={true}
+        mediaPlaybackRequiresUserAction={false}
+        mediaCapturePermissionGrantType="grant"      /* iOS: allow camera capture from <input type=file> */
+        allowFileAccess={true}                        /* Android: <input type=file> photo picker */
+        allowFileAccessFromFileURLs={true}
+        allowUniversalAccessFromFileURLs={true}
+        javaScriptCanOpenWindowsAutomatically={true}
         originWhitelist={['*']}
         allowsBackForwardNavigationGestures
         setSupportMultipleWindows={false}

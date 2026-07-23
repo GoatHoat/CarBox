@@ -7,6 +7,7 @@
 var http = require('http');
 var recommend = require('./api/recommend.js');
 var shops = require('./api/shops.js');
+var deleteAccount = require('./api/delete-account.js');
 
 var PORT = process.env.PORT || 8787;
 
@@ -14,6 +15,7 @@ var server = http.createServer(function (req, res) {
   var path = (req.url || '').split('?')[0];
   if (path === '/api/recommend') return recommend(req, res);
   if (path === '/api/shops') return shops(req, res);
+  if (path === '/api/delete-account') return deleteAccount(req, res);
   if (path === '/api/health') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', 'application/json');
