@@ -1,64 +1,37 @@
-/* CarBoxBilling — the single gate for the Pro entitlement.
+/* CarBoxBilling — reads the Pro entitlement. Does NOT sell anything.
 
-   REAL iOS subscriptions run through StoreKit, which only exists in the native
-   Expo shell. The recommended path is RevenueCat: the shell wires the RevenueCat
-   SDK and injects a `window.CarBoxNativeBilling` bridge into the WebView with:
-       getEntitlement() -> Promise<bool>   // is "pro" entitlement active
-       purchase(plan)   -> Promise<bool>   // run StoreKit purchase, resolve active
-       restore()        -> Promise<bool>   // StoreKit restore, resolve active
-       manage()         -> void            // open the iOS subscriptions screen
-   (See SUBMISSION_CHECKLIST.md + expo-shell for where to add it.)
+   CarBox Pro is granted server-side: a Stripe webhook flips `isPro` in
+   Supabase (supabase_stripe_migration.sql) after a purchase made on
+   app/upgrade.html, a web page never linked from inside this app. The app
+   only needs to reflect that state, which `supabase.js` already pulls down
+   into the local store on every sign-in — this module just exposes it
+   under one name so every Pro gate reads from the same place, and offers
+   a manual refresh for "I just paid on the web, check again now."
 
-   This module makes the app's existing `isPro` flag MIRROR that real entitlement
-   whenever the native bridge is present, so every Pro gate (multi-car, goal/
-   budget changes) is driven by StoreKit, not a local toggle.
-
-   If the native bridge is absent (web preview / dev), it falls back to flipping
-   the local flag so the app still runs. That path is NON-PRODUCTION and is
-   flagged as such; a shipping build MUST have CarBoxNativeBilling. */
+   There is intentionally no purchase()/native bridge here. Adding an
+   in-app purchase mechanism (StoreKit or otherwise) changes CarBox Pro's
+   compliance story — see the header comment in app/pro.js before doing that. */
 window.CarBoxBilling = (function () {
-  function native() { return window.CarBoxNativeBilling || null; }
-  function configured() { return !!native(); }
+  function isPro() { return !!(window.CarBox && CarBox.get('isPro')); }
 
-  function setPro(v) {
-    if (window.CarBox) CarBox.set('isPro', !!v);
-    if (v) { try { document.dispatchEvent(new CustomEvent('carbox-pro')); } catch (e) {} }
-  }
-
-  /* on load, if the native bridge exists, sync isPro to the REAL entitlement */
-  function syncEntitlement() {
-    var n = native();
-    if (!n || !n.getEntitlement) return;
-    try { Promise.resolve(n.getEntitlement()).then(function (active) { setPro(!!active); }, function () {}); } catch (e) {}
-  }
-
-  function purchase(plan) {
-    var n = native();
-    if (n && n.purchase) {
-      return Promise.resolve(n.purchase(plan)).then(function (active) { if (active) setPro(true); return !!active; });
-    }
-    /* NON-PRODUCTION fallback: no StoreKit here, so flip the local flag for testing. */
-    setPro(true);
-    return Promise.resolve(true);
-  }
-  function restore() {
-    var n = native();
-    if (n && n.restore) {
-      return Promise.resolve(n.restore()).then(function (active) { setPro(!!active); return !!active; });
-    }
-    return Promise.resolve(!!(window.CarBox && CarBox.get('isPro')));
-  }
-  function manage() {
-    var n = native();
-    if (n && n.manage) { n.manage(); return; }
-    var url = 'https://apps.apple.com/account/subscriptions';
-    try { var w = window.open(url, '_blank'); if (!w) location.href = url; } catch (e) { location.href = url; }
+  /* re-pull cloud state now, so returning to the app right after paying on
+     the web reflects the new entitlement without waiting for the next
+     natural sync point. No-op if not signed in or Supabase isn't configured. */
+  function refresh() {
+    if (!window.sb || !window.CarBox) return Promise.resolve(isPro());
+    return sb.auth.getSession().then(function (r) {
+      var session = r && r.data && r.data.session;
+      if (!session) return isPro();
+      return sb.from('user_state').select('data').eq('user_id', session.user.id).maybeSingle()
+        .then(function (res) {
+          var row = res && res.data;
+          if (row && row.data && window.CarBox) {
+            CarBox.set('isPro', !!row.data.isPro);
+          }
+          return isPro();
+        }, function () { return isPro(); });
+    }, function () { return isPro(); });
   }
 
-  document.addEventListener('DOMContentLoaded', syncEntitlement);
-  return {
-    configured: configured,
-    isPro: function () { return !!(window.CarBox && CarBox.get('isPro')); },
-    purchase: purchase, restore: restore, manage: manage
-  };
+  return { isPro: isPro, refresh: refresh };
 })();

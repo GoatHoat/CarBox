@@ -310,9 +310,9 @@
       <button class="upchip" id="upgrade">Upgrade</button>
     </div>
     <div class="setrow rowbtn" id="restore" role="button" tabindex="0">
-      <div class="stx">Restore purchases</div>
+      <div class="stx">Refresh subscription status</div>
     </div>
-    <div class="setrow rowbtn" id="managesub" role="button" tabindex="0">
+    <div class="setrow rowbtn" id="managesub" role="button" tabindex="0" hidden>
       <div class="stx">Manage subscription</div>
     </div>
   </div>
@@ -856,29 +856,43 @@ document.addEventListener('DOMContentLoaded', function () {
     if (r2) r2.remove();
   }
 
-  /* ════ CARBOX PRO ════ */
+  /* ════ CARBOX PRO ════
+     No purchase happens from Settings — CarBox Pro is sold on the web
+     (app/upgrade.html). "Upgrade" just opens the informational Pro.open()
+     modal; "Refresh subscription status" re-pulls the entitlement from
+     Supabase (useful right after paying on the web); "Manage subscription"
+     only appears once already Pro and opens Stripe's own portal. */
   function paintPlan() {
     var pro = CarBox.get('isPro');
     $('upgrade').parentElement.querySelector('.ssub').textContent = pro ? 'CarBox Pro' : 'Free';
-    $('upgrade').textContent = pro ? 'Active' : 'Upgrade';
+    $('upgrade').textContent = pro ? 'Active' : 'Learn more';
+    $('managesub').hidden = !pro;
   }
   paintPlan();
   document.addEventListener('carbox-pro', paintPlan);
-  $('upgrade').addEventListener('click', function () {
-    if (CarBox.get('isPro')) UI.toast('You’re on CarBox Pro');
-    else Pro.open();
-  });
+  $('upgrade').addEventListener('click', function () { Pro.open(); });
   bindRow('restore', function () {
-    UI.toast('Restoring purchases…');
-    var run = window.CarBoxBilling ? CarBoxBilling.restore() : Promise.resolve(!!CarBox.get('isPro'));
+    UI.toast('Checking your account…');
+    var run = window.CarBoxBilling ? CarBoxBilling.refresh() : Promise.resolve(!!CarBox.get('isPro'));
     Promise.resolve(run).then(function (active) {
       paintPlan();
-      UI.toast(active ? 'CarBox Pro restored' : 'No purchases to restore');
-    }, function () { UI.toast('Restore failed, please try again'); });
+      UI.toast(active ? 'CarBox Pro is active' : 'No active CarBox Pro subscription found');
+    }, function () { UI.toast('Could not check right now, please try again'); });
   });
   bindRow('managesub', function () {
-    if (window.CarBoxBilling) CarBoxBilling.manage();
-    else UI.toast('Manage your subscription in the App Store');
+    if (!window.sb) { UI.toast('Not available right now'); return; }
+    UI.toast('Opening subscription management…');
+    sb.auth.getSession().then(function (r) {
+      var session = r && r.data && r.data.session;
+      if (!session) { UI.toast('Please sign in again'); return; }
+      fetch((function () { try { return localStorage.getItem('carbox.apiBase') || location.origin; } catch (e) { return location.origin; } })() + '/api/billing-portal', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessToken: session.access_token })
+      }).then(function (r2) { return r2.json(); }).then(function (data) {
+        if (data && data.url) location.href = data.url;
+        else UI.toast((data && data.error) || 'Could not open billing portal');
+      }, function () { UI.toast('Network error'); });
+    }, function () { UI.toast('Please sign in again'); });
   });
 
   /* ════ ABOUT & LEGAL ════ */

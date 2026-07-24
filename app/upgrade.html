@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CarBox Pro</title>
+<!--
+  This page is deliberately NOT linked from anywhere inside the iOS app's
+  WebView (check app/pro.js and expo-shell/App.js before adding a link to
+  it from either). It's how CarBox Pro is actually sold: Stripe Checkout on
+  the open web, so Apple never takes a 30% cut of the subscription. That's
+  only compliant with App Store guideline 3.1.3(f) ("free stand-alone
+  companion app") because the app itself has ZERO purchase button or
+  pricing display. Share this URL via email / your own marketing / social
+  media — never as an in-app tap target.
+-->
+<style>html{background:#E9E9E9}</style>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script defer src="state.js"></script>
+<script defer src="ui.js"></script>
+<script defer src="config.js"></script>
+<script defer src="vendor/supabase.js"></script>
+<script defer src="supabase.js"></script>
+<style>
+  .wrap{max-width:380px;margin:0 auto;padding:60px 22px 50px;font-family:'League Spartan',sans-serif;text-align:center}
+  .wrap h1{font-family:'DM Serif Display',serif;font-size:32px;color:var(--tx,#141210)}
+  .wrap p.sub{color:var(--warmgray,#7F7269);font-size:15.5px;margin-top:6px}
+  .benefits{text-align:left;margin-top:26px;background:var(--surface,#F7F7F7);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
+  .benefits div{font-size:15.5px;font-weight:600;color:var(--tx,#17130F);padding:8px 0}
+  .plans{display:flex;gap:12px;margin-top:22px}
+  .plan{flex:1;background:var(--surface,#F7F7F7);border:2px solid transparent;border-radius:16px;padding:16px 8px;cursor:pointer;font-family:'League Spartan',sans-serif}
+  .plan.sel{border-color:var(--accent,#615142)}
+  .plan .pn{font-weight:700;font-size:15px;color:var(--tx,#141210)}
+  .plan .pa{font-size:19px;font-weight:700;color:var(--accent-tx,#615142);margin-top:4px}
+  .plan .ps{font-size:11.5px;font-weight:700;color:#fff;background:var(--accent,#615142);border-radius:999px;padding:2px 8px;display:inline-block;margin-bottom:6px}
+  .go{width:100%;margin-top:22px;background:var(--accent,#615142);color:#fff;border:none;border-radius:999px;
+    padding:15px 0;font-family:'League Spartan',sans-serif;font-weight:700;font-size:16.5px;cursor:pointer}
+  .go:disabled{opacity:.5;cursor:default}
+  .status{margin-top:16px;font-size:14px;font-weight:600;min-height:18px}
+  .status.ok{color:var(--accent-tx,#5C7350)}
+  .status.err{color:#c0392b}
+  .manage{margin-top:20px;background:none;border:1.5px solid var(--hairline,rgba(0,0,0,.14));border-radius:999px;
+    padding:11px 22px;font-family:'League Spartan',sans-serif;font-weight:600;font-size:14.5px;color:var(--tx,#141210);cursor:pointer}
+  .alt{margin-top:26px;font-size:14px;color:var(--warmgray,#7F7269)}
+  .alt a{color:var(--accent,#615142);font-weight:600;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <h1>CarBox Pro</h1>
+  <p class="sub" id="sub">Loading…</p>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var wrap = document.getElementById('wrap');
+  var params = new URLSearchParams(location.search);
+
+  function renderLoggedOut() {
+    wrap.innerHTML =
+      '<h1>CarBox Pro</h1>' +
+      '<p class="sub">Log in to subscribe to CarBox Pro.</p>' +
+      '<div class="alt"><a href="login.html?next=upgrade.html">Log in</a> &middot; ' +
+      'new to CarBox? Create your account in the app first, then come back here.</div>';
+  }
+
+  function renderCanceled(email) {
+    var note = document.createElement('p');
+    note.className = 'status err';
+    note.textContent = 'Checkout canceled — no charge was made.';
+    wrap.appendChild(note);
+  }
+
+  function renderSuccess() {
+    wrap.innerHTML =
+      '<h1>You’re Pro!</h1>' +
+      '<p class="sub">Open the CarBox app — your account will sync automatically within a few seconds.</p>';
+  }
+
+  function renderOffer(session, isPro) {
+    var email = session.user.email;
+    wrap.innerHTML =
+      '<h1>CarBox Pro</h1>' +
+      '<p class="sub">Signed in as ' + email + '</p>' +
+      '<div class="benefits">' +
+        '<div>&#127942; All upgrade goals unlocked</div>' +
+        '<div>&#128663; Up to 3 cars in your garage</div>' +
+        '<div>&#128196; PDF history export for resale</div>' +
+      '</div>';
+
+    if (isPro) {
+      wrap.innerHTML += '<p class="status ok">CarBox Pro is active on your account.</p>' +
+        '<button class="manage" id="manageBtn">Manage subscription</button>';
+      document.getElementById('manageBtn').addEventListener('click', function () {
+        openPortal(session.access_token, this);
+      });
+      return;
+    }
+
+    wrap.innerHTML +=
+      '<div class="plans">' +
+        '<button class="plan" data-plan="monthly"><div class="pn">Monthly</div><div class="pa">$4.99/mo</div></button>' +
+        '<button class="plan sel" data-plan="annual"><span class="ps">SAVE 33%</span><div class="pn">Annual</div><div class="pa">$39.99/yr</div></button>' +
+      '</div>' +
+      '<button class="go" id="goBtn">Subscribe</button>' +
+      '<div class="status" id="status"></div>';
+
+    var plan = 'annual';
+    wrap.querySelectorAll('.plan').forEach(function (p) {
+      p.addEventListener('click', function () {
+        wrap.querySelectorAll('.plan').forEach(function (q) { q.classList.remove('sel'); });
+        p.classList.add('sel');
+        plan = p.getAttribute('data-plan');
+      });
+    });
+    document.getElementById('goBtn').addEventListener('click', function () {
+      startCheckout(session.access_token, plan, this);
+    });
+  }
+
+  function startCheckout(accessToken, plan, btn) {
+    var status = document.getElementById('status');
+    btn.disabled = true;
+    status.className = 'status'; status.textContent = 'Redirecting to secure checkout…';
+    fetch(apiBase() + '/api/create-checkout-session', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accessToken: accessToken, plan: plan })
+    }).then(function (r) { return r.json(); }).then(function (data) {
+      if (data && data.url) { location.href = data.url; return; }
+      status.className = 'status err'; status.textContent = (data && data.error) || 'Could not start checkout.';
+      btn.disabled = false;
+    }).catch(function () {
+      status.className = 'status err'; status.textContent = 'Network error.'; btn.disabled = false;
+    });
+  }
+
+  function openPortal(accessToken, btn) {
+    btn.disabled = true; btn.textContent = 'Opening…';
+    fetch(apiBase() + '/api/billing-portal', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accessToken: accessToken })
+    }).then(function (r) { return r.json(); }).then(function (data) {
+      if (data && data.url) { location.href = data.url; return; }
+      btn.disabled = false; btn.textContent = 'Manage subscription';
+      if (window.UI) UI.toast((data && data.error) || 'Could not open billing portal');
+    }).catch(function () {
+      btn.disabled = false; btn.textContent = 'Manage subscription';
+      if (window.UI) UI.toast('Network error');
+    });
+  }
+
+  function apiBase() {
+    try {
+      var saved = localStorage.getItem('carbox.apiBase');
+      if (saved) return saved.replace(/\/+$/, '');
+    } catch (e) {}
+    return location.origin;
+  }
+
+  function boot() {
+    if (params.get('success') === '1') { renderSuccess(); return; }
+    if (!window.sb) { renderLoggedOut(); return; }
+    sb.auth.getSession().then(function (r) {
+      var session = r && r.data && r.data.session;
+      if (!session) { renderLoggedOut(); return; }
+      var isPro = !!(window.CarBox && CarBox.get('isPro'));
+      renderOffer(session, isPro);
+      if (params.get('canceled') === '1') renderCanceled();
+    }, function () { renderLoggedOut(); });
+  }
+
+  /* config.js/supabase.js load with `defer`, so they're guaranteed to have
+     run by DOMContentLoaded, but sb.auth needs a tick to read its stored session */
+  setTimeout(boot, 50);
+});
+</script>
+</body>
+</html>

@@ -60,7 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {
       try { sessionStorage.removeItem('cbPulled'); } catch (e) {}
       localStorage.setItem('cbSignedUp', '1');
       err.style.color = 'var(--accent-tx,#5C7350)'; err.textContent = 'Success, loading your garage…';
-      location.replace('index.html');
+      var next = new URLSearchParams(location.search).get('next');
+      location.replace(/^[a-zA-Z0-9_-]+\.html$/.test(next || '') ? next : 'index.html');
     }, function () { err.textContent = 'Network error'; go.disabled = false; });
   });
 
