@@ -15,19 +15,19 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.carbox.app",
+      "bundleIdentifier": "com.coilover.app",
       "buildNumber": "1",
       "config": { "usesNonExemptEncryption": false },
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "CarBox uses your location to find nearby shops that can perform your recommended mods and to show how far away they are. Your location is used only for this and is never shared.",
-        "NSCameraUsageDescription": "CarBox uses the camera so you can take photos of your car and its mods to add to a log entry.",
-        "NSPhotoLibraryUsageDescription": "CarBox lets you attach photos from your library to a build or maintenance log entry.",
-        "NSPhotoLibraryAddUsageDescription": "CarBox can save photos you add to your garage back to your photo library.",
+        "NSLocationWhenInUseUsageDescription": "Coilover uses your location to find nearby shops that can perform your recommended mods and to show how far away they are. Your location is used only for this and is never shared.",
+        "NSCameraUsageDescription": "Coilover uses the camera so you can take photos of your car and its mods to add to a log entry.",
+        "NSPhotoLibraryUsageDescription": "Coilover lets you attach photos from your library to a build or maintenance log entry.",
+        "NSPhotoLibraryAddUsageDescription": "Coilover can save photos you add to your garage back to your photo library.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.carbox.app",
+      "package": "com.coilover.app",
       "versionCode": 1,
       "permissions": [
         "ACCESS_COARSE_LOCATION",

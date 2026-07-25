@@ -71,7 +71,7 @@ window.Pro = (function () {
         MICRO +
       '</div>' +
 
-      /* ── Screen 2: plan picker; each option starts Stripe checkout at once ── */
+      /* ── Screen 2: pick a plan (tap to select), then the Subscribe button buys it ── */
       '<div class="pro-view pro-step2" data-step="2" style="display:none">' +
         '<button class="pro-back" aria-label="Back">‹ Back</button>' +
         '<h2 class="serif pro-plan-title">Choose your plan</h2>' +
@@ -79,13 +79,14 @@ window.Pro = (function () {
           '<button class="pro-planopt" data-plan="monthly">' +
             '<div class="pp-name">Monthly</div>' +
             '<div class="pp-amt">$4.99/mo</div>' +
-            '<div class="pp-tag">Billed every month</div></button>' +
-          '<button class="pro-planopt best" data-plan="annual">' +
+            '<div class="pp-tag">Billed every month</div><span class="pp-check">✓</span></button>' +
+          '<button class="pro-planopt best sel" data-plan="annual">' +
             '<span class="pp-save">SAVE 33%</span>' +
             '<div class="pp-name">Annual</div>' +
             '<div class="pp-amt">$39.99/yr</div>' +
-            '<div class="pp-tag">Best value</div></button>' +
+            '<div class="pp-tag">Best value</div><span class="pp-check">✓</span></button>' +
         '</div>' +
+        '<button class="pro-buy">Subscribe</button>' +
         MICRO +
       '</div>';
 
@@ -110,6 +111,7 @@ window.Pro = (function () {
        without closing and reopening the paywall. */
     function reenablePlans() {
       card.querySelectorAll('.pro-planopt').forEach(function (o) { o.disabled = false; o.classList.remove('loading'); });
+      var buy = card.querySelector('.pro-buy'); if (buy) { buy.disabled = false; buy.classList.remove('loading'); buy.textContent = 'Subscribe'; }
       var cta = card.querySelector('.pro-cta'); if (cta) cta.disabled = false;
       var link = card.querySelector('.pro-stripe-link'); if (link) link.disabled = false;
     }
@@ -205,20 +207,28 @@ window.Pro = (function () {
     card.querySelector('.pro-back').addEventListener('click', function () {
       showStep('1', 'back');
     });
+    /* tap a plan to SELECT it (highlight); annual is selected by default */
     card.querySelectorAll('.pro-planopt').forEach(function (opt) {
       opt.addEventListener('click', function () {
-        var btn = this;
-        if (btn.disabled || !window.CarBoxBilling || !CarBoxBilling.purchaseViaStripe) return;
-        var plan = btn.getAttribute('data-plan') || 'annual';
-        card.querySelectorAll('.pro-planopt').forEach(function (o) { o.disabled = true; });
-        btn.classList.add('loading');
-        CarBoxBilling.purchaseViaStripe(plan).then(function () {
-          /* navigates away to Stripe Checkout on success; nothing to do here */
-        }, function (err) {
-          card.querySelectorAll('.pro-planopt').forEach(function (o) { o.disabled = false; });
-          btn.classList.remove('loading');
-          toastErr(err, 'Could not start Stripe checkout');
-        });
+        if (this.disabled) return;
+        card.querySelectorAll('.pro-planopt').forEach(function (o) { o.classList.remove('sel'); });
+        this.classList.add('sel');
+      });
+    });
+    /* the explicit Subscribe button buys the selected plan via Stripe */
+    card.querySelector('.pro-buy').addEventListener('click', function () {
+      var btn = this;
+      if (btn.disabled || !window.CarBoxBilling || !CarBoxBilling.purchaseViaStripe) return;
+      var selEl = card.querySelector('.pro-planopt.sel') || card.querySelector('.pro-planopt[data-plan="annual"]');
+      var plan = (selEl && selEl.getAttribute('data-plan')) || 'annual';
+      btn.disabled = true; btn.classList.add('loading'); btn.textContent = 'Starting checkout…';
+      card.querySelectorAll('.pro-planopt').forEach(function (o) { o.disabled = true; });
+      CarBoxBilling.purchaseViaStripe(plan).then(function () {
+        /* navigates away to Stripe Checkout on success; nothing to do here */
+      }, function (err) {
+        btn.disabled = false; btn.classList.remove('loading'); btn.textContent = 'Subscribe';
+        card.querySelectorAll('.pro-planopt').forEach(function (o) { o.disabled = false; });
+        toastErr(err, 'Could not start Stripe checkout');
       });
     });
 
