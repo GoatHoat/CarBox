@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CarBox — Pick a goal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Coilover — Pick a goal</title>
 <style>html{background:#E9E9E9}</style>
 <script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -139,7 +139,7 @@
   <div class="goalfoot">
     <div class="prorow">
       <div class="protx">Pick one goal for free.<br>Change it anytime with Pro</div>
-      <button class="probadge" aria-label="CarBox Pro"><img src="assets/badge_pro.png" alt=""></button>
+      <button class="probadge" aria-label="Coilover Pro"><img src="assets/badge_pro.png" alt=""></button>
     </div>
     <button class="continue" id="continue">Continue</button>
   </div>
@@ -167,13 +167,13 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   function proText() {
-    if (CarBox.get('isPro')) document.querySelector('.protx').innerHTML = 'CarBox Pro: change your goal anytime.';
+    if (CarBox.get('isPro')) document.querySelector('.protx').innerHTML = 'Coilover Pro: change your goal anytime.';
   }
   proText();
   document.addEventListener('carbox-pro', proText);
 
   document.querySelector('.probadge').addEventListener('click', function () {
-    if (CarBox.get('isPro')) UI.toast('You’re on CarBox Pro');
+    if (CarBox.get('isPro')) UI.toast('You’re on Coilover Pro');
     else Pro.open();
   });
 
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
       build: function (body) {
         var note = document.createElement('div');
         note.className = 'sheet-note'; note.style.marginTop = '0';
-        note.textContent = 'Narrow ' + selected.toLowerCase() + ' to one area, or let CarBox pick what this car needs most.';
+        note.textContent = 'Narrow ' + selected.toLowerCase() + ' to one area, or let Coilover pick what this car needs most.';
         body.appendChild(note);
 
         var chips = document.createElement('div'); chips.className = 'bchips';
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var note = document.createElement('div');
         note.className = 'sheet-note'; note.style.marginTop = '0';
         note.textContent = isOneTime
-          ? 'We’ll only recommend mods within this. This goal and budget are your one free pick, and changing them later needs CarBox Pro.'
+          ? 'We’ll only recommend mods within this. This goal and budget are your one free pick, and changing them later needs Coilover Pro.'
           : 'We’ll keep recommendations for ' + selected + ' within this budget.';
         body.appendChild(note);
 
@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var current = CarBox.get('goal');
     /* Free + already locked: switching GOALS needs Pro, but they can still open
        the budget step to set/adjust the budget for their current goal. */
-    if (!pro && locked && selected !== current) { UI.toast('Changing your goal needs CarBox Pro'); Pro.open(); return; }
+    if (!pro && locked && selected !== current) { UI.toast('Changing your goal needs Coilover Pro'); Pro.open(); return; }
     /* everyone else: goal -> filter -> budget, then commit as one unit.
        Nothing is written to the store until the budget step confirms, so
        backing out of either sheet leaves the previous setup intact. */

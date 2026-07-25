@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CarBox — Entry</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Coilover — Entry</title>
 <style>html{background:#E9E9E9}</style>
 <script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function () {
     chip.className = 'echip ' + entry.type;
     chip.textContent = CHIP_LABEL[entry.type] || 'MOD';
     document.getElementById('e-title').textContent = entry.title;
-    document.title = 'CarBox — ' + entry.title;
+    document.title = 'Coilover — ' + entry.title;
     var parts = [];
     if (entry.cost > 0) parts.push(CarBox.fmtMoney(entry.cost));
     if (entry.miles > 0) parts.push(CarBox.fmtMiles(entry.miles));

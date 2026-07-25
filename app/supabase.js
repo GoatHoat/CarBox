@@ -1,4 +1,4 @@
-/* CarBox ↔ Supabase connector.
+/* Coilover ↔ Supabase connector.
    ADDITIVE + defensive: the app keeps working entirely on localStorage (via
    state.js). This layer adds real accounts and cloud persistence on top:
      • signup during onboarding creates a real Supabase Auth user
@@ -29,11 +29,11 @@
      UI.toast isn't on every page that loads this file, so fall back to the
      console — the detail always lands somewhere. */
   function reportError(msg, detail) {
-    try { console.error('[CarBox] ' + msg, detail || ''); } catch (e) {}
+    try { console.error('[Coilover] ' + msg, detail || ''); } catch (e) {}
     try { if (window.UI && UI.toast) UI.toast(msg); } catch (e) {}
   }
 
-  var UNREACHABLE = 'Could not reach CarBox accounts — your data is saved on this device only';
+  var UNREACHABLE = 'Could not reach Coilover accounts — your data is saved on this device only';
   /* Turn a signUp failure into copy that points at the actual cause. */
   function signupErrorText(err) {
     var m = String((err && (err.message || err.msg)) || err || 'unknown error');
@@ -41,9 +41,9 @@
     if (/failed to fetch|networkerror|network request failed|load failed/i.test(m) ||
         /AuthRetryableFetchError/i.test(name)) return UNREACHABLE;
     if (/already registered|already exists/i.test(m)) {
-      return 'That email already has a CarBox account — sign in instead';
+      return 'That email already has a Coilover account — sign in instead';
     }
-    return 'Could not create your CarBox account: ' + m;
+    return 'Could not create your Coilover account: ' + m;
   }
 
   /* Fields the SERVER owns — written only by the Stripe webhook, never by the

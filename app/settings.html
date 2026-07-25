@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CarBox — Settings</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Coilover — Settings</title>
 <style>html{background:#E9E9E9}</style>
 <script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -288,7 +288,7 @@
     </div>
   </div>
 
-  <div class="sec-label">CarBox Pro</div>
+  <div class="sec-label">Coilover Pro</div>
   <div class="setcard">
     <div class="setrow">
       <div>
@@ -310,10 +310,10 @@
     <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Privacy Policy</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
     <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Terms of Use</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
     <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Contact support</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
-    <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Rate CarBox</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
+    <div class="setrow rowbtn legal" role="button" tabindex="0"><div class="stx">Rate Coilover</div><img class="chev-r" src="assets/icon_chevron.png" alt=""></div>
     <div class="setrow" id="versionRow">
       <div class="stx">Version</div>
-      <div class="sval">CarBox 1.0.0</div>
+      <div class="sval">Coilover 1.0.0</div>
     </div>
   </div>
 
@@ -735,7 +735,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* CarBox API proxy base — the deployed backend project (override via carbox.apiBase,
+  /* Coilover API proxy base — the deployed backend project (override via carbox.apiBase,
      e.g. localStorage.setItem('carbox.apiBase','http://localhost:8787') for local dev).
      Used by Delete Account (/api/delete-account), so it must reach the live backend. */
   function apiBase() {
@@ -745,7 +745,7 @@ document.addEventListener('DOMContentLoaded', function () {
   bindRow('signout', function () {
     confirmSheet({
       title: 'Sign out',
-      message: 'You’ll be signed out of your CarBox account on this device. Your data stays safe in the cloud and returns when you log back in.',
+      message: 'You’ll be signed out of your Coilover account on this device. Your data stays safe in the cloud and returns when you log back in.',
       confirmLabel: 'Sign out',
       onConfirm: function () {
         var go = function () { location.replace((window.CarBoxAuth && CarBoxAuth.available) ? 'login.html' : 'onboarding.html?v=' + Date.now()); };
@@ -757,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function () {
   bindRow('delacct', function () {
     confirmSheet({
       title: 'Delete account',
-      message: 'This permanently deletes your CarBox account, cars, entries, and photos from the server. This cannot be undone.',
+      message: 'This permanently deletes your Coilover account, cars, entries, and photos from the server. This cannot be undone.',
       confirmLabel: 'Delete my account',
       danger: true,
       onConfirm: function () {
@@ -795,13 +795,13 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ════ CARBOX PRO ════ */
   function paintPlan() {
     var pro = CarBox.get('isPro');
-    $('upgrade').parentElement.querySelector('.ssub').textContent = pro ? 'CarBox Pro' : 'Free';
+    $('upgrade').parentElement.querySelector('.ssub').textContent = pro ? 'Coilover Pro' : 'Free';
     $('upgrade').textContent = pro ? 'Active' : 'Upgrade';
   }
   paintPlan();
   document.addEventListener('carbox-pro', paintPlan);
   $('upgrade').addEventListener('click', function () {
-    if (CarBox.get('isPro')) UI.toast('You’re on CarBox Pro');
+    if (CarBox.get('isPro')) UI.toast('You’re on Coilover Pro');
     else Pro.open();
   });
   bindRow('restore', function () {
@@ -809,7 +809,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var run = window.CarBoxBilling ? CarBoxBilling.restore() : Promise.resolve(!!CarBox.get('isPro'));
     Promise.resolve(run).then(function (active) {
       paintPlan();
-      UI.toast(active ? 'CarBox Pro restored' : 'No purchases to restore');
+      UI.toast(active ? 'Coilover Pro restored' : 'No purchases to restore');
     }, function () { UI.toast('Restore failed, please try again'); });
   });
   bindRow('managesub', function () {
@@ -825,15 +825,15 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.legal').forEach(function (row) {
     var label = (row.querySelector('.stx') || {}).textContent ? row.querySelector('.stx').textContent.trim() : '';
     var L = window.CARBOX_LEGAL || {};
-    /* hide "Rate CarBox" until the App Store URL exists (no dead link) */
-    if (label === 'Rate CarBox' && (!L.APPSTORE_URL || L.APPSTORE_URL.indexOf('REPLACE') >= 0)) { row.style.display = 'none'; return; }
+    /* hide "Rate Coilover" until the App Store URL exists (no dead link) */
+    if (label === 'Rate Coilover' && (!L.APPSTORE_URL || L.APPSTORE_URL.indexOf('REPLACE') >= 0)) { row.style.display = 'none'; return; }
     var fn = function () {
       if (label === 'Privacy Policy') openExternal(L.PRIVACY_URL);
       else if (label === 'Terms of Use') openExternal(L.TERMS_URL);
       else if (label === 'Contact support') {
         if (!L.SUPPORT_EMAIL || L.SUPPORT_EMAIL.indexOf('REPLACE') >= 0) UI.toast('Support email not set');
         else location.href = 'mailto:' + L.SUPPORT_EMAIL;
-      } else if (label === 'Rate CarBox') openExternal(L.APPSTORE_URL);
+      } else if (label === 'Rate Coilover') openExternal(L.APPSTORE_URL);
       else UI.toast('Opens at launch');
     };
     row.addEventListener('click', fn);

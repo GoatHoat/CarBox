@@ -1,4 +1,4 @@
-/* CarBox state store — single source of truth, persisted under "carbox.v1".
+/* Coilover state store — single source of truth, persisted under "carbox.v1".
    Pages hydrate from this on load so HTML and store never disagree.
 
    MULTI-CAR (2026-07-22): all per-car data lives inside state.cars[], and
@@ -12,7 +12,7 @@ window.CarBox = (function () {
 
   /* keys that live PER CAR. Legacy key 'car' maps to the car's `appearance`.
      `goalLocked` = the free one-time goal choice for this car has been used
-     (changing the goal again requires CarBox Pro).
+     (changing the goal again requires Coilover Pro).
      `upgradesOnboarded` = this car has seen the one-time Upgrades intro screen.
      `upgradeFilter` = the mod category chosen in the filter step, or the string
      'best overall' to let the AI pick from the car's weakest attributes. */

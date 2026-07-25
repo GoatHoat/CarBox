@@ -97,7 +97,7 @@ window.CarForm = (function () {
       year.parentElement.classList.toggle('invalid', bad);
       if (tooOld) {
         specNote.className = 'cf-specnote show note';
-        specNote.textContent = 'CarBox supports model years ' + MIN_YEAR + ' and newer.';
+        specNote.textContent = 'Coilover supports model years ' + MIN_YEAR + ' and newer.';
       } else if (make.value && model.value && y >= MIN_YEAR && y <= thisYear + 1) {
         var hit = CarBoxCars.lookup(make.value, model.value, y);
         specNote.className = 'cf-specnote show ' + (hit ? 'ok' : 'note');

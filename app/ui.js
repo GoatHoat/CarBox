@@ -1,4 +1,4 @@
-/* CarBox shared UI primitives: toast, bottom sheet, pressable, page-enter
+/* Coilover shared UI primitives: toast, bottom sheet, pressable, page-enter
    stagger, count-up. One easing family: cubic-bezier(.3,1.4,.4,1). */
 window.UI = (function () {
   var SPRING = 'cubic-bezier(.3,1.4,.4,1)';

@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CarBox — For You</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Coilover — For You</title>
 <style>html{background:#E9E9E9}</style>
 <script>(function(){try{var _st=(JSON.parse(localStorage.getItem('carbox.v1'))||{});var _sess=false;try{for(var _i=0;_i<localStorage.length;_i++){if(/^sb-.*-auth-token$/.test(localStorage.key(_i))){_sess=true;break}}}catch(e){}if(!_st.onboardingComplete&&!_sess){location.replace('onboarding.html');return}}catch(e){location.replace('onboarding.html');return}var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,10 +70,13 @@
   .post-user .uh{display:block;font-size:12px;font-weight:500;color:var(--mut,#9A928B)}
   .post-title{text-align:center;font-weight:700;font-size:17px;color:var(--tx,#141210);margin:0 4px 8px;line-height:1.2}
 
-  .post-media{position:relative;border-radius:14px;overflow:hidden;background:var(--brown-warm)}
+  /* the media area is a fixed square, but images FIT inside it (contain) with a
+     letterbox in the card's own colour (near-white in light, grey in dark) — any
+     aspect ratio, never cropped, never black bars. */
+  .post-media{position:relative;border-radius:14px;overflow:hidden;background:var(--surface,#F1EEEB)}
   .media-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;aspect-ratio:1/1}
   .media-track::-webkit-scrollbar{display:none}
-  .media-img{flex:none;width:100%;height:100%;object-fit:cover;scroll-snap-align:center;background:var(--brown-warm)}
+  .media-img{flex:none;width:100%;height:100%;object-fit:contain;scroll-snap-align:center;background:transparent}
   .media-ph{flex:none;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
     color:#efe7df;font-weight:600;font-size:15px;scroll-snap-align:center}
   .media-count{position:absolute;top:9px;right:11px;background:rgba(0,0,0,.55);color:#fff;
@@ -86,11 +89,12 @@
   .act{display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;
     color:var(--tx,#141210);padding:4px 2px;margin-right:16px;font-family:'League Spartan',sans-serif}
   .act .cnt{font-size:14px;font-weight:700;color:var(--tx,#141210);min-width:6px}
-  .act.more{margin-left:auto;margin-right:0;color:var(--mut,#8D8579)}
-  .pxheart,.pxcomment{width:26px;height:24px;display:block}
-  .pxheart{color:var(--tx,#141210)}
-  .pxheart.on{color:#111;animation:heartpop .32s cubic-bezier(.3,1.4,.4,1)}
-  html[data-theme="dark"] .pxheart.on{color:#F2EEE9}
+  .act.more{margin-left:auto;margin-right:0}
+  .act.more .pxdots{width:24px;height:24px;color:var(--mut,#8D8579)}
+  .pxheart{width:28px;height:auto;display:block}
+  .pxcomment{width:27px;height:auto;display:block}
+  .pxheart.on{animation:heartpop .32s cubic-bezier(.3,1.4,.4,1)}
+  html[data-theme="dark"] .pxheart,html[data-theme="dark"] .pxcomment{filter:invert(1)}
   @keyframes heartpop{0%{transform:scale(1)}45%{transform:scale(1.35)}100%{transform:scale(1)}}
   .pxdots{width:24px;height:24px}
   .post-desc{font-size:14.5px;font-weight:500;color:var(--tx,#2a2622);line-height:1.4;margin-top:8px;padding:0 2px}
@@ -168,14 +172,14 @@
     border-top:1px solid var(--hairline);background:var(--sheet,var(--card));position:sticky;bottom:0;
   }
   .cmt-composer input{flex:1;min-width:0;background:var(--input,var(--surface,#F1EEEB));border:none;border-radius:999px;
-    padding:11px 15px;font-family:'League Spartan',sans-serif;font-size:15px;font-weight:500;color:var(--tx,#141210);outline:none}
+    padding:12px 18px;font-family:'League Spartan',sans-serif;font-size:15px;font-weight:500;color:var(--tx,#141210);outline:none}
   .cmt-composer .send{background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
-    padding:10px 16px;font-family:'League Spartan',sans-serif;font-weight:700;font-size:14px;flex:none}
+    padding:11px 17px;font-family:'League Spartan',sans-serif;font-weight:700;font-size:14px;flex:none}
   .cmt-composer .send:disabled{background:var(--ctl,#D9D4D0);color:var(--mut,#9B918F);cursor:default}
-  .replybar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;
-    background:var(--surface,#F1EEEB);border-radius:10px;margin:0 4px}
+  /* reply indicator: minimal inline text, NOT a boxed rectangle */
+  .replybar{display:flex;align-items:center;gap:10px;padding:6px 10px 2px;background:none}
   .replybar span{font-size:12.5px;font-weight:600;color:var(--mut,#7d756e)}
-  .replybar button{background:none;border:none;cursor:pointer;color:var(--accent-tx,#776357);font-weight:700;font-size:12.5px}
+  .replybar button{background:none;border:none;cursor:pointer;color:var(--accent-tx,#776357);font-weight:700;font-size:12.5px;padding:0}
 
   @media (prefers-reduced-motion: reduce){ .pxheart.on{animation:none} }
 </style>
@@ -214,7 +218,7 @@
     <a class="tab" href="index.html"><img class="i-navtire" src="assets/nav_tire_v2.png" alt=""><span class="lbl">Garage</span></a>
     <a class="tab" href="log.html"><img class="i-navwrench" src="assets/nav_wrench.png" alt=""><span class="lbl">log</span></a>
     <a class="tab" href="upgrades.html"><img class="i-navgear" src="assets/nav_up.png" alt=""><span class="lbl">upgrades</span></a>
-    <a class="tab active" href="foryou.html"><svg class="i-navperson" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 H15 V11 H9 Z M6 21 V16 H8 V15 H16 V16 H18 V21 Z" fill="currentColor" shape-rendering="crispEdges"/></svg><span class="lbl">for you</span></a>
+    <a class="tab active" href="foryou.html"><img class="i-navperson" src="assets/nav_person.png" alt=""><span class="lbl">for you</span></a>
   </nav>
 </div>
 
@@ -551,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function () {
       perm.innerHTML =
         '<div class="permart"><svg viewBox="0 0 24 24"><path d="M4 6 H8 L9 4 H15 L16 6 H20 V19 H4 Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></div>' +
         '<h3>Add your photos</h3>' +
-        '<p>CarBox needs access to your photo library so you can pick up to ' + Social.MAX_PHOTOS + ' photos for your post. They are selected in the order you tap them.</p>' +
+        '<p>Coilover needs access to your photo library so you can pick up to ' + Social.MAX_PHOTOS + ' photos for your post. They are selected in the order you tap them.</p>' +
         '<button class="allow" id="allowPhotos">Allow photo access</button>';
       cbody.appendChild(perm);
       $('allowPhotos').addEventListener('click', function () { photoInput.click(); });

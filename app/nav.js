@@ -1,4 +1,4 @@
-/* CarBox bottom-nav pill: draggable + springy tab highlight.
+/* Coilover bottom-nav pill: draggable + springy tab highlight.
    The pill snaps to the nearest tab on release, then navigates. */
 (function () {
   var nav = document.querySelector('.nav');

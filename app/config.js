@@ -1,4 +1,4 @@
-/* CarBox → Supabase connection config.
+/* Coilover → Supabase connection config.
    These two values connect the app to YOUR Supabase project.
    Get them from Supabase → Project Settings → API:
      • Project URL  → paste into SUPABASE_URL below
@@ -28,7 +28,7 @@ try { localStorage.removeItem('carbox.dev'); } catch (e) {}
    App Store Connect additionally needs a PUBLIC https URL for the Privacy
    Policy — host the same two files anywhere public and paste that URL into the
    App Privacy section there (the in-app links can stay as the bundled pages).
-   APPSTORE_URL is your app's store page ("Rate CarBox" stays hidden until set). */
+   APPSTORE_URL is your app's store page ("Rate Coilover" stays hidden until set). */
 window.CARBOX_LEGAL = {
   PRIVACY_URL: 'https://carbox-one.vercel.app/privacy.html',
   TERMS_URL: 'https://carbox-one.vercel.app/terms.html',

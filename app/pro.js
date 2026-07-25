@@ -1,4 +1,4 @@
-/* CarBox Pro paywall — centered modal, two screens inside one card.
+/* Coilover Pro paywall — centered modal, two screens inside one card.
    Screen 1: benefits + a primary "Subscribe" button + a secondary "or pay on
    app" link. Screen 2 (slides in when Subscribe is tapped): a Monthly/Annual
    picker whose options START CHECKOUT immediately.
@@ -43,7 +43,7 @@ window.Pro = (function () {
     card.className = 'pro-card';
     card.setAttribute('role', 'dialog');
     card.setAttribute('aria-modal', 'true');
-    card.setAttribute('aria-label', 'CarBox Pro');
+    card.setAttribute('aria-label', 'Coilover Pro');
     card.tabIndex = -1;
     card.innerHTML =
       '<button class="pro-x" aria-label="Close">×</button>' +
@@ -59,7 +59,7 @@ window.Pro = (function () {
           '<img class="pro-spark s5" src="assets/sparkle.png" alt="">' +
           '<img class="pro-spark s6" src="assets/sparkle.png" alt="">' +
         '</div>' +
-        '<h2 class="serif pro-title">CarBox Pro</h2>' +
+        '<h2 class="serif pro-title">Coilover Pro</h2>' +
         '<div class="pro-benefit"><img src="assets/pro_trophy.png" alt=""><div>' +
           '<div class="pb-top">All upgrade goals unlocked</div></div></div>' +
         '<div class="pro-benefit"><img src="assets/pro_garage.png" alt=""><div>' +
@@ -104,6 +104,18 @@ window.Pro = (function () {
       });
     });
 
+    /* Re-enable the plan buttons when the page is restored from the back/forward
+       cache (e.g. you tapped Monthly, went to Stripe, then came back). Without
+       this the whole plan picker stays disabled and you can't switch to Annual
+       without closing and reopening the paywall. */
+    function reenablePlans() {
+      card.querySelectorAll('.pro-planopt').forEach(function (o) { o.disabled = false; o.classList.remove('loading'); });
+      var cta = card.querySelector('.pro-cta'); if (cta) cta.disabled = false;
+      var link = card.querySelector('.pro-stripe-link'); if (link) link.disabled = false;
+    }
+    function onPageShow(e) { if (e.persisted) reenablePlans(); }
+    window.addEventListener('pageshow', onPageShow);
+
     var closed = false;
     function close() {
       if (closed) return;
@@ -114,6 +126,7 @@ window.Pro = (function () {
       scrim.classList.remove('show');
       document.documentElement.style.overflow = '';
       document.removeEventListener('keydown', onKey);
+      window.removeEventListener('pageshow', onPageShow);
       setTimeout(function () { scrim.remove(); card.remove(); }, 260);
       if (prevFocus && prevFocus.focus) prevFocus.focus({ preventScroll: true });
     }
@@ -179,7 +192,7 @@ window.Pro = (function () {
       var text = (window.CarBoxBilling && CarBoxBilling.errorText)
         ? CarBoxBilling.errorText(err, fallback) : fallback;
       UI.toast(text);
-      try { console.error('[CarBox] purchase failed:', err); } catch (e) {}
+      try { console.error('[Coilover] purchase failed:', err); } catch (e) {}
     }
 
     /* ── PRIMARY: Subscribe -> plan picker -> Stripe checkout ──
@@ -222,7 +235,7 @@ window.Pro = (function () {
         ? CarBoxBilling.purchase('annual')
         : (CarBox.set('isPro', true), document.dispatchEvent(new CustomEvent('carbox-pro')), Promise.resolve(true));
       Promise.resolve(run).then(function (active) {
-        if (active) { close(); UI.toast('Welcome to CarBox Pro'); }
+        if (active) { close(); UI.toast('Welcome to Coilover Pro'); }
         else { btn.disabled = false; UI.toast('Purchase cancelled'); }
       }, function (err) {
         btn.disabled = false;

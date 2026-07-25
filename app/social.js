@@ -1,7 +1,7 @@
-/* CarBox social ("For You") — data layer + shared bits for the feed, the compose
+/* Coilover social ("For You") — data layer + shared bits for the feed, the compose
    flow, post detail, comments/replies, and the notifications they generate.
 
-   LOCAL-ONLY for now (like the rest of the app): everything lives in the CarBox
+   LOCAL-ONLY for now (like the rest of the app): everything lives in the Coilover
    store under the top-level `posts` and `notifications` keys and persists to
    localStorage. A real cross-user feed needs a backend — every place that would
    become a network call is marked `BACKEND:` so the swap is mechanical. Nothing
@@ -12,7 +12,7 @@ window.Social = (function () {
   var MAX_PHOTOS = 5;
   var MAX_DESC_WORDS = 80;
 
-  /* ── who "I" am (from the CarBox profile) ── */
+  /* ── who "I" am (from the Coilover profile) ── */
   function me() {
     var p = (window.CarBox && CarBox.get('profile')) || {};
     return { handle: p.handle || '@you', name: p.name || 'You', mine: true };
@@ -202,23 +202,19 @@ window.Social = (function () {
     reader.readAsDataURL(file);
   }
 
-  /* ── pixel-style icons (inline SVG, currentColor; original art, not a lib) ──
-     heart toggles outline → solid on like; comment + person for the nav/feed. */
+  /* ── pixel icons: the user's own heart art (outline → solid on like) + a
+     matching pixel comment. Black PNGs on transparent; dark mode inverts them
+     via CSS (.pxheart/.pxcomment). ── */
   var ICON = {
     heart: function (filled) {
-      return '<svg class="pxheart' + (filled ? ' on' : '') + '" viewBox="0 0 24 22" aria-hidden="true">' +
-        '<path d="M12 20 L3 11 L3 7 L5 5 L9 5 L12 8 L15 5 L19 5 L21 7 L21 11 Z" ' +
-        'fill="' + (filled ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" ' +
-        'stroke-linejoin="miter" shape-rendering="crispEdges"/></svg>';
+      return '<img class="pxheart' + (filled ? ' on' : '') + '" src="assets/' +
+        (filled ? 'icon_heart_solid.png' : 'icon_heart.png') + '" alt="' + (filled ? 'Liked' : 'Like') + '">';
     },
     comment: function () {
-      return '<svg class="pxcomment" viewBox="0 0 24 24" aria-hidden="true">' +
-        '<path d="M3 4 H21 V16 H11 L7 20 V16 H3 Z" fill="none" stroke="currentColor" stroke-width="2" ' +
-        'stroke-linejoin="miter" shape-rendering="crispEdges"/></svg>';
+      return '<img class="pxcomment" src="assets/icon_comment_px.png" alt="Comment">';
     },
     person: function () {
-      return '<svg class="pxperson" viewBox="0 0 24 24" aria-hidden="true">' +
-        '<path d="M8 7 H16 V13 H8 Z M6 22 V17 H18 V22 Z" fill="currentColor" shape-rendering="crispEdges"/></svg>';
+      return '<img class="pxperson" src="assets/nav_person.png" alt="">';
     },
     dots: function () {
       return '<svg class="pxdots" viewBox="0 0 24 24" aria-hidden="true">' +

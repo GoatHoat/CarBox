@@ -1,10 +1,10 @@
-/* CarBox onboarding — 7-step signup flow, single page, JS step machine.
+/* Coilover onboarding — 7-step signup flow, single page, JS step machine.
    Answers live in one in-memory object; NOTHING is written to the carbox.v1
    store until the user finishes step 6, when everything commits at once. */
 document.addEventListener('DOMContentLoaded', function () {
 
-  /* ─── CarBox age policy ────────────────────────────────────────────────
-     16 is CarBox's OWN chosen minimum. Apple doesn't mandate a specific
+  /* ─── Coilover age policy ────────────────────────────────────────────────
+     16 is Coilover's OWN chosen minimum. Apple doesn't mandate a specific
      number, but whatever we set must be genuinely enforced (step 4 blocks
      under-age users), not merely asked. Change here to change the policy. */
   var MIN_AGE = 16;
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
      lookup should always resolve; this placeholder is a defensive fallback. */
   var PLACEHOLDER_SPECS = { engine: '', horsepower: '', torque: '', transmission: '', drivetrain: '', accel: '' };
 
-  /* CarBox policy: model years 2010 and newer only (older years are declined). */
+  /* Coilover policy: model years 2010 and newer only (older years are declined). */
   var MIN_YEAR = 2010;
 
   /* single in-memory answer object; survives forward/back navigation.
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
   bdayNext.addEventListener('click', function () {
     if (!bday.value) return;
     if (ageFrom(bday.value) < MIN_AGE) {
-      bdayErr.textContent = 'You must be at least ' + MIN_AGE + ' to use CarBox';
+      bdayErr.textContent = 'You must be at least ' + MIN_AGE + ' to use Coilover';
       bdayErr.classList.add('show');
       markInvalid(bday.parentElement, true);
       return;
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (tooOld) {
       /* explicit decline for pre-2010 model years */
       specNote.className = 'ob-specnote show note';
-      specNote.textContent = 'CarBox supports model years ' + MIN_YEAR + ' and newer.';
+      specNote.textContent = 'Coilover supports model years ' + MIN_YEAR + ' and newer.';
     } else if (make.value && model.value && y >= MIN_YEAR && y <= thisYear + 1) {
       var hit = CarBoxCars.lookup(make.value, model.value, y);
       specNote.className = 'ob-specnote show ' + (hit ? 'ok' : 'note');
@@ -408,18 +408,18 @@ document.addEventListener('DOMContentLoaded', function () {
      privacy.html + terms.html (linked below the checkboxes). Keep the two in
      sync if the hosted docs change. */
   var LEGAL = {
-    terms: 'CarBox Terms of Service — summary\n\n' +
+    terms: 'Coilover Terms of Service — summary\n\n' +
       '1. Your account. You must be 16 or older. Keep your login private; you are responsible for activity on your account.\n\n' +
       '2. Your garage. You are responsible for the accuracy of the vehicle, build, and maintenance information you add.\n\n' +
       '3. Mod suggestions. Upgrade recommendations and price figures are informational estimates, not professional mechanical advice. Always confirm work with a qualified shop, and check that modifications are legal where you drive.\n\n' +
-      '4. CarBox Pro. Pro is an auto-renewing subscription billed through your App Store account. Cancel anytime in your App Store subscription settings.\n\n' +
+      '4. Coilover Pro. Pro is an auto-renewing subscription billed through your App Store account. Cancel anytime in your App Store subscription settings.\n\n' +
       '5. Acceptable use. Do not misuse the service, disrupt it, or upload content you do not have rights to share. Content that is abusive or unlawful may be removed.\n\n' +
       '6. No warranty. The service is provided "as is" to the extent permitted by law.\n\n' +
       'Read the full Terms below — the full document is the one that applies.',
-    privacy: 'CarBox Privacy Policy — summary\n\n' +
+    privacy: 'Coilover Privacy Policy — summary\n\n' +
       '1. What we collect. Your account email and name, your vehicle details, log entries and photos you add, and (only if you allow it) your approximate location to find nearby shops.\n\n' +
       '2. How it is used. To run your garage, sync it to your account, generate upgrade suggestions for your car, and find shops near you. We do not sell your personal information.\n\n' +
-      '3. Where it lives. Your data is stored on your device and, when you are signed in, in your CarBox account in the cloud.\n\n' +
+      '3. Where it lives. Your data is stored on your device and, when you are signed in, in your Coilover account in the cloud.\n\n' +
       '4. Your control. Location is optional and can be turned off in system settings. You can delete your account and its data anytime in Settings.\n\n' +
       'Read the full Privacy Policy below — the full document is the one that applies.'
   };

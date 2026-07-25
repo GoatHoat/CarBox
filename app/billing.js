@@ -64,7 +64,7 @@ window.CarBoxBilling = (function () {
         throw billingError(r.status === 503 ? 'not-configured' : 'server', msg, r.status);
       });
     }, function (e) {
-      throw billingError('network', 'could not reach the CarBox server: ' + (e && e.message || e));
+      throw billingError('network', 'could not reach the Coilover server: ' + (e && e.message || e));
     });
   }
 
@@ -75,7 +75,7 @@ window.CarBoxBilling = (function () {
     var code = err && err.code;
     if (code === 'not-signed-in') return 'Sign in to subscribe';
     if (code === 'not-configured') return 'Subscriptions aren’t set up yet — try again later';
-    if (code === 'network') return 'Couldn’t reach CarBox — check your connection';
+    if (code === 'network') return 'Couldn’t reach Coilover — check your connection';
     return fallback || 'Purchase could not be completed';
   }
 
@@ -143,7 +143,7 @@ window.CarBoxBilling = (function () {
           return;
         }
         if (stripeManaged && !d.isPro) {
-          if (window.UI) UI.toast('Your CarBox Pro subscription has ended');
+          if (window.UI) UI.toast('Your Coilover Pro subscription has ended');
           return;
         }
         /* still active and not scheduled to cancel. Poll a couple times first so a
@@ -231,7 +231,7 @@ window.CarBoxBilling = (function () {
     (function poll() {
       tries++;
       refreshFromCloud().then(function (active) {
-        if (active) { if (window.UI) UI.toast('Welcome to CarBox Pro'); return; }
+        if (active) { if (window.UI) UI.toast('Welcome to Coilover Pro'); return; }
         if (tries < 8) setTimeout(poll, 1200);
         else if (window.UI) UI.toast('Still confirming, check back in a minute');
       });

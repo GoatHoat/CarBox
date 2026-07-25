@@ -1,4 +1,4 @@
-/* CarBox upgrade goals + their mod-category filters — the SINGLE source of
+/* Coilover upgrade goals + their mod-category filters — the SINGLE source of
    truth shared by goal-picker.html (which renders the chips) and upgrades.html
    (whose offline fallback pools are keyed by the same strings). Keep the two in
    step by editing only this file; a filter with no matching pool silently falls

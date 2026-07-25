@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CarBox — Upgrades</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Coilover — Upgrades</title>
 <style>html{background:#E9E9E9}</style>
 <script>(function(){try{var _st=(JSON.parse(localStorage.getItem('carbox.v1'))||{});var _sess=false;try{for(var _i=0;_i<localStorage.length;_i++){if(/^sb-.*-auth-token$/.test(localStorage.key(_i))){_sess=true;break}}}catch(e){}if(!_st.onboardingComplete&&!_sess){location.replace('onboarding.html');return}}catch(e){location.replace('onboarding.html');return}var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -226,7 +226,7 @@
     <a class="tab" href="index.html"><img class="i-navtire" src="assets/nav_tire_v2.png" alt=""><span class="lbl">Garage</span></a>
     <a class="tab" href="log.html"><img class="i-navwrench" src="assets/nav_wrench.png" alt=""><span class="lbl">log</span></a>
     <a class="tab active" href="upgrades.html"><img class="i-navgear" src="assets/nav_up.png" alt=""><span class="lbl">upgrades</span></a>
-    <a class="tab" href="foryou.html"><svg class="i-navperson" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 H15 V11 H9 Z M6 21 V16 H8 V15 H16 V16 H18 V21 Z" fill="currentColor" shape-rendering="crispEdges"/></svg><span class="lbl">for you</span></a>
+    <a class="tab" href="foryou.html"><img class="i-navperson" src="assets/nav_person.png" alt=""><span class="lbl">for you</span></a>
   </nav>
 
 </div>
@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function () {
       /* LOCKED (free plan): the mod is already fetched and cached, we just blur
          it. Going Pro re-renders from the same cache with no new AI call. */
       var lockStage = card(
-        '<div class="scard locked" role="button" tabindex="0" aria-label="Unlock with CarBox Pro">' +
+        '<div class="scard locked" role="button" tabindex="0" aria-label="Unlock with Coilover Pro">' +
         '<span class="schip">RECOMMENDED</span>' +
         '<div class="stitle"></div>' +
         '<div class="smeta"></div>' +
@@ -614,8 +614,8 @@ document.addEventListener('DOMContentLoaded', function () {
     setupView.hidden = false; resultsView.hidden = true;
     $('setupTitle').textContent = firstTime ? 'Welcome to Upgrades' : 'Pick your upgrade path';
     $('setupBody').textContent = firstTime
-      ? 'Tell CarBox what you want out of your ' + vehicle.name + ' and it builds a ranked list of modifications matched to this exact car, the area you care about, and your budget.'
-      : 'Choose a goal, the area to focus on, and a budget, and CarBox will build a ranked list of mods for your ' + vehicle.name + '.';
+      ? 'Tell Coilover what you want out of your ' + vehicle.name + ' and it builds a ranked list of modifications matched to this exact car, the area you care about, and your budget.'
+      : 'Choose a goal, the area to focus on, and a budget, and Coilover will build a ranked list of mods for your ' + vehicle.name + '.';
     $('setupGo').textContent = firstTime ? 'Continue' : 'Choose a goal';
   }
   function showResults() {
