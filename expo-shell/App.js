@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, Linking, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
@@ -83,13 +83,23 @@ export default function App() {
   const dark = bg === DARK;
   const webref = useRef(null);
 
-  // configure RevenueCat once on launch
-  useEffect(() => {
+  // RevenueCat is configured LAZILY — only the first time a purchase/entitlement
+  // call actually happens, never at app launch. That way a bad key or a store
+  // hiccup can only make a purchase fail (with a normal error toast in the web
+  // app); it can NEVER stop the app from opening. Configured at most once.
+  const rcReady = useRef(false);
+  function ensureRC() {
+    if (rcReady.current) return true;
     try {
-      if (Purchases.setLogLevel && Purchases.LOG_LEVEL) Purchases.setLogLevel(Purchases.LOG_LEVEL.WARN);
+      if (!Purchases || !Purchases.configure) return false;
+      try { if (Purchases.setLogLevel && Purchases.LOG_LEVEL) Purchases.setLogLevel(Purchases.LOG_LEVEL.WARN); } catch (e) {}
       Purchases.configure({ apiKey: RC_API_KEY });
-    } catch (e) { /* dev/Expo Go without the native module — bridge just no-ops */ }
-  }, []);
+      rcReady.current = true;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 
   // pick the package for a plan: prefer the offering's convenience accessors,
   // else match by package type on the current offering.
@@ -113,6 +123,21 @@ export default function App() {
         JSON.stringify(value === undefined ? null : value) + '); true;'
       );
     };
+    // "manage" only opens a URL — never needs RevenueCat.
+    if (d.method === 'manage') {
+      const url = Platform.OS === 'android'
+        ? 'https://play.google.com/store/account/subscriptions'
+        : 'https://apps.apple.com/account/subscriptions';
+      Linking.openURL(url).catch(() => {});
+      return;
+    }
+    // getEntitlement fires on page load. Do NOT spin up RevenueCat just to check
+    // on load — if it hasn't been configured yet (no purchase attempted this
+    // session), report "not active" and move on. This keeps RevenueCat entirely
+    // off the launch path, so it can never stop the app from opening.
+    if (d.method === 'getEntitlement' && !rcReady.current) { reply(true, false); return; }
+    // purchase / restore (explicit user action) — configure now, guarded.
+    if (!ensureRC()) { reply(false, 'In-app purchases are not available right now.'); return; }
     try {
       if (d.method === 'getEntitlement') {
         const info = await Purchases.getCustomerInfo();
@@ -132,11 +157,6 @@ export default function App() {
       } else if (d.method === 'restore') {
         const info = await Purchases.restorePurchases();
         reply(true, !!(info.entitlements.active && info.entitlements.active[RC_ENTITLEMENT]));
-      } else if (d.method === 'manage') {
-        const url = Platform.OS === 'android'
-          ? 'https://play.google.com/store/account/subscriptions'
-          : 'https://apps.apple.com/account/subscriptions';
-        Linking.openURL(url).catch(() => {});
       }
     } catch (err) {
       reply(false, (err && err.message) || 'Billing error.');
