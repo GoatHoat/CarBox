@@ -15,17 +15,13 @@ window.CARBOX_CONFIG = {
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjeWRwYmd1aXl4bWRjbGt4dm11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NTQ1NDEsImV4cCI6MjEwMDMzMDU0MX0.mcODGv7byrOBpuTCzeXg6RGhqP8IE5zQFzxuQH1gquQ'
 };
 
-/* ── Dev mode ──
-   Dev affordances (Redo onboarding, Switch to Pro/Base) are OFF by default, so
-   the App Store build can NEVER ship the payment-bypass toggle that would be an
-   automatic rejection (guideline 3.1.1). They live behind a per-device flag.
-   To use them on your OWN phone: open Settings and tap the "Settings" title 7
-   times — it flips the local 'carbox.dev' flag and reloads. Because it is
-   per-device localStorage, it can never appear for a reviewer on a fresh
-   install, and there is nothing to remember to turn off before submitting. */
-window.CARBOX_DEV = (function () {
-  try { return localStorage.getItem('carbox.dev') === '1'; } catch (e) { return false; }
-})();
+/* ── Dev mode: REMOVED (2026-07-24) ──
+   The dev affordances (Redo onboarding, Switch to Pro/Base, the 7-tap unlock)
+   have been permanently removed. The app is now non-dev everywhere, on every
+   device, with nothing to toggle. CARBOX_DEV is hard-false so any lingering
+   reference resolves to "off", and any stale per-device flag is cleared. */
+window.CARBOX_DEV = false;
+try { localStorage.removeItem('carbox.dev'); } catch (e) {}
 
 /* ── Legal + support links (REQUIRED for App Store review) ──
    privacy.html + terms.html ship inside the app, so these links always work.

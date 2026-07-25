@@ -12,13 +12,23 @@ window.CarBox = (function () {
 
   /* keys that live PER CAR. Legacy key 'car' maps to the car's `appearance`.
      `goalLocked` = the free one-time goal choice for this car has been used
-     (changing the goal again requires CarBox Pro). */
+     (changing the goal again requires CarBox Pro).
+     `upgradesOnboarded` = this car has seen the one-time Upgrades intro screen.
+     `upgradeFilter` = the mod category chosen in the filter step, or the string
+     'best overall' to let the AI pick from the car's weakest attributes. */
   var PER_CAR = {
     vehicle: 'vehicle', car: 'appearance', entries: 'entries',
     planItems: 'planItems', goal: 'goal', goalLocked: 'goalLocked',
-    budget: 'budget', nextService: 'nextService', stats: 'stats',
+    budget: 'budget', upgradesOnboarded: 'upgradesOnboarded',
+    upgradeFilter: 'upgradeFilter', nextService: 'nextService', stats: 'stats',
     likes: 'likes', liked: 'liked', comments: 'comments'
   };
+
+  /* Goal renames. The picker grew past the original four, and "Show car looks"
+     split into exterior vs interior, so old saves are mapped forward. Anything
+     that matches a mod-category pool in upgrades.html must agree with this. */
+  var GOAL_ALIASES = { 'Show car looks': 'Exterior looks' };
+  function normalizeGoal(g) { return GOAL_ALIASES[g] || g || 'More power'; }
 
   function clone(v) { return v == null ? v : JSON.parse(JSON.stringify(v)); }
   function uid(prefix) {
@@ -142,6 +152,8 @@ window.CarBox = (function () {
       goal: 'More power',
       goalLocked: false,
       budget: null,   /* {min, max} spend target for the goal; max null = no cap */
+      upgradesOnboarded: false,   /* has this car seen the Upgrades intro screen */
+      upgradeFilter: null,        /* mod category, or 'best overall' */
       nextService: { title: 'Oil change', due: 82800, interval: 5000 },
       stats: { baseInvested: 48200, baseCount: 31 },
       likes: 412, liked: false,
@@ -181,7 +193,15 @@ window.CarBox = (function () {
     units: 'mi',
     reminders: true,
     notifsOn: true,
-    blocked: []   /* handles the user has blocked (their comments are hidden) */
+    blocked: [],   /* handles the user has blocked (their comments are hidden) */
+    /* ── Social (2026-07-24): account-level, NOT per-car — mirrors units/currency.
+       discoverable: opt-in, OFF by default; must be flipped on in Settings before
+       this user shows up in anyone else's Discover list. city: optional free-text
+       the user types themselves — NEVER device geolocation. Both are also synced
+       to the `profiles` table (see supabase.js) because Discover reads profiles/
+       cars directly, not the localStorage-mirroring user_state blob. */
+    discoverable: false,
+    city: ''
   };
 
   /* ── migration: wrap a legacy flat single-car store into cars[0] ── */
@@ -193,9 +213,11 @@ window.CarBox = (function () {
       appearance: raw.car || { presetId: 'body_suv', hue: null, shade: 1 },
       entries: raw.entries || [],
       planItems: raw.planItems || [],
-      goal: raw.goal || 'More power',
+      goal: normalizeGoal(raw.goal),
       goalLocked: !!raw.goalLocked,
       budget: raw.budget || null,
+      upgradesOnboarded: !!raw.upgradesOnboarded,
+      upgradeFilter: raw.upgradeFilter || null,
       nextService: raw.nextService || null,
       stats: raw.stats || { baseInvested: 0, baseCount: 0 },
       likes: typeof raw.likes === 'number' ? raw.likes : 0,
@@ -231,6 +253,9 @@ window.CarBox = (function () {
       if (!c.stats) c.stats = { baseInvested: 0, baseCount: 0 };
       if (typeof c.goalLocked !== 'boolean') c.goalLocked = false;
       if (c.budget === undefined) c.budget = null;
+      c.goal = normalizeGoal(c.goal);
+      if (typeof c.upgradesOnboarded !== 'boolean') c.upgradesOnboarded = false;
+      if (c.upgradeFilter === undefined) c.upgradeFilter = null;
       if (c.vehicle && c.vehicle.trim === undefined) c.vehicle.trim = '';
     });
     if (!findCar(state, state.activeCarId)) state.activeCarId = state.cars[0].id;
@@ -311,9 +336,12 @@ window.CarBox = (function () {
     if (!carObj.stats) carObj.stats = { baseInvested: 0, baseCount: 0 };
     if (typeof carObj.likes !== 'number') carObj.likes = 0;
     if (typeof carObj.liked !== 'boolean') carObj.liked = false;
-    if (!carObj.goal) carObj.goal = 'More power';
+    carObj.goal = normalizeGoal(carObj.goal);
     if (typeof carObj.goalLocked !== 'boolean') carObj.goalLocked = false;
     if (carObj.budget === undefined) carObj.budget = null;
+    /* a new car has never been through the Upgrades setup flow */
+    if (typeof carObj.upgradesOnboarded !== 'boolean') carObj.upgradesOnboarded = false;
+    if (carObj.upgradeFilter === undefined) carObj.upgradeFilter = null;
     if (carObj.vehicle && carObj.vehicle.trim === undefined) carObj.vehicle.trim = '';
     carObj.nextService = computeNextService(carObj);
     state.cars.push(carObj);

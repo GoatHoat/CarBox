@@ -23,7 +23,37 @@
   function localState() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
   function setLocal(obj) { try { localStorage.setItem(KEY, JSON.stringify(obj)); } catch (e) {} }
 
-  /* ── push the full local state up (debounced) ── */
+  /* Sync failures stay quiet by design (the app is fully usable offline), but a
+     failed SIGNUP is different: the account silently never exists, and the user
+     only finds out when they try to log in on another device. Surface those.
+     UI.toast isn't on every page that loads this file, so fall back to the
+     console — the detail always lands somewhere. */
+  function reportError(msg, detail) {
+    try { console.error('[CarBox] ' + msg, detail || ''); } catch (e) {}
+    try { if (window.UI && UI.toast) UI.toast(msg); } catch (e) {}
+  }
+
+  var UNREACHABLE = 'Could not reach CarBox accounts — your data is saved on this device only';
+  /* Turn a signUp failure into copy that points at the actual cause. */
+  function signupErrorText(err) {
+    var m = String((err && (err.message || err.msg)) || err || 'unknown error');
+    var name = String((err && err.name) || '');
+    if (/failed to fetch|networkerror|network request failed|load failed/i.test(m) ||
+        /AuthRetryableFetchError/i.test(name)) return UNREACHABLE;
+    if (/already registered|already exists/i.test(m)) {
+      return 'That email already has a CarBox account — sign in instead';
+    }
+    return 'Could not create your CarBox account: ' + m;
+  }
+
+  /* Fields the SERVER owns — written only by the Stripe webhook, never by the
+     device. A full-blob upsert of local state would wipe them, which would
+     "un-stick" a real purchase the next time the device pushed (the webhook marks
+     you Pro in the cloud, then a routine push overwrites it back). So pushState
+     MERGES: it keeps these from the current cloud row. */
+  var STRIPE_FIELDS = ['stripeCustomerId', 'stripeSubscriptionId', 'subscriptionStatus', 'cancelAtPeriodEnd', 'currentPeriodEnd'];
+
+  /* ── push the local state up (debounced), preserving server-owned fields ── */
   var pushT = null;
   function pushState() {
     if (pushT) clearTimeout(pushT);
@@ -37,9 +67,20 @@
           data = JSON.parse(JSON.stringify(data));
           delete data.account.password;
         }
-        sb.from('user_state').upsert({
-          user_id: user.id, data: data, updated_at: new Date().toISOString()
-        }).then(function () {}, function () {});
+        /* read the current cloud row so we don't clobber what the webhook wrote */
+        sb.from('user_state').select('data').eq('user_id', user.id).maybeSingle().then(function (res) {
+          var cloud = (res && res.data && res.data.data) || {};
+          var stripeManaged = !!(cloud.stripeSubscriptionId || cloud.stripeCustomerId);
+          STRIPE_FIELDS.forEach(function (k) {
+            if (cloud[k] !== undefined) data[k] = cloud[k]; else delete data[k];
+          });
+          /* Pro is cloud-authoritative for Stripe subscribers; for native/free
+             accounts the device value (StoreKit/local) is kept and synced up. */
+          if (stripeManaged) data.isPro = !!cloud.isPro;
+          sb.from('user_state').upsert({
+            user_id: user.id, data: data, updated_at: new Date().toISOString()
+          }).then(function () {}, function () {});
+        }, function () { /* couldn't read cloud: skip rather than risk clobbering entitlement */ });
       });
     }, 800);
   }
@@ -76,6 +117,30 @@
     }, function () {});
   }
 
+  /* Pull the Pro entitlement DOWN from the cloud when the account is Stripe-managed.
+     The Stripe webhook writes user_state.data.isPro authoritatively; the device
+     otherwise only ever pushes state UP, so without this a server-side cancel or
+     lapse would never reach the app. Only STRIPE-managed accounts are governed by
+     the cloud here (they carry a stripeCustomerId/stripeSubscriptionId); native
+     StoreKit users are governed by billing.js syncEntitlement() instead, and
+     non-subscribers keep the device-wins behaviour. Returns a promise so the
+     caller can order it before pushState(). */
+  function reconcileEntitlement(user) {
+    return sb.from('user_state').select('data').eq('user_id', user.id).maybeSingle().then(function (res) {
+      var d = res && res.data && res.data.data;
+      if (!d) return;
+      if (!(d.stripeSubscriptionId || d.stripeCustomerId)) return;   /* not Stripe-managed */
+      var cloudPro = !!d.isPro;
+      var localPro = !!(window.CarBox && CarBox.get('isPro'));
+      if (cloudPro === localPro) return;
+      if (window.CarBox) CarBox.set('isPro', cloudPro);
+      /* fire the same event pages already listen for on unlock; a distinct one on
+         lapse so a downgrade can re-lock live if a page cares (else it re-locks on
+         the next navigation, which is when reconcile runs again anyway). */
+      try { document.dispatchEvent(new CustomEvent(cloudPro ? 'carbox-pro' : 'carbox-pro-lapsed')); } catch (e) {}
+    }, function () { /* offline: keep whatever the device has */ });
+  }
+
   /* ── reconcile on every page load: logged in -> sync; else -> sign up if onboarding done ── */
   function reconcile() {
     sb.auth.getSession().then(function (r) {
@@ -91,7 +156,15 @@
            feels like "nothing works / can't switch tabs"). Just sync upward.
            A proper two-way merge is a future improvement; for now the device
            you're actively using always wins. */
-        if (local && local.onboardingComplete) { pushState(); }
+        if (local && local.onboardingComplete) {
+          /* The device wins for the garage data it's actively editing, BUT the Pro
+             entitlement is the one field the SERVER owns for a Stripe subscriber:
+             the webhook writes isPro (true through a paid/canceled-but-not-yet-
+             ended period, false once it lapses). Pull that down FIRST, then push
+             the (corrected) local state up — otherwise a stale local isPro:true
+             would re-clobber a server-side cancellation. */
+          reconcileEntitlement(session.user).then(function () { pushState(); }, function () { pushState(); });
+        }
         else { pullOnce(session.user); }
         return;
       }
@@ -100,7 +173,17 @@
       var acct = local.account || {};
       if (local.onboardingComplete && acct.email && acct.password && !localStorage.getItem('cbSignedUp')) {
         sb.auth.signUp({ email: acct.email, password: acct.password }).then(function (res) {
-          if (res && res.error) { return; }              /* e.g. already registered; leave local as-is */
+          if (res && res.error) {
+            /* Leave local state as-is either way — the app keeps working — but say
+               so, because an unreported failure here means "no account was ever
+               created" and nothing else in the UI would ever hint at it.
+               NOTE: supabase-js does NOT reject on network failure — it resolves
+               with the error in here ("Failed to fetch" / AuthRetryableFetchError),
+               so an unreachable project must be recognised in THIS branch or it
+               gets misreported as a bad-account problem. */
+            reportError(signupErrorText(res.error), res.error);
+            return;
+          }
           localStorage.setItem('cbSignedUp', '1');
           sb.auth.getSession().then(function (r2) {
             var s2 = r2 && r2.data && r2.data.session;
@@ -108,13 +191,36 @@
             /* if email confirmation is ON, there is no session yet; the profile row is still
                created by the DB trigger, and state syncs after the user confirms + logs in. */
           });
-        }, function () {});
+        }, function (err) {
+          /* Backstop: supabase-js normally resolves-with-error even for network
+             failures (handled above), so this only fires if the client itself
+             throws. Report it rather than swallowing it. */
+          reportError(signupErrorText(err), err);
+        });
       }
     }, function () {});
   }
 
+  /* ── keep profiles.discoverable / profiles.city in sync (Social, 2026-07-24) ──
+     Discover reads other users' rows straight from `profiles`/`cars` (RLS-gated),
+     NOT from the per-user `user_state` JSON blob that pushState() writes — so
+     those two fields need their own direct upsert whenever they change, or a
+     user flipping the Settings toggle would never actually become discoverable. */
+  function pushProfileField(key, value) {
+    if (key !== 'discoverable' && key !== 'city') return;
+    sb.auth.getUser().then(function (r) {
+      var user = r && r.data && r.data.user;
+      if (!user) return;
+      var patch = { id: user.id };
+      patch[key] = value;
+      sb.from('profiles').upsert(patch).then(function () {}, function () {});
+    });
+  }
+
   /* push whenever the store changes (only takes effect once a session exists) */
-  if (window.CarBox && CarBox.subscribe) { CarBox.subscribe(function () { pushState(); }); }
+  if (window.CarBox && CarBox.subscribe) {
+    CarBox.subscribe(function (key, value) { pushState(); pushProfileField(key, value); });
+  }
 
   /* ── public auth helpers (used by login.html + settings sign out) ── */
   window.CarBoxAuth = {

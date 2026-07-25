@@ -10,6 +10,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<!-- SYNCHRONOUS (no defer): paints the real active car before the deferred
+     scripts load, so the demo car never flashes. See prehydrate.js. -->
+<script src="prehydrate.js"></script>
 <style>
   /* spec list header + small Edit pill (top of the 6-spec list) */
   .spec-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 7px}
@@ -66,11 +69,26 @@
   }
   @media (prefers-reduced-motion: reduce){ .carbtn.justadded{animation:none} }
 
+  /* your posts grid (under the specs) */
+  .posts-head{
+    font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--mut,#8D8D8B);margin:20px 2px 8px;
+  }
+  .posts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .pg-item{position:relative;aspect-ratio:1/1;border-radius:6px;overflow:hidden;background:var(--brown-warm);
+    border:none;cursor:pointer;padding:0}
+  .pg-item img{width:100%;height:100%;object-fit:cover}
+  .pg-item .pg-multi{position:absolute;top:5px;right:6px;color:#fff;font-size:12px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+  .pg-item .pg-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#efe7df;font-size:12px;font-weight:600}
+
   /* back arrow (top-left) on the car detail view */
   .detailback{
     position:absolute;top:0;left:0;z-index:25;background:none;border:none;cursor:pointer;
     padding:6px 10px 6px 0;display:flex;align-items:center;min-height:44px;
   }
+  /* the display:flex above would otherwise override the [hidden] attribute the JS
+     toggles, so the arrow leaked onto the single-car garage — keep it truly hidden */
+  .detailback[hidden]{display:none}
   .detailback img{width:30px}
   /* cards home */
   .garage-lbl{font-family:'DM Serif Display',serif;font-size:26px;color:var(--tx,#141210);margin:4px 2px 12px}
@@ -121,6 +139,7 @@
 <script defer src="pro.js"></script>
 <script defer src="data/cars.js"></script>
 <script defer src="carform.js"></script>
+<script defer src="social.js"></script>
 <script defer src="nav.js"></script>
 <link rel="prefetch" href="log.html">
 <link rel="prefetch" href="upgrades.html">
@@ -133,10 +152,7 @@
 
   <div class="toprow">
     <button class="detailback" id="detailBack" aria-label="Back to garage" hidden><img src="assets/icon_back.png" alt=""></button>
-    <div class="notif" id="notifpill" role="button" tabindex="0" data-press>
-      <span id="notiftext">Oil change due in 400 mi</span>
-      <img src="assets/icon_warning.png" alt="">
-    </div>
+    <!-- service reminder lives ONLY on the Log tab now (removed from the Garage) -->
     <div class="iconstack">
       <button class="roundbtn" id="bellbtn" aria-label="Notifications">
         <img class="i-bell" src="assets/icon_bell.png" alt="">
@@ -162,9 +178,11 @@
 
   <!-- DETAIL VIEW: the single-car garage (what it looked like before) -->
   <div id="detailView">
-  <div class="hero"><img class="i-sprite" src="assets/sprite_chiron.png" alt="Bugatti Chiron pixel art"></div>
-  <h1 class="cartitle serif">Bugatti Chiron</h1>
-  <div class="caryear serif">2026</div>
+  <div class="hero"><img class="i-sprite" alt="Your car"></div>
+  <h1 class="cartitle serif"></h1>
+  <div class="caryear serif"></div>
+  <!-- fill the real car synchronously so the demo car never shows -->
+  <script>(function(){if(!window.CBPre)return;var v=CBPre.activeVehicle();CBPre.setSrc('.i-sprite',CBPre.spriteSrc());if(v){CBPre.setText('.cartitle',v.name);CBPre.setText('.caryear',v.year);}}());</script>
 
   <div class="spec-head">
     <span class="spec-head-lbl">Specs</span>
@@ -184,6 +202,10 @@
     <button class="actbtn" id="commentbtn" aria-label="Comments"><img class="i-comment" src="assets/icon_comment.png" alt=""></button>
     <button class="actbtn" id="sharebtn" aria-label="Share"><img class="i-share" src="assets/icon_share.png" alt=""></button>
   </div>
+
+  <!-- your posts (For You), TikTok-profile style 3-column grid -->
+  <div class="posts-head" id="postsHead" hidden>Posts</div>
+  <div class="posts-grid" id="postsGrid" hidden></div>
   </div>
 
   <nav class="nav" data-active="0">
@@ -191,6 +213,7 @@
     <a class="tab active" href="index.html"><img class="i-navtire" src="assets/nav_tire_v2.png" alt=""><span class="lbl">Garage</span></a>
     <a class="tab" href="log.html"><img class="i-navwrench" src="assets/nav_wrench.png" alt=""><span class="lbl">log</span></a>
     <a class="tab" href="upgrades.html"><img class="i-navgear" src="assets/nav_up.png" alt=""><span class="lbl">upgrades</span></a>
+    <a class="tab" href="foryou.html"><svg class="i-navperson" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 H15 V11 H9 Z M6 21 V16 H8 V15 H16 V16 H18 V21 Z" fill="currentColor" shape-rendering="crispEdges"/></svg><span class="lbl">for you</span></a>
   </nav>
 
 </div>
@@ -234,7 +257,6 @@ document.addEventListener('DOMContentLoaded', function () {
   var detailView = document.getElementById('detailView');
   var detailBack = document.getElementById('detailBack');
   var carCards = document.getElementById('carCards');
-  var pillEl = document.getElementById('notifpill');
   var currentView = null;
   var delMode = false;
 
@@ -279,9 +301,27 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('.caryear').textContent = String(vehicle.year);
     paintSpecs(vehicle);
     UI.carSprite(document.querySelector('.i-sprite'));
-    var line = serviceLine();
-    if (line) { document.getElementById('notiftext').textContent = line; pillEl.style.display = ''; }
-    else { pillEl.style.display = 'none'; }
+    /* service reminder is Log-only now — no pill on the Garage */
+    renderPostsGrid();
+  }
+  /* TikTok-profile style grid of MY For You posts (cover = first photo) */
+  function renderPostsGrid() {
+    var head = document.getElementById('postsHead'), grid = document.getElementById('postsGrid');
+    if (!head || !grid || !window.Social) return;
+    Social.seedIfEmpty();
+    var posts = Social.myPosts();
+    grid.innerHTML = '';
+    if (!posts.length) { head.hidden = true; grid.hidden = true; return; }
+    head.hidden = false; grid.hidden = false;
+    posts.forEach(function (p) {
+      var b = document.createElement('button'); b.className = 'pg-item'; b.setAttribute('aria-label', 'Open post');
+      var cover = p.photos && p.photos[0];
+      if (cover) { var im = document.createElement('img'); im.src = cover; im.alt = ''; b.appendChild(im); }
+      else { var ph = document.createElement('div'); ph.className = 'pg-ph'; ph.textContent = 'Post'; b.appendChild(ph); }
+      if (p.photos && p.photos.length > 1) { var m = document.createElement('span'); m.className = 'pg-multi'; m.textContent = '⧉'; b.appendChild(m); }
+      b.addEventListener('click', function () { location.href = 'foryou.html?post=' + encodeURIComponent(p.id); });
+      grid.appendChild(b);
+    });
   }
   function tintInto(img, ap) {
     ap = ap || { presetId: 'body_suv', hue: null, shade: 1 };
@@ -336,7 +376,8 @@ document.addEventListener('DOMContentLoaded', function () {
     hydrateShared();
     renderCards(justAddedId);
     detailView.hidden = true; cardsView.hidden = false; detailBack.hidden = true;
-    pillEl.style.display = 'none';
+    var ph = document.getElementById('postsHead'), pg = document.getElementById('postsGrid');
+    if (ph) ph.hidden = true; if (pg) pg.hidden = true;
     if (animate && !UI.reduced()) { cardsView.classList.remove('slidein'); void cardsView.offsetWidth; cardsView.classList.add('slidein'); }
     window.scrollTo(0, 0);
   }
@@ -582,99 +623,57 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /* ── notifications: comments land here, replies happen inline ── */
+  /* ── notifications: who liked / commented on your For You posts ──
+     Tapping jumps straight to that post (and comment); no inline reply. ── */
   document.getElementById('bellbtn').addEventListener('click', function () {
+    if (window.Social) Social.seedIfEmpty();
     UI.sheet({
       title: 'Notifications',
       label: 'Notifications',
       build: function (body) {
-        function render() {
-          body.innerHTML = '';
-          /* computed service reminder for the active car sits at the top (Part C) */
-          var svc = serviceLine();
-          if (svc) {
-            var srow = document.createElement('div');
-            srow.className = 'sheetrow';
-            srow.setAttribute('data-press', ''); srow.setAttribute('role', 'button');
-            srow.setAttribute('tabindex', '0'); srow.style.cursor = 'pointer';
-            var stx = document.createElement('div'); stx.className = 'rowtx';
-            stx.textContent = svc + ' · ' + CarBox.get('vehicle').name;
-            srow.appendChild(stx);
-            srow.addEventListener('click', function () { location.href = 'log.html'; });
-            body.appendChild(srow);
-          }
-          /* stored notifications = comments/replies only (service is computed above) */
-          var list = CarBox.get('notifications').filter(function (n) { return n.type !== 'service'; });
-          if (!svc && !list.length) {
-            var empty = document.createElement('div');
-            empty.className = 'sheet-note';
-            empty.textContent = 'You’re all caught up.';
-            body.appendChild(empty);
-            return;
-          }
-          list.slice().reverse().forEach(function (n) {
+        var list = (window.Social ? Social.notifs() : (CarBox.get('notifications') || []));
+        if (!list.length) {
+          var empty = document.createElement('div');
+          empty.className = 'sheet-note';
+          empty.textContent = 'You’re all caught up.';
+          body.appendChild(empty);
+        } else {
+          list.forEach(function (n) {
+            var name = (n.user && (n.user.name || n.user.handle)) || n.user || 'Someone';
             var row = document.createElement('div');
-            row.className = 'sheetrow';
-            var top = document.createElement('div');
-            top.className = 'rowtop';
-            top.textContent = n.user + (n.type === 'reply' ? ' replied' : ' commented');
-            var tx2 = document.createElement('div');
-            tx2.className = 'rowtx';
-            tx2.textContent = n.text;
-            row.appendChild(top); row.appendChild(tx2);
-            if (n.type === 'comment' && n.ref) {
-              var c = null;
-              CarBox.get('comments').forEach(function (cc) { if (cc.id === n.ref) c = cc; });
-              if (c && c.reply) {
-                row.appendChild(replySub(c.reply));
-              } else if (c) {
-                var rr = document.createElement('div');
-                rr.className = 'rowreply';
-                var input = document.createElement('input');
-                input.placeholder = 'Reply…';
-                input.setAttribute('aria-label', 'Reply to ' + n.user);
-                var send = document.createElement('button');
-                send.textContent = 'Reply';
-                send.addEventListener('click', function () {
-                  var text = input.value.trim();
-                  if (!text) return;
-                  var me = CarBox.get('profile');
-                  var comments = CarBox.get('comments');
-                  comments.forEach(function (cc) {
-                    if (cc.id === n.ref) cc.reply = { user: me.handle, text: text };
-                  });
-                  CarBox.set('comments', comments);
-                  /* the commenter's side gets notified too */
-                  var notifs = CarBox.get('notifications');
-                  notifs.push({ id: 'nr' + Date.now().toString(36), type: 'reply', user: me.handle, text: text, unread: true });
-                  CarBox.set('notifications', notifs);
-                  render();
-                  paintBadge();
-                });
-                input.addEventListener('keydown', function (e) { if (e.key === 'Enter') send.click(); });
-                rr.appendChild(input); rr.appendChild(send);
-                row.appendChild(rr);
-              }
+            row.className = 'sheetrow rowflex';
+            row.setAttribute('role', 'button'); row.setAttribute('tabindex', '0');
+            row.setAttribute('data-press', ''); row.style.cursor = 'pointer';
+            row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '11px';
+            if (window.Social) row.appendChild(Social.avatar(n.user || { name: name }, 38));
+            var col = document.createElement('div'); col.style.minWidth = '0'; col.style.flex = '1';
+            var top = document.createElement('div'); top.className = 'rowtop';
+            top.textContent = name + (n.type === 'like' ? ' liked your post' : ' commented') +
+              (window.Social && n.ts ? ' · ' + Social.ago(n.ts) : '');
+            col.appendChild(top);
+            if (n.type !== 'like' && n.text) {
+              var tx2 = document.createElement('div'); tx2.className = 'rowtx'; tx2.textContent = n.text; col.appendChild(tx2);
             }
+            row.appendChild(col);
+            row.addEventListener('click', function () {
+              if (n.postId) {
+                var url = 'foryou.html?post=' + encodeURIComponent(n.postId);
+                if (n.commentId) url += '&c=' + encodeURIComponent(n.commentId);
+                location.href = url;
+              }
+            });
             body.appendChild(row);
           });
         }
-        render();
         /* opening the bell clears unread */
-        var read = CarBox.get('notifications').map(function (n) { n.unread = false; return n; });
-        CarBox.set('notifications', read);
+        if (window.Social) Social.markNotifsRead();
+        else { var read = (CarBox.get('notifications') || []).map(function (n) { n.unread = false; return n; }); CarBox.set('notifications', read); }
         paintBadge();
       }
     });
   });
 
   /* ── shortcuts ── */
-  var pill = document.getElementById('notifpill');
-  pill.style.cursor = 'pointer';
-  pill.addEventListener('click', function () { location.href = 'log.html'; });
-  pill.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); location.href = 'log.html'; }
-  });
   document.getElementById('gearbtn').addEventListener('click', function () {
     /* cache-bust: WKWebView otherwise serves settings.html from cache without
        hitting the dev server, so code changes never appear. Harmless in prod. */

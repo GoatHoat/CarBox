@@ -68,6 +68,7 @@ export default function App() {
           if (/^https?:/i.test(url) || /^(mailto:|tel:)/i.test(url)) { Linking.openURL(url).catch(() => {}); return false; }
           return true;
         }}
+        injectedJavaScriptBeforeContentLoaded={`(function(){window.CARBOX_NATIVE_SHELL=true})(); true;`}
         injectedJavaScript={`(function(){try{var t=document.documentElement.getAttribute('data-theme')||'light';window.ReactNativeWebView.postMessage(JSON.stringify({theme:t}))}catch(e){}})(); true;`}
         onMessage={(e) => {
           try {

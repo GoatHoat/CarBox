@@ -103,7 +103,7 @@ img{display:block}
 /* bottom nav */
 .nav{
   position:fixed;bottom:calc(14px + env(safe-area-inset-bottom, 0px));left:50%;transform:translateX(-50%);
-  width:270px;height:56px;
+  width:326px;height:56px;
   background:var(--pill);border-radius:28px;box-shadow:0 12px 30px rgba(0,0,0,.12);
   display:flex;align-items:stretch;
   padding:3px;
@@ -111,7 +111,7 @@ img{display:block}
 }
 .navpill{
   position:absolute;top:3px;left:3px;
-  width:calc((100% - 6px)/3);height:calc(100% - 6px);
+  width:calc((100% - 6px)/4);height:calc(100% - 6px);
   background:#C9C2BA;border-radius:999px;
   transform:translateX(0);
   transition:transform .5s cubic-bezier(.3,1.4,.4,1);
@@ -119,6 +119,7 @@ img{display:block}
 }
 .nav[data-active="1"] .navpill{transform:translateX(100%)}
 .nav[data-active="2"] .navpill{transform:translateX(200%)}
+.nav[data-active="3"] .navpill{transform:translateX(300%)}
 .tab{
   position:relative;flex:1;
   border:none;background:transparent;cursor:pointer;border-radius:25px;
@@ -126,12 +127,15 @@ img{display:block}
   padding:0;text-decoration:none;
 }
 .tab img{margin-top:6px;pointer-events:none}
-.i-navtire{width:26px}
-.i-navwrench{width:28px}
-.i-navgear{width:23px}
+.i-navtire{width:25px}
+.i-navwrench{width:27px}
+.i-navgear{width:22px}
+.i-navperson{width:22px;margin-top:7px;pointer-events:none;color:var(--tx,#2A2521)}
+html[data-theme="dark"] .i-navperson{color:var(--tx,#F2EEE9)}
+html[data-theme="dark"] .tab.active .i-navperson{color:#2A2521}
 .tab .lbl{
   position:absolute;bottom:3px;left:0;right:0;
-  font-family:'DM Serif Display',serif;font-size:13.5px;color:var(--tx,#2A2521);
+  font-family:'DM Serif Display',serif;font-size:12.5px;color:var(--tx,#2A2521);
   text-align:center;pointer-events:none;
 }
 
@@ -466,29 +470,58 @@ button,.tab,[data-press],input,textarea,.switch,.seg{touch-action:manipulation}
 .pro-benefit img{width:30px;flex:none}
 .pb-top{font-size:15.5px;font-weight:700;color:var(--tx,#141311);line-height:1.15}
 .pb-sub{font-size:12.5px;font-weight:500;color:var(--mut,#8D8D8B);margin-top:1px}
-.pro-prices{display:flex;gap:10px;margin:14px 0 12px}
-.pro-price{
-  position:relative;flex:1;min-height:64px;
-  background:var(--surface,#F5F3F4);border:2.5px solid var(--hairline);
-  border-radius:16px;cursor:pointer;padding:13px 6px 11px;
-  font-family:'League Spartan',sans-serif;
-  transition:border-color .25s ease-out,transform .25s cubic-bezier(.3,1.4,.4,1);
+/* two-screen paywall: screen 1 (benefits) and screen 2 (plan picker) live in the
+   same .pro-card and slide/fade between each other with the shared spring easing.
+   data-dir on the card decides which way the outgoing/incoming views travel. */
+.pro-view{transition:transform .32s cubic-bezier(.3,1.4,.4,1),opacity .18s ease-out}
+.pro-view.entering,.pro-view.leaving{opacity:0}
+.pro-card[data-dir="fwd"] .pro-view.entering{transform:translateX(26px)}
+.pro-card[data-dir="fwd"] .pro-view.leaving{transform:translateX(-26px)}
+.pro-card[data-dir="back"] .pro-view.entering{transform:translateX(-26px)}
+.pro-card[data-dir="back"] .pro-view.leaving{transform:translateX(26px)}
+.pro-view.active{transform:translateX(0);opacity:1}
+
+.pro-back{
+  display:inline-flex;align-items:center;gap:2px;
+  background:none;border:none;cursor:pointer;padding:2px 6px 8px 0;margin-top:2px;
+  font-family:'League Spartan',sans-serif;font-weight:700;font-size:15px;
+  color:var(--accent-tx,#776357);
 }
-.pro-price.sel{border-color:var(--brown-warm)}
+.pro-plan-title{font-size:27px;text-align:center;color:var(--tx,#2A2119);margin:2px 0 16px;letter-spacing:-.3px}
+
+/* plan picker: two full-width, directly-tappable options (each starts checkout) */
+.pro-planpick{display:flex;flex-direction:column;gap:12px;margin:0 0 4px}
+.pro-planopt{
+  position:relative;width:100%;
+  background:var(--surface,#F5F3F4);border:2.5px solid var(--hairline);
+  border-radius:18px;cursor:pointer;padding:15px 16px 13px;text-align:left;
+  font-family:'League Spartan',sans-serif;
+  transition:border-color .25s ease-out,transform .2s cubic-bezier(.3,1.4,.4,1),opacity .2s ease-out;
+}
+.pro-planopt.best{border-color:var(--brown-warm)}
+.pro-planopt:active{transform:scale(.98)}
+.pro-planopt.loading{opacity:.6;cursor:default}
+.pro-planopt:disabled{cursor:default}
 .pp-name{font-size:15px;font-weight:700;color:var(--mut,#8D8D8B)}
-.pro-price.sel .pp-name{color:var(--tx,#141311)}
-.pp-amt{font-size:16.5px;font-weight:700;color:var(--tx,#141311);margin-top:2px;font-variant-numeric:tabular-nums}
+.pro-planopt.best .pp-name{color:var(--tx,#141311)}
+.pp-amt{font-size:20px;font-weight:700;color:var(--tx,#141311);margin-top:1px;font-variant-numeric:tabular-nums}
+.pp-tag{font-size:12px;font-weight:600;color:var(--mut,#9B918F);margin-top:2px}
 .pp-save{
-  position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  position:absolute;top:-11px;right:16px;
   background:var(--brown-warm);color:#FBF8F4;border-radius:999px;padding:3px 10px 2px;
   font-size:10.5px;font-weight:700;letter-spacing:.04em;white-space:nowrap;
 }
 .pro-cta{
-  width:100%;min-height:48px;
+  width:100%;min-height:48px;margin-top:14px;
   background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
   padding:13px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:17.5px;
   box-shadow:var(--shadow);
   display:flex;align-items:center;justify-content:center;
+}
+.pro-stripe-link{
+  display:block;width:100%;text-align:center;background:none;border:none;cursor:pointer;
+  margin-top:8px;padding:6px 0;font-family:'League Spartan',sans-serif;font-weight:600;
+  font-size:13.5px;color:var(--accent-tx,#776357);text-decoration:underline;
 }
 .pro-micro{font-size:11px;font-weight:500;color:var(--mut,#9B918F);text-align:center;margin-top:9px;line-height:1.45}
 .pro-micro .pro-legal{color:var(--accent-tx,#776357);font-weight:700;text-decoration:none}
@@ -505,7 +538,7 @@ button,.tab,[data-press],input,textarea,.switch,.seg{touch-action:manipulation}
 @media (prefers-reduced-motion: reduce){
   .anim-in{transform:none}
   .anim-go{transition:opacity .3s ease-out}
-  .toast,.ui-sheet,.switch::after,.seg .segpill,.plantotal,.pro-card,.pro-benefit,.lock,.condense{transition-duration:.01ms}
+  .toast,.ui-sheet,.switch::after,.seg .segpill,.plantotal,.pro-card,.pro-benefit,.pro-view,.lock,.condense{transition-duration:.01ms}
   .wiggle,.pop,.pinpulse,.rail-draw,.dotpop,.pro-spark,.bell-live,.pindrop,
   .switch.anim-on::after,.switch.anim-off::after,.checkdraw path{animation:none}
   .checkdraw path{stroke-dashoffset:0}

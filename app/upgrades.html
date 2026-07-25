@@ -15,7 +15,12 @@
 <script defer src="vendor/supabase.js"></script>
 <script defer src="supabase.js"></script>
 <script defer src="ui.js"></script>
+<!-- billing + pro power the locked recommendation cards (Pro.open on tap) -->
+<script defer src="billing.js"></script>
+<script defer src="pro.js"></script>
+<script defer src="goals.js"></script>
 <script defer src="nav.js"></script>
+<link rel="prefetch" href="goal-picker.html">
 <link rel="prefetch" href="index.html">
 <link rel="prefetch" href="log.html">
 <script type="speculationrules">
@@ -38,6 +43,47 @@
   .changegoal{
     background:transparent;border:2.5px solid #C2B6AA;border-radius:999px;cursor:pointer;
     padding:7px 16px;color:var(--mut,#8D8579);font-family:'League Spartan',sans-serif;font-weight:600;font-size:14.5px;
+  }
+
+  /* ── one-time intro (step 1) + the "no setup run yet" prompt ──
+     Both share the card look; neither ever triggers an AI call on its own. */
+  .setupcard{
+    background:var(--surface,#F5F3F4);border-radius:20px;box-shadow:var(--shadow);
+    margin-top:16px;padding:20px 18px 18px;text-align:center;
+  }
+  .setupcard h2{
+    font-family:'DM Serif Display',serif;font-size:25px;font-weight:400;
+    color:var(--tx,#17130F);line-height:1.15;
+  }
+  .setupcard p{
+    font-size:14.5px;font-weight:500;color:var(--warmgray);line-height:1.45;margin-top:9px;
+  }
+  .setupcard .setupgo{
+    width:100%;margin-top:16px;
+    background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:13px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:17px;
+    box-shadow:var(--shadow);
+  }
+
+  /* header row above the recs: title-less, just the ordering hint on the right.
+     Wording stays neutral about rank, it only explains the ORDER. */
+  .recshead{display:flex;justify-content:flex-end;align-items:center;margin-top:12px}
+  .recsorder{font-size:12px;font-weight:600;color:var(--mut,#8D8D8B);letter-spacing:.01em}
+
+  /* locked recommendations (free plan): blurred content + lock badge, matching
+     the locked-map pattern. Tapping anywhere opens the Pro paywall. */
+  .scard.locked{cursor:pointer;overflow:hidden}
+  .scard.locked .stitle,.scard.locked .smeta,.scard.locked .schip{
+    filter:blur(5px);user-select:none;pointer-events:none;
+  }
+  .scard.locked .lockwrap{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:7px;
+    border-radius:16px;background:rgba(247,247,247,.34);
+  }
+  html[data-theme="dark"] .scard.locked .lockwrap{background:rgba(41,40,39,.34)}
+  .scard.locked .lockwrap img{width:17px}
+  .scard.locked .lockwrap .lktx{
+    font-size:13.5px;font-weight:700;color:var(--accent-tx,#776357);
   }
 
   .budgetline{font-size:13.5px;font-weight:600;color:var(--warmgray);margin-top:8px;cursor:pointer}
@@ -144,22 +190,35 @@
     </div>
   </div>
 
-  <div class="goalrow">
-    <div class="goalpill"><span>Goal: More power</span></div>
-    <button class="changegoal">Change goal</button>
-  </div>
-  <div class="budgetline" id="budgetline" role="button" tabindex="0"></div>
-  <div class="recnote" id="recnote"></div>
-
-  <!-- AI recommendations render here (skeleton first, then 2 cards) -->
-  <div class="stages" id="recs">
-    <div class="rail"></div>
+  <!-- SETUP VIEW: shown until this car has been through goal -> filter -> budget.
+       Nothing here calls the AI; the button just starts the flow. -->
+  <div class="setupcard" id="setupView" hidden>
+    <h2 id="setupTitle">Upgrades</h2>
+    <p id="setupBody"></p>
+    <button class="setupgo" id="setupGo">Continue</button>
   </div>
 
-  <div class="mapcard">
-    <h2>Where to get it done</h2>
-    <div class="msub" id="mapsub"></div>
-    <div id="mapzone"></div>
+  <!-- RESULTS VIEW: only rendered once recommendations exist for this car. -->
+  <div id="resultsView" hidden>
+    <div class="goalrow">
+      <div class="goalpill"><span>Goal: More power</span></div>
+      <button class="changegoal">Change goal</button>
+    </div>
+    <div class="budgetline" id="budgetline" role="button" tabindex="0"></div>
+    <div class="recnote" id="recnote"></div>
+
+    <div class="recshead"><span class="recsorder" id="recsorder"></span></div>
+
+    <!-- AI recommendations render here (skeleton first, then 5 cards) -->
+    <div class="stages" id="recs">
+      <div class="rail"></div>
+    </div>
+
+    <div class="mapcard">
+      <h2>Where to get it done</h2>
+      <div class="msub" id="mapsub"></div>
+      <div id="mapzone"></div>
+    </div>
   </div>
 
   <nav class="nav" data-active="2">
@@ -167,6 +226,7 @@
     <a class="tab" href="index.html"><img class="i-navtire" src="assets/nav_tire_v2.png" alt=""><span class="lbl">Garage</span></a>
     <a class="tab" href="log.html"><img class="i-navwrench" src="assets/nav_wrench.png" alt=""><span class="lbl">log</span></a>
     <a class="tab active" href="upgrades.html"><img class="i-navgear" src="assets/nav_up.png" alt=""><span class="lbl">upgrades</span></a>
+    <a class="tab" href="foryou.html"><svg class="i-navperson" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 H15 V11 H9 Z M6 21 V16 H8 V15 H16 V16 H18 V21 Z" fill="currentColor" shape-rendering="crispEdges"/></svg><span class="lbl">for you</span></a>
   </nav>
 
 </div>
@@ -201,6 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var vehicle = CarBox.get('vehicle');
   var goal = CarBox.get('goal');
   var budget = CarBox.get('budget');
+  var filter = CarBox.get('upgradeFilter');
   document.querySelector('.goalpill span').textContent = 'Goal: ' + goal;
   document.querySelector('.upghead .sub').textContent = 'for your ' + vehicle.name;
   /* "Change goal" is the ONLY way into the goal picker (the pill is a label) */
@@ -222,13 +283,25 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ════════ AI RECOMMENDATIONS (Part B) ════════ */
   var recsWrap = $('recs');
   var recNote = $('recnote');
+  var orderLabel = $('recsorder');
   function renderNote(note) {
     if (note) { recNote.textContent = note; recNote.style.display = ''; }
     else { recNote.textContent = ''; recNote.style.display = 'none'; }
   }
   var budgetKey = budget ? budget.min + '-' + budget.max : 'nb';
-  var recsKey = [vehicle.make, vehicle.model, vehicle.year, vehicle.trim || '', goal, budgetKey].join('|');
-  var items = [];   /* [{name, benefit, detail}] */
+  /* filter is part of the key: changing ONLY the filter must refetch, not serve
+     the previous category's picks from cache. */
+  var recsKey = [vehicle.make, vehicle.model, vehicle.year, vehicle.trim || '',
+                 goal, filter || 'nf', budgetKey].join('|');
+  var items = [];   /* [{name, benefit, detail}] — up to 5, best first */
+
+  /* ── Pro gating: first FREE_RECS are always visible, the rest need Pro ── */
+  var FREE_RECS = 2;
+  function isPro() {
+    if (window.CarBoxBilling && CarBoxBilling.isPro) return !!CarBoxBilling.isPro();
+    return !!CarBox.get('isPro');
+  }
+  function unlockedCount() { return isPro() ? Infinity : FREE_RECS; }
 
   function card(html) {
     var stage = document.createElement('div');
@@ -238,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   function renderSkeleton() {
     recsWrap.querySelectorAll('.stage').forEach(function (el) { el.remove(); });
-    for (var i = 0; i < 2; i++) {
+    for (var i = 0; i < 5; i++) {
       recsWrap.appendChild(card(
         '<div class="scard skel" aria-hidden="true">' +
         '<div class="skelline w40"></div><div class="skelline w70"></div><div class="skelline w55"></div></div>'
@@ -250,10 +323,14 @@ document.addEventListener('DOMContentLoaded', function () {
     'style="display:inline-block;vertical-align:-1px"><path d="M4 12.5 L10 18.5 L20 6.5" fill="none" ' +
     'stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
+  /* only UNLOCKED mods can drive the shops map — a free user must not be able to
+     map a mod they cannot read */
+  function visibleItems() { return items.slice(0, unlockedCount()); }
   function mappedName() {
+    var vis = visibleItems();
     var m = CarBox.get('mappedMod');
-    for (var i = 0; i < items.length; i++) if (items[i].name === m) return m;
-    return items.length ? items[0].name : null;
+    for (var i = 0; i < vis.length; i++) if (vis[i].name === m) return m;
+    return vis.length ? vis[0].name : null;
   }
   function paintMapped() {
     var m = mappedName();
@@ -294,51 +371,99 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function renderRecs() {
     recsWrap.querySelectorAll('.stage').forEach(function (el) { el.remove(); });
-    items.forEach(function (mod) {
-      var stage = card(
-        '<div class="scard" data-name="' + mod.name.replace(/"/g, '&quot;') + '" role="button" tabindex="0" data-press>' +
+    var freeUpTo = unlockedCount();
+    /* the ordering hint only appears once there is a list to order */
+    orderLabel.textContent = items.length > 1 ? 'Best pick first' : '';
+
+    items.forEach(function (mod, i) {
+      if (i < freeUpTo) {
+        var stage = card(
+          '<div class="scard" data-name="' + mod.name.replace(/"/g, '&quot;') + '" role="button" tabindex="0" data-press>' +
+          '<span class="schip">RECOMMENDED</span>' +
+          '<div class="stitle"></div>' +
+          '<div class="smeta"></div>' +
+          '<button class="addmap">Add to map</button></div>'
+        );
+        stage.querySelector('.stitle').textContent = mod.name;
+        stage.querySelector('.smeta').textContent = clean(mod.benefit);
+        var sc = stage.querySelector('.scard');
+        sc.addEventListener('click', function (e) {
+          if (e.target.closest('.addmap')) return;
+          openDetail(mod);
+        });
+        sc.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') openDetail(mod);
+        });
+        stage.querySelector('.addmap').addEventListener('click', function () {
+          CarBox.set('mappedMod', mod.name);
+          var b = this;
+          b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+          paintMapped();
+          loadShops();   /* swap the map section to this mod's shops */
+        });
+        recsWrap.appendChild(stage);
+        return;
+      }
+      /* LOCKED (free plan): the mod is already fetched and cached, we just blur
+         it. Going Pro re-renders from the same cache with no new AI call. */
+      var lockStage = card(
+        '<div class="scard locked" role="button" tabindex="0" aria-label="Unlock with CarBox Pro">' +
         '<span class="schip">RECOMMENDED</span>' +
         '<div class="stitle"></div>' +
         '<div class="smeta"></div>' +
-        '<button class="addmap">Add to map</button></div>'
+        '<div class="lockwrap"><img src="assets/badge_lock.png" alt="">' +
+        '<span class="lktx">Unlock with Pro</span></div></div>'
       );
-      stage.querySelector('.stitle').textContent = mod.name;
-      stage.querySelector('.smeta').textContent = clean(mod.benefit);
-      var sc = stage.querySelector('.scard');
-      sc.addEventListener('click', function (e) {
-        if (e.target.closest('.addmap')) return;
-        openDetail(mod);
-      });
-      sc.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') openDetail(mod);
-      });
-      stage.querySelector('.addmap').addEventListener('click', function () {
-        CarBox.set('mappedMod', mod.name);
-        var b = this;
-        b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
-        paintMapped();
-        loadShops();   /* swap the map section to this mod's shops */
-      });
-      recsWrap.appendChild(stage);
+      lockStage.querySelector('.stitle').textContent = mod.name;
+      lockStage.querySelector('.smeta').textContent = clean(mod.benefit);
+      var lc = lockStage.querySelector('.scard');
+      function openPaywall() { if (window.Pro) Pro.open(); }
+      lc.addEventListener('click', openPaywall);
+      lc.addEventListener('keydown', function (e) { if (e.key === 'Enter') openPaywall(); });
+      recsWrap.appendChild(lockStage);
     });
+
     if (!CarBox.get('mappedMod') || mappedName() !== CarBox.get('mappedMod')) {
       CarBox.set('mappedMod', mappedName());
     }
     paintMapped();
   }
 
+  /* Going Pro unlocks the cards already in memory. No refetch: the locked items
+     were fetched with the rest, so this is purely a re-render. */
+  document.addEventListener('carbox-pro', function () {
+    if (items.length) { renderRecs(); loadShops(); }
+  });
+
   /* ── LOCAL FALLBACK recommender (budget-aware) ──
      Used when the API proxy is unreachable/keyless, so the page never breaks.
      Rules-based pools per goal + aspiration, each with an approx installed cost;
      filtered by the budget cap so it never suggests something unaffordable.
      Detail strings contain no em/en dashes. Returns { items, note }. */
+  var WANT_RECS = 5;
   function selectByBudget(pool, cap) {
-    var sorted = pool.slice().sort(function (a, b) { return a.cost - b.cost; });
-    var affordable = (cap == null) ? sorted : sorted.filter(function (m) { return m.cost <= cap; });
+    /* Rank by PRIORITY, not price: the best first mod for a goal is often not
+       the cheapest one, and ordering by cost produced actively bad advice (it
+       put brake cooling ducts above track pads). Cost is used only to decide
+       what is affordable and which note to show, matching the AI path, which
+       also returns strongest first. */
+    var ranked = pool.slice().sort(function (a, b) { return a.priority - b.priority; });
+    var affordable = (cap == null) ? ranked : ranked.filter(function (m) { return m.cost <= cap; });
     var chosen, note = null;
-    if (affordable.length >= 2) chosen = affordable.slice(0, 2);
-    else if (affordable.length === 1) { chosen = affordable.slice(0, 1); note = 'Only one solid mod fits this budget. Raise it a little for a second option.'; }
-    else { chosen = sorted.slice(0, 1); note = 'The mods for this goal sit above your budget right now, so here is the most affordable place to start.'; }
+    if (affordable.length >= WANT_RECS) {
+      chosen = affordable.slice(0, WANT_RECS);
+    } else if (affordable.length >= 1) {
+      /* top up past the cap so there are still five, affordable ones first and
+         each group still in priority order, and say so honestly */
+      var extra = ranked.filter(function (m) { return affordable.indexOf(m) < 0; });
+      chosen = affordable.concat(extra.slice(0, WANT_RECS - affordable.length));
+      note = affordable.length === 1
+        ? 'Only one of these fits your budget. The rest sit above it.'
+        : 'Only the first ' + affordable.length + ' fit your budget. The rest sit above it.';
+    } else {
+      chosen = ranked.slice(0, WANT_RECS);
+      note = 'The mods for this goal all sit above your budget right now, so these are ranked by what matters most.';
+    }
     return { items: chosen.map(function (m) { return { name: m.name, benefit: m.benefit, detail: m.detail }; }), note: note };
   }
   function localRecs(cap) {
@@ -347,67 +472,109 @@ document.addEventListener('DOMContentLoaded', function () {
     var ev = /electric/.test(eng);
     var boosted = /turbo|supercharg/.test(eng);
     var t = vehicle.year + ' ' + vehicle.make + ' ' + vehicle.model;
-    function R(name, benefit, detail, cost) { return { name: name, benefit: benefit, detail: detail, cost: cost }; }
+    /* priority = how important this mod genuinely is for THIS goal, 1 = the best
+       first pick, ascending. Deliberately independent of cost: a cheap mod is
+       not automatically the right place to start (brake ducts are cheaper than
+       track pads, but pads come first). `cost` is now only used for budget
+       filtering, never for ranking. */
+    function R(name, benefit, detail, cost, priority) {
+      return { name: name, benefit: benefit, detail: detail, cost: cost, priority: priority };
+    }
     var pool;
-    if (goal === 'Better handling') {
+    if (goal === 'Interior looks and comfort') {
       pool = [
-        R('Sway bar upgrade', 'Less body roll for little money, roughly $250-450', 'A stiffer front and rear anti-roll bar set ties the wheels together so the ' + t + ' leans less and turns in flatter. It is a cheap, reversible bolt-on that sharpens handling without hurting ride quality, which makes it a great first step on any budget.', 350),
-        R('Performance summer tires', 'The biggest grip per dollar, roughly $600-1,100 a set', 'Tires are the only contact with the road, so modern performance summer tires transform grip, braking, and steering feel at once on the ' + t + '. They are safe, reversible, and work with every stock part, which is why they come before anything else.', 850),
-        R('Coilover suspension kit', 'Adjustable height and damping, roughly $1,200-2,200', 'A coilover kit replaces the springs and shocks with height and damping adjustable units, lowering the center of gravity and cutting body roll on the ' + t + '. You can fine tune how firm it feels, keeping comfort at softer settings. It is the biggest single handling step.', 1700)
+        R('Ambient LED lighting kit', 'Transforms the cabin at night, roughly $120-300', 'A footwell and door ambient lighting kit adds a soft, adjustable glow that makes the ' + t + ' cabin feel far more premium after dark. It wires into existing power, installs in an afternoon, and is completely reversible, which makes it the cheapest meaningful interior change you can make.', 200, 3),
+        R('Custom fitted floor mats', 'Protects and lifts the cabin, roughly $150-350', 'Laser measured all weather mats cover the exact floor shape of the ' + t + ', protecting the carpet underneath while looking far tidier than universal mats. They keep resale value up and are the easiest interior upgrade to live with day to day.', 250, 4),
+        R('Steering wheel restoration or wrap', 'The touchpoint you feel most, roughly $300-700', 'The wheel is the part of the ' + t + ' your hands are on constantly, so a fresh leather or alcantara wrap immediately changes how the whole car feels. A professional rewrap also fixes shine and wear on an older wheel without replacing the airbag assembly.', 500, 2),
+        R('Wireless CarPlay and screen upgrade', 'Modern infotainment, roughly $500-1,200', 'A modern head unit or a wireless adapter brings the ' + t + ' up to date with phone mirroring, better resolution, and reliable navigation. It is the single biggest quality of life change in the cabin, and it keeps steering wheel controls working when installed with the right harness.', 850, 1),
+        R('Upgraded seats or seat reupholstery', 'The biggest cabin change, roughly $1,400-3,000', 'Reupholstering in better leather, or fitting supportive sport seats, changes the look and the comfort of the ' + t + ' more than anything else inside it. It is the most involved interior job here, so it belongs last, but it is the one that makes the cabin feel genuinely new.', 2200, 5)
       ];
-    } else if (goal === 'Show car looks') {
+    } else if (goal === 'Daily reliability') {
       pool = [
-        R('Window tint', 'Clean look, cooler cabin, roughly $250-450', 'A quality tint gives the ' + t + ' a finished, aggressive look while blocking heat and UV, and it is done in a couple of hours. One of the most affordable cosmetic upgrades and a simple, high impact place to start.', 350),
-        R('Paint correction and ceramic coating', 'Deep lasting gloss, roughly $600-1,200', 'Paint correction polishes out swirls and haze, then a ceramic coating seals that finish so the ' + t + ' beads water and stays glossy for years. Flawless paint is the base layer every other cosmetic mod sits on.', 900),
-        R('Aftermarket wheel setup', 'A complete stance change, roughly $1,400-2,600', 'A well chosen set of wheels in the right width and offset changes the whole character of the ' + t + ' more than any other visual mod, and it stays bolt-on and reversible. The highest impact way to make it look intentional.', 2000)
+        R('Full fluid and filter service', 'Prevents the expensive failures, roughly $200-500', 'Fresh oil, brake fluid, coolant, and filters are the cheapest insurance the ' + t + ' can get, and most major failures trace back to a fluid that was left too long. Doing all of them at once gives you a clean baseline and a known service date to track from.', 350, 1),
+        R('Battery and charging system refresh', 'Ends no-start mornings, roughly $200-450', 'A weak battery or corroded grounds cause most non-starts and odd electrical faults on a car of this age. Replacing the battery and cleaning the terminals and ground straps on the ' + t + ' removes a whole category of intermittent problems that are miserable to diagnose later.', 320, 2),
+        R('Quality tires and an alignment', 'Safety and even wear, roughly $600-1,100', 'Good tires plus a proper four wheel alignment keep the ' + t + ' stopping predictably in the wet and stop the uneven wear that quietly destroys expensive rubber. It is the highest value safety spend on any daily driven car.', 850, 4),
+        R('Cooling system overhaul', 'Avoids the big engine bill, roughly $700-1,500', 'Hoses, the thermostat, the water pump, and the radiator all age together, and an overheat on the ' + t + ' can cost far more than the parts that prevented it. Refreshing the cooling system as a set is the classic way to turn a car into a dependable long term daily.', 1100, 3),
+        R('Suspension refresh with bushings', 'Restores how it drives, roughly $1,200-2,400', 'Worn dampers, bushings, and mounts make the ' + t + ' feel loose and wander on the highway long before anything actually breaks. Replacing them as a package restores the original ride and steering precision, and it stops the uneven tire wear that tired suspension causes.', 1800, 5)
+      ];
+    } else if (goal === 'Fuel efficiency') {
+      pool = ev ? [
+        R('Correct tire pressures and alignment', 'Free range back, roughly $80-200', 'Underinflated or misaligned tires are the most common hidden range loss on an EV. Setting the ' + t + ' to the door placard pressures and correcting the alignment recovers efficiency immediately for almost no money and improves tire life at the same time.', 140, 1),
+        R('Low rolling resistance tires', 'The biggest EV range gain, roughly $600-1,100 a set', 'Rolling resistance is a much larger share of energy use on an EV than on a combustion car, so a dedicated low rolling resistance tire can meaningfully extend the ' + t + ' real world range. Choose a quality set so wet braking does not suffer.', 850, 3),
+        R('Aero wheel covers or lighter wheels', 'Highway range, roughly $400-1,400', 'Wheels are a surprisingly large aerodynamic and rotating mass factor at speed. Smoother aero covers or a lighter set on the ' + t + ' cut turbulence around the arches and reduce the energy needed to keep it rolling at highway pace.', 900, 4),
+        R('Remove unnecessary weight and roof racks', 'Easy consistent savings, roughly $0-150', 'Roof racks and crossbars wreck aerodynamics, and carried weight costs energy every time you accelerate. Stripping unused racks and clearing the ' + t + ' of dead weight is genuinely free efficiency that most owners never claim.', 75, 2),
+        R('Home charging setup optimisation', 'Cheaper miles, roughly $500-1,600', 'A proper level 2 charger with scheduled off peak charging cuts the cost per mile of the ' + t + ' far more than any efficiency mod can. It is the change that most affects what you actually pay to drive, even though it does not touch the car itself.', 1200, 5)
+      ] : [
+        R('Tune up: plugs, filters, pressures', 'Recovers lost mpg, roughly $150-350', 'Old spark plugs, a clogged air filter, and soft tires quietly cost the ' + t + ' several miles per gallon. Restoring all three brings back the efficiency the car had when new, and it is the cheapest possible starting point.', 250, 1),
+        R('Low rolling resistance tires', 'Real everyday savings, roughly $500-900 a set', 'Low rolling resistance tires reduce the energy the ' + t + ' wastes just keeping the wheels turning, which shows up on every trip. Pick a reputable set so wet grip and braking stay where they should be.', 700, 4),
+        R('Remove roof racks and excess weight', 'Free mpg back, roughly $0-150', 'Roof racks add significant drag at highway speed and unused cargo adds weight the ' + t + ' has to accelerate constantly. Removing both is the rare upgrade that costs nothing and works immediately.', 75, 2),
+        R('Synthetic low viscosity oil service', 'Less internal friction, roughly $120-260', 'A quality low viscosity synthetic reduces internal drag in the ' + t + ' engine, especially on short cold trips where most fuel is wasted. Stay within the viscosity the manufacturer specifies so engine protection is not compromised.', 190, 3),
+        R('Efficiency focused ECU tune', 'Optimises the calibration, roughly $400-800', 'An economy oriented tune adjusts fuelling and shift behaviour on the ' + t + ' for steady cruising rather than peak power. Gains are modest and depend heavily on how you drive, so it belongs last, after the cheaper mechanical fixes are done.', 600, 5)
+      ];
+    } else if (goal === 'Better handling') {
+      pool = [
+        R('Sway bar upgrade', 'Less body roll for little money, roughly $250-450', 'A stiffer front and rear anti-roll bar set ties the wheels together so the ' + t + ' leans less and turns in flatter. It is a cheap, reversible bolt-on that sharpens handling without hurting ride quality, which makes it a great first step on any budget.', 350, 2),
+        R('Performance summer tires', 'The biggest grip per dollar, roughly $600-1,100 a set', 'Tires are the only contact with the road, so modern performance summer tires transform grip, braking, and steering feel at once on the ' + t + '. They are safe, reversible, and work with every stock part, which is why they come before anything else.', 850, 1),
+        R('Chassis bracing and strut tower bar', 'Sharper, more precise steering, roughly $300-700', 'Adding a strut tower brace and underbody bracing stiffens the ' + t + ' shell so the suspension geometry stays where it was designed to be under load. Steering response gets crisper and the car feels more of a piece, especially on an older chassis that has softened with age.', 500, 4),
+        R('Coilover suspension kit', 'Adjustable height and damping, roughly $1,200-2,200', 'A coilover kit replaces the springs and shocks with height and damping adjustable units, lowering the center of gravity and cutting body roll on the ' + t + '. You can fine tune how firm it feels, keeping comfort at softer settings. It is the biggest single handling step.', 1700, 3),
+        R('Big brake kit', 'Confidence at the limit, roughly $2,000-3,500', 'Larger rotors and multi piston calipers give the ' + t + ' stronger, more consistent braking with far better pedal feel and heat capacity. It is the most expensive handling step here, so it makes sense once tires and suspension are already sorted.', 2600, 5)
+      ];
+    } else if (goal === 'Exterior looks') {
+      pool = [
+        R('Window tint', 'Clean look, cooler cabin, roughly $250-450', 'A quality tint gives the ' + t + ' a finished, aggressive look while blocking heat and UV, and it is done in a couple of hours. One of the most affordable cosmetic upgrades and a simple, high impact place to start.', 350, 3),
+        R('LED lighting upgrade', 'Modern face, better vision, roughly $300-800', 'Upgrading the headlight and tail light bulbs or housings on the ' + t + ' modernises the whole front end and genuinely improves night visibility. Choose properly engineered housings rather than bare LED bulbs in reflector lamps so the beam pattern stays legal and safe for oncoming traffic.', 550, 5),
+        R('Paint correction and ceramic coating', 'Deep lasting gloss, roughly $600-1,200', 'Paint correction polishes out swirls and haze, then a ceramic coating seals that finish so the ' + t + ' beads water and stays glossy for years. Flawless paint is the base layer every other cosmetic mod sits on.', 900, 1),
+        R('Lowering springs for stance', 'Closes the wheel gap, roughly $500-1,000', 'A modest drop removes the factory wheel arch gap that makes the ' + t + ' look tall, and it is the change people notice before they can say why. Keep the drop sensible so the ride and the driveshaft angles stay healthy.', 750, 4),
+        R('Aftermarket wheel setup', 'A complete stance change, roughly $1,400-2,600', 'A well chosen set of wheels in the right width and offset changes the whole character of the ' + t + ' more than any other visual mod, and it stays bolt-on and reversible. The highest impact way to make it look intentional.', 2000, 2)
       ];
     } else if (goal === 'Track ready') {
       pool = [
-        R('Track brake pads and fluid', 'Fade-free stops all session, roughly $400-800', 'High temperature pads and racing fluid keep the pedal firm lap after lap where stock parts fade. On the ' + t + ' this is the first safety critical track upgrade, worth more lap time than power because it lets you brake later with confidence.', 600),
-        R('200TW track tires', 'Seconds off your lap time, roughly $800-1,400 a set', 'A 200 treadwear tire is street legal but built for circuit grip, with stiff sidewalls and a compound that wakes up with heat. On the ' + t + ' grip from the tires makes the brakes, power, and suspension all work better together.', 1100),
-        R('Coilover suspension kit', 'Flatter, predictable handling, roughly $1,200-2,200', 'Track focused coilovers lower the ' + t + ' and let you dial in damping and corner balance so it stays flat and predictable at the limit. Pair them with good tires and brakes for a complete track setup.', 1700)
+        R('Track brake pads and fluid', 'Fade-free stops all session, roughly $400-800', 'High temperature pads and racing fluid keep the pedal firm lap after lap where stock parts fade. On the ' + t + ' this is the first safety critical track upgrade, worth more lap time than power because it lets you brake later with confidence.', 600, 1),
+        R('Brake cooling ducts', 'Keeps the pedal firm, roughly $300-700', 'Ducting air to the front rotors lets the ' + t + ' shed heat between corners instead of accumulating it until the pedal goes long. It is a cheap, unglamorous change that extends how many hard laps you can string together before anything fades.', 500, 4),
+        R('200TW track tires', 'Seconds off your lap time, roughly $800-1,400 a set', 'A 200 treadwear tire is street legal but built for circuit grip, with stiff sidewalls and a compound that wakes up with heat. On the ' + t + ' grip from the tires makes the brakes, power, and suspension all work better together.', 1100, 2),
+        R('Coilover suspension kit', 'Flatter, predictable handling, roughly $1,200-2,200', 'Track focused coilovers lower the ' + t + ' and let you dial in damping and corner balance so it stays flat and predictable at the limit. Pair them with good tires and brakes for a complete track setup.', 1700, 3),
+        R('Safety harness and roll bar', 'Holds you in, adds protection, roughly $1,500-3,000', 'A proper harness keeps you located in the seat so you can actually feel what the ' + t + ' is doing, and a roll bar adds real protection as pace increases. Fit these as a matched system with a compatible seat, because a harness used with the wrong seat is more dangerous than the factory belt.', 2200, 5)
       ];
     } else if (ev) {
       pool = [
-        R('Lowering springs', 'Better stance and response, roughly $300-600', 'A quality lowering spring set drops the ' + t + ' slightly, lowering the center of gravity for sharper turn in and a planted look while keeping the stock dampers. An affordable way to make an EV feel more connected.', 500),
-        R('High-grip summer tires', 'Puts the instant torque down, roughly $700-1,200 a set', 'EVs often overpower their efficiency tires. A performance summer tire converts the ' + t + ' instant torque into real acceleration instead of wheelspin and shortens braking too. The safest, most effective way to use the power it already has.', 950),
-        R('Lightweight wheels', 'Quicker feel and sharper handling, roughly $1,200-2,000', 'Shedding rotating mass with lighter wheels makes the ' + t + ' accelerate and change direction more eagerly, and it can even help range a little. It keeps the powertrain and warranty untouched.', 1600)
+        R('Lowering springs', 'Better stance and response, roughly $300-600', 'A quality lowering spring set drops the ' + t + ' slightly, lowering the center of gravity for sharper turn in and a planted look while keeping the stock dampers. An affordable way to make an EV feel more connected.', 500, 4),
+        R('High-grip summer tires', 'Puts the instant torque down, roughly $700-1,200 a set', 'EVs often overpower their efficiency tires. A performance summer tire converts the ' + t + ' instant torque into real acceleration instead of wheelspin and shortens braking too. The safest, most effective way to use the power it already has.', 950, 1),
+        R('Lightweight wheels', 'Quicker feel and sharper handling, roughly $1,200-2,000', 'Shedding rotating mass with lighter wheels makes the ' + t + ' accelerate and change direction more eagerly, and it can even help range a little. It keeps the powertrain and warranty untouched.', 1600, 5),
+        R('Performance brake pads and fluid', 'Confident repeat stops, roughly $400-800', 'Instant torque means an EV gains speed faster than most drivers expect, and the ' + t + ' is heavy, so brakes work hard on a spirited drive. Better pads and fresh high temperature fluid restore bite and stop the soft pedal that shows up after repeated hard stops.', 600, 2),
+        R('Sway bar upgrade', 'Flatter cornering, roughly $250-500', 'A stiffer anti-roll bar set counteracts the body roll that comes with a heavy floor mounted battery, so the ' + t + ' stays flatter and turns in more willingly. It is a cheap bolt-on that leaves the ride quality largely intact and does not touch the powertrain.', 400, 3)
       ];
     } else if (boosted) {
       pool = [
-        R('ECU flash tune', 'Best power per dollar, roughly $500-900', 'A flash tune rewrites the factory calibration to raise boost and optimize fuel and timing within safe limits. Because the ' + t + ' already runs forced induction, the headroom is there and a reputable dyno tune unlocks real gains. The single best value power mod here.', 700),
-        R('Intercooler upgrade', 'Consistent power, less heat soak, roughly $700-1,200', 'A larger intercooler keeps intake temperatures down so the ' + t + ' holds power on repeated pulls and hot days instead of pulling timing. A reliable supporting mod that pairs perfectly with a tune.', 950),
-        R('Cat-back exhaust system', 'Freer flow and real sound, roughly $800-1,500', 'A cat-back replaces the restrictive rear piping with larger, smoother tubing, freeing a little power, cutting weight, and giving the ' + t + ' a genuine voice. It helps the whole system breathe alongside a tune.', 1150)
+        R('ECU flash tune', 'Best power per dollar, roughly $500-900', 'A flash tune rewrites the factory calibration to raise boost and optimize fuel and timing within safe limits. Because the ' + t + ' already runs forced induction, the headroom is there and a reputable dyno tune unlocks real gains. The single best value power mod here.', 700, 1),
+        R('Intercooler upgrade', 'Consistent power, less heat soak, roughly $700-1,200', 'A larger intercooler keeps intake temperatures down so the ' + t + ' holds power on repeated pulls and hot days instead of pulling timing. A reliable supporting mod that pairs perfectly with a tune.', 950, 2),
+        R('Cat-back exhaust system', 'Freer flow and real sound, roughly $800-1,500', 'A cat-back replaces the restrictive rear piping with larger, smoother tubing, freeing a little power, cutting weight, and giving the ' + t + ' a genuine voice. It helps the whole system breathe alongside a tune.', 1150, 4),
+        R('High flow intake system', 'Feeds the turbo properly, roughly $350-700', 'A larger intake and filter reduce the restriction ahead of the compressor so the ' + t + ' turbo can draw the air a tune is asking it to move. On a boosted engine the gains are real rather than cosmetic, and it is a natural companion to a flash tune.', 520, 3),
+        R('Upgraded clutch or drivetrain hardware', 'Holds the extra torque, roughly $1,400-2,600', 'Once a tune raises torque, the stock clutch or driveline on the ' + t + ' becomes the weak link and starts to slip under load. Upgrading it does not add power by itself, it makes the power you added usable and stops an expensive failure later, so it belongs after the tune.', 2000, 5)
       ];
     } else {
       pool = [
-        R('Cold air intake', 'Better breathing and response, roughly $300-450', 'A cold air intake swaps the airbox for a freer flowing filter drawing cooler, denser air. On the naturally aspirated ' + t + ' the gains are modest but throttle response and sound improve right away. Affordable, reversible, and safe with the stock computer.', 380),
-        R('Cat-back exhaust system', 'Flow, sound, and less weight, roughly $700-1,400', 'A cat-back swaps the muffler and rear piping for a straighter, larger path, freeing a few horsepower and cutting weight while giving the ' + t + ' a cleaner note without drone. A sensible naturally aspirated power step.', 1050),
-        R('Long-tube headers', 'The biggest N/A gain, roughly $1,000-1,800', 'Long tube headers improve exhaust scavenging for the ' + t + ' and, with a supporting tune, give the largest naturally aspirated power gain of these options. Best combined with the intake and exhaust as a package.', 1400)
+        R('Cold air intake', 'Better breathing and response, roughly $300-450', 'A cold air intake swaps the airbox for a freer flowing filter drawing cooler, denser air. On the naturally aspirated ' + t + ' the gains are modest but throttle response and sound improve right away. Affordable, reversible, and safe with the stock computer.', 380, 4),
+        R('Cat-back exhaust system', 'Flow, sound, and less weight, roughly $700-1,400', 'A cat-back swaps the muffler and rear piping for a straighter, larger path, freeing a few horsepower and cutting weight while giving the ' + t + ' a cleaner note without drone. A sensible naturally aspirated power step.', 1050, 3),
+        R('Long-tube headers', 'The biggest N/A gain, roughly $1,000-1,800', 'Long tube headers improve exhaust scavenging for the ' + t + ' and, with a supporting tune, give the largest naturally aspirated power gain of these options. Best combined with the intake and exhaust as a package.', 1400, 1),
+        R('Naturally aspirated ECU tune', 'Sharpens the whole package, roughly $450-800', 'A dyno tune re-optimises fuel and timing for the ' + t + ' and for the intake and exhaust you have fitted, which is where the bolt-ons finally add up. Gains alone are small on a naturally aspirated engine, so its real value is making the other parts work together properly.', 620, 2),
+        R('Supercharger kit', 'The only large N/A power jump, roughly $5,000-8,000', 'A complete supercharger kit is the one change that transforms output on the naturally aspirated ' + t + ' rather than adding a few percent. Only fit a kit engineered for this platform with its own fuelling and calibration, and budget for supporting cooling and drivetrain work.', 6500, 5)
       ];
     }
     return selectByBudget(pool, cap);
   }
 
-  function initRecs() {
+  /* Generate recommendations. THE ONLY function that calls /api/recommend, and
+     it only ever runs from an explicit user action (finishing the setup flow),
+     never on page load. `fetchRecs` is what makes the billed call. */
+  function fetchRecs() {
     var cap = budget ? budget.max : null;
-    var cached = CarBox.get('recs');
-    if (cached && cached.key === recsKey && cached.source === 'api' && cached.items && cached.items.length >= 1) {
-      items = cached.items;      /* fresh cache for this exact car+goal+budget */
-      renderNote(null); renderRecs();
-      return;
-    }
-    if (cached && cached.key === recsKey && cached.items && cached.items.length >= 1) {
-      items = cached.items;      /* fallback cache: show instantly, still retry the API */
-      renderNote(cached.note || null); renderRecs();
-    } else {
-      renderSkeleton();
-    }
+    renderSkeleton();
     api('/api/recommend', {
       make: vehicle.make, model: vehicle.model, year: vehicle.year,
-      trim: vehicle.trim || '', specs: vehicle.specs || {}, goal: goal, budget: budget
-    }, 20000).then(function (data) {
-      if (data && data.recommendations && data.recommendations.length === 2) {
+      trim: vehicle.trim || '', specs: vehicle.specs || {}, goal: goal,
+      filter: filter || CarBoxGoals.BEST_OVERALL, budget: budget
+    }, 25000).then(function (data) {
+      if (data && data.recommendations && data.recommendations.length === WANT_RECS) {
         items = data.recommendations.map(function (m) {
           return { name: m.name, benefit: clean(m.benefit), detail: clean(m.detail) };
         });
@@ -417,13 +584,61 @@ document.addEventListener('DOMContentLoaded', function () {
     }).catch(function () {
       /* FALLBACK: proxy down or key missing — never show a broken state.
          Respects the budget cap so it never suggests something unaffordable. */
-      if (!items.length) {
-        var res = localRecs(cap);
-        items = res.items;
-        CarBox.set('recs', { key: recsKey, items: items, source: 'local', note: res.note });
-        renderNote(res.note); renderRecs(); loadShops();
-      }
+      var res = localRecs(cap);
+      items = res.items;
+      CarBox.set('recs', { key: recsKey, items: items, source: 'local', note: res.note });
+      renderNote(res.note); renderRecs(); loadShops();
     });
+  }
+
+  /* Render whatever is already cached for this exact car+goal+filter+budget.
+     Returns false when there is nothing to show (caller shows the setup card). */
+  function renderCached() {
+    var cached = CarBox.get('recs');
+    if (!cached || cached.key !== recsKey || !cached.items || !cached.items.length) return false;
+    items = cached.items;
+    renderNote(cached.source === 'api' ? null : (cached.note || null));
+    renderRecs();
+    loadShops();
+    return true;
+  }
+
+  /* ── VIEW ROUTING ─────────────────────────────────────────────────────────
+     setup card  -> the car has never completed goal/filter/budget, OR the
+                    cached recs no longer match the current setup
+     results     -> cached recs exist, or the user just finished the flow
+     The AI is called in exactly one case: `runNow`, set by goal-picker.html
+     when the budget step is confirmed. */
+  var setupView = $('setupView'), resultsView = $('resultsView');
+  function showSetup(firstTime) {
+    setupView.hidden = false; resultsView.hidden = true;
+    $('setupTitle').textContent = firstTime ? 'Welcome to Upgrades' : 'Pick your upgrade path';
+    $('setupBody').textContent = firstTime
+      ? 'Tell CarBox what you want out of your ' + vehicle.name + ' and it builds a ranked list of modifications matched to this exact car, the area you care about, and your budget.'
+      : 'Choose a goal, the area to focus on, and a budget, and CarBox will build a ranked list of mods for your ' + vehicle.name + '.';
+    $('setupGo').textContent = firstTime ? 'Continue' : 'Choose a goal';
+  }
+  function showResults() {
+    setupView.hidden = true; resultsView.hidden = false;
+  }
+  $('setupGo').addEventListener('click', function () {
+    /* mark the intro as seen so it never shows for this car again, then hand
+       straight to the goal picker (step 2) */
+    CarBox.set('upgradesOnboarded', true);
+    location.href = 'goal-picker.html';
+  });
+
+  function initRecs() {
+    var runNow = false;
+    try {
+      runNow = sessionStorage.getItem('carbox.runRecs') === '1';
+      if (runNow) sessionStorage.removeItem('carbox.runRecs');   /* consume: a reload must not re-bill */
+    } catch (e) {}
+
+    if (runNow) { showResults(); fetchRecs(); return; }
+    if (renderCached()) { showResults(); return; }
+    /* No cache and no explicit request: show the setup card and call nothing. */
+    showSetup(!CarBox.get('upgradesOnboarded'));
   }
 
   /* ════════ WHERE TO GET IT DONE (Parts C + D) ════════ */
@@ -569,9 +784,12 @@ document.addEventListener('DOMContentLoaded', function () {
       .catch(renderError);
   }
 
-  /* ── boot ── */
+  /* ── boot ──
+     initRecs() decides between the setup card and cached results, and is the
+     only entry point to the AI. Shops are loaded by whichever branch produces
+     recommendations (there is nothing to map before then), so there is no
+     unconditional /api/shops call here either. */
   initRecs();
-  loadShops();
   UI.condense('Upgrades');
 });
 </script>

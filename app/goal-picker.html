@@ -10,6 +10,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<!-- SYNCHRONOUS (no defer): paints the real active car before the deferred
+     scripts load, so the demo car never flashes. See prehydrate.js. -->
+<script src="prehydrate.js"></script>
 <script defer src="state.js"></script>
 <script defer src="config.js"></script>
 <script defer src="vendor/supabase.js"></script>
@@ -17,6 +20,7 @@
 <script defer src="ui.js"></script>
 <script defer src="billing.js"></script>
 <script defer src="pro.js"></script>
+<script defer src="goals.js"></script>
 <link rel="prefetch" href="upgrades.html">
 <style>
 
@@ -93,9 +97,14 @@
 
   <div class="goalhead">
     <h1 class="serif">Pick a goal</h1>
-    <div class="sub">for your Bugatti Chiron</div>
+    <div class="sub"></div>
   </div>
+  <!-- fill the real car synchronously so the demo car never shows -->
+  <script>(function(){if(!window.CBPre)return;var v=CBPre.activeVehicle();if(v&&v.name)CBPre.setText('.goalhead .sub','for your '+v.name);}());</script>
 
+  <!-- Icons are reused across goals on purpose: assets/ is cropped from the
+       approved mockups and new icons may only come from a mockup crop, so a
+       new goal borrows the closest existing icon rather than inventing one. -->
   <div class="goalgrid">
     <button class="goalcard" data-goal="More power">
       <img class="g-cash" src="assets/goal_cash.png" alt="">
@@ -105,13 +114,25 @@
       <img class="g-tire" src="assets/goal_tire.png" alt="">
       <span class="glabel">Better handling</span>
     </button>
-    <button class="goalcard" data-goal="Show car looks">
+    <button class="goalcard" data-goal="Exterior looks">
       <img class="g-star" src="assets/goal_star.png" alt="">
-      <span class="glabel">Show car looks</span>
+      <span class="glabel">Exterior looks</span>
+    </button>
+    <button class="goalcard" data-goal="Interior looks and comfort">
+      <img class="g-star" src="assets/goal_star.png" alt="">
+      <span class="glabel">Interior and comfort</span>
     </button>
     <button class="goalcard" data-goal="Track ready">
       <img class="g-watch" src="assets/goal_watch.png" alt="">
       <span class="glabel">Track ready</span>
+    </button>
+    <button class="goalcard" data-goal="Daily reliability">
+      <img class="g-watch" src="assets/goal_watch.png" alt="">
+      <span class="glabel">Daily reliability</span>
+    </button>
+    <button class="goalcard" data-goal="Fuel efficiency">
+      <img class="g-cash" src="assets/goal_cash.png" alt="">
+      <span class="glabel">Fuel efficiency</span>
     </button>
   </div>
 
@@ -155,6 +176,47 @@ document.addEventListener('DOMContentLoaded', function () {
     if (CarBox.get('isPro')) UI.toast('You’re on CarBox Pro');
     else Pro.open();
   });
+
+  /* ── STEP 3: filter step ──────────────────────────────────────────────────
+     Sits between the goal and the budget. Picks the mod CATEGORY to focus on,
+     or "Best overall", which hands the choice to the AI to make from this car's
+     weakest attributes (see server/api/recommend.js). */
+  function openFilter(onConfirm) {
+    var chosen = CarBox.get('upgradeFilter');
+    var options = CarBoxGoals.filtersFor(selected);
+    /* a filter from a DIFFERENT goal must not carry over */
+    if (options.indexOf(chosen) < 0) chosen = null;
+    var sh = UI.sheet({
+      title: 'What should we focus on?',
+      label: 'What should we focus on?',
+      build: function (body) {
+        var note = document.createElement('div');
+        note.className = 'sheet-note'; note.style.marginTop = '0';
+        note.textContent = 'Narrow ' + selected.toLowerCase() + ' to one area, or let CarBox pick what this car needs most.';
+        body.appendChild(note);
+
+        var chips = document.createElement('div'); chips.className = 'bchips';
+        var go = document.createElement('button');
+        go.className = 'gsheetbtn'; go.textContent = 'Continue'; go.disabled = !chosen;
+
+        options.forEach(function (f) {
+          var c = document.createElement('button');
+          c.type = 'button'; c.className = 'bchip'; c.textContent = CarBoxGoals.label(f);
+          c.setAttribute('data-filter', f);
+          if (f === chosen) c.classList.add('sel');
+          c.addEventListener('click', function () {
+            chips.querySelectorAll('.bchip').forEach(function (q) { q.classList.remove('sel'); });
+            c.classList.add('sel');
+            chosen = f; go.disabled = false;
+          });
+          chips.appendChild(c);
+        });
+        body.appendChild(chips);
+        go.addEventListener('click', function () { if (!chosen) return; sh.close(); onConfirm(chosen); });
+        body.appendChild(go);
+      }
+    });
+  }
 
   /* budget ranges for the budget step (labels use the active currency) */
   var RANGES = [{ min: 0, max: 500 }, { min: 500, max: 2000 }, { min: 2000, max: 5000 }, { min: 5000, max: null }];
@@ -222,12 +284,21 @@ document.addEventListener('DOMContentLoaded', function () {
     /* Free + already locked: switching GOALS needs Pro, but they can still open
        the budget step to set/adjust the budget for their current goal. */
     if (!pro && locked && selected !== current) { UI.toast('Changing your goal needs CarBox Pro'); Pro.open(); return; }
-    /* everyone else: pick/adjust the budget, then commit. */
-    openBudget(!pro && !locked, function (budget) {
-      CarBox.set('goal', selected);
-      CarBox.set('budget', budget);
-      if (!pro && !locked) CarBox.set('goalLocked', true);
-      location.href = 'upgrades.html';
+    /* everyone else: goal -> filter -> budget, then commit as one unit.
+       Nothing is written to the store until the budget step confirms, so
+       backing out of either sheet leaves the previous setup intact. */
+    openFilter(function (filter) {
+      openBudget(!pro && !locked, function (budget) {
+        CarBox.set('goal', selected);
+        CarBox.set('upgradeFilter', filter);
+        CarBox.set('budget', budget);
+        if (!pro && !locked) CarBox.set('goalLocked', true);
+        /* The ONLY thing that authorises a billed /api/recommend call. upgrades.html
+           consumes this flag on load; without it the page renders from cache or
+           asks the user to run the setup, and never calls the AI on its own. */
+        try { sessionStorage.setItem('carbox.runRecs', '1'); } catch (e) {}
+        location.href = 'upgrades.html';
+      });
     });
   });
 

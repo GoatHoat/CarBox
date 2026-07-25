@@ -507,6 +507,12 @@ document.addEventListener('DOMContentLoaded', function () {
     CarBox.set('comments', []);
     CarBox.set('notifications', []);
     CarBox.set('goalLocked', false);   /* fresh car: the free one-time goal choice is unused */
+    /* fresh car: no goal/filter/budget chosen yet, so Upgrades shows its intro
+       and no AI recommendation call happens until the user finishes that flow */
+    CarBox.set('upgradesOnboarded', false);
+    CarBox.set('upgradeFilter', null);
+    CarBox.set('budget', null);
+    CarBox.set('recs', null);
     /* nextService is computed automatically from the (empty) log + this vehicle
        by the store — no hardcoded guess (see state.js computeNextService). */
 

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CarBox — For You</title>
+<style>html{background:#E9E9E9}</style>
+<script>(function(){try{var _st=(JSON.parse(localStorage.getItem('carbox.v1'))||{});var _sess=false;try{for(var _i=0;_i<localStorage.length;_i++){if(/^sb-.*-auth-token$/.test(localStorage.key(_i))){_sess=true;break}}}catch(e){}if(!_st.onboardingComplete&&!_sess){location.replace('onboarding.html');return}}catch(e){location.replace('onboarding.html');return}var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);try{var d=sessionStorage.getItem('carbox.navdir');if(d){document.documentElement.setAttribute('data-navdir',d);sessionStorage.removeItem('carbox.navdir')}}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script defer src="state.js"></script>
+<script defer src="config.js"></script>
+<script defer src="vendor/supabase.js"></script>
+<script defer src="supabase.js"></script>
+<script defer src="ui.js"></script>
+<script defer src="social.js"></script>
+<script defer src="nav.js"></script>
+<link rel="prefetch" href="index.html">
+<style>
+  .phone{padding-bottom:118px}
+  /* top bar: plus (compose) left, title center */
+  .fybar{display:flex;align-items:center;min-height:52px;position:relative;margin-bottom:4px}
+  .fyplus{
+    width:42px;height:42px;border-radius:50%;background:var(--card);box-shadow:var(--shadow);
+    border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tx,#1a1a1a);
+  }
+  .fyplus svg{width:22px;height:22px}
+  .fytitle{position:absolute;left:0;right:0;text-align:center;font-size:26px;color:var(--tx,#141210);pointer-events:none}
+
+  /* search + filters row */
+  .fy-search{display:flex;align-items:center;gap:9px;margin:2px 0 10px}
+  .fy-searchbox{flex:1;min-width:0;display:flex;align-items:center;gap:8px;
+    background:var(--surface,#F1EEEB);border-radius:999px;padding:9px 14px}
+  .fy-searchbox svg{width:18px;height:18px;color:var(--mut,#9B918F);flex:none}
+  .fy-searchbox input{flex:1;min-width:0;background:none;border:none;outline:none;
+    font-family:'League Spartan',sans-serif;font-size:15px;font-weight:500;color:var(--tx,#141210)}
+  .fy-searchbox .clr{background:none;border:none;cursor:pointer;color:var(--mut,#9B918F);font-size:18px;line-height:1;padding:0 2px}
+  .fy-filter{position:relative;flex:none;background:var(--card);box-shadow:var(--shadow);border:none;cursor:pointer;
+    border-radius:14px;height:40px;padding:0 14px;display:flex;align-items:center;gap:6px;
+    font-family:'League Spartan',sans-serif;font-weight:700;font-size:14px;color:var(--tx,#141210)}
+  .fy-filter.on{background:var(--brown-warm);color:#FBF8F4}
+  .fy-filter svg{width:16px;height:16px}
+  .fy-filter .fbadge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:999px;
+    background:var(--brown-warm);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+  .fy-filter .fbadge[hidden]{display:none}   /* [hidden] loses to display:flex otherwise */
+  html[data-theme="dark"] .fy-filter.on .fbadge,.fy-filter.on .fbadge{background:#2A2521;color:#FBF8F4}
+
+  /* filter sheet */
+  .flt-label{font-size:12.5px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--mut,#9B918F);margin:14px 2px 8px}
+  .flt-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .flt-chip{background:var(--ctl,#E3DED9);border:none;border-radius:999px;cursor:pointer;padding:9px 14px;
+    font-family:'League Spartan',sans-serif;font-size:14px;font-weight:700;color:var(--tx2,#3E3A36)}
+  .flt-chip.sel{background:var(--brown-warm);color:#FBF8F4}
+  .flt-apply{width:100%;margin-top:20px;background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:13px 0;font-family:'League Spartan',sans-serif;font-weight:700;font-size:16px;box-shadow:var(--shadow)}
+  .flt-clear{width:100%;margin-top:8px;background:transparent;color:var(--tx,#141210);border:none;cursor:pointer;
+    padding:10px 0;font-family:'League Spartan',sans-serif;font-weight:600;font-size:15px}
+
+  /* ── a post card ── */
+  .post{border-bottom:1px solid var(--hairline);padding:8px 0 14px;margin-bottom:6px}
+  .post:last-child{border-bottom:none}
+  .post-head{display:flex;align-items:center;gap:10px;padding:2px 2px 8px}
+  .sv-avatar{
+    flex:none;border-radius:50%;background:#080808;color:#fff;border:2px solid #6E5A46;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'League Spartan',sans-serif;
+  }
+  .post-user{font-size:16px;font-weight:700;color:var(--tx,#141210);line-height:1.05}
+  .post-user .uh{display:block;font-size:12px;font-weight:500;color:var(--mut,#9A928B)}
+  .post-title{text-align:center;font-weight:700;font-size:17px;color:var(--tx,#141210);margin:0 4px 8px;line-height:1.2}
+
+  .post-media{position:relative;border-radius:14px;overflow:hidden;background:var(--brown-warm)}
+  .media-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;aspect-ratio:1/1}
+  .media-track::-webkit-scrollbar{display:none}
+  .media-img{flex:none;width:100%;height:100%;object-fit:cover;scroll-snap-align:center;background:var(--brown-warm)}
+  .media-ph{flex:none;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+    color:#efe7df;font-weight:600;font-size:15px;scroll-snap-align:center}
+  .media-count{position:absolute;top:9px;right:11px;background:rgba(0,0,0,.55);color:#fff;
+    font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px}
+  .media-dots{display:flex;gap:5px;justify-content:center;margin-top:7px}
+  .media-dots .d{width:6px;height:6px;border-radius:50%;background:var(--ctl,#D3CCC4)}
+  .media-dots .d.on{background:var(--brown-warm)}
+
+  .post-actions{display:flex;align-items:center;margin-top:9px;padding:0 2px}
+  .act{display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;
+    color:var(--tx,#141210);padding:4px 2px;margin-right:16px;font-family:'League Spartan',sans-serif}
+  .act .cnt{font-size:14px;font-weight:700;color:var(--tx,#141210);min-width:6px}
+  .act.more{margin-left:auto;margin-right:0;color:var(--mut,#8D8579)}
+  .pxheart,.pxcomment{width:26px;height:24px;display:block}
+  .pxheart{color:var(--tx,#141210)}
+  .pxheart.on{color:#111;animation:heartpop .32s cubic-bezier(.3,1.4,.4,1)}
+  html[data-theme="dark"] .pxheart.on{color:#F2EEE9}
+  @keyframes heartpop{0%{transform:scale(1)}45%{transform:scale(1.35)}100%{transform:scale(1)}}
+  .pxdots{width:24px;height:24px}
+  .post-desc{font-size:14.5px;font-weight:500;color:var(--tx,#2a2622);line-height:1.4;margin-top:8px;padding:0 2px}
+  .post-desc .u{font-weight:700;margin-right:6px}
+
+  .fy-empty{text-align:center;color:var(--mut,#8D8D8B);font-weight:600;margin-top:60px;line-height:1.5}
+
+  /* ── single-post detail (opened from the garage grid / a notification) ── */
+  .detail-head{display:flex;align-items:center;min-height:48px;gap:6px}
+  .detail-back{background:none;border:none;cursor:pointer;padding:6px 8px 6px 0;display:flex;align-items:center}
+  .detail-back img{width:30px}
+  .detail-head .dt{font-size:22px;color:var(--tx,#141210)}
+
+  /* ── compose overlay (full-screen step machine) ── */
+  .compose{position:fixed;inset:0;z-index:120;background:var(--bg,#F4F4F4);display:none;flex-direction:column}
+  .compose.show{display:flex}
+  .compose-top{display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top,0)) 16px 8px}
+  .compose-top .cx{background:none;border:none;cursor:pointer;font-size:26px;line-height:1;color:var(--mut,#8D8579);font-family:'League Spartan',sans-serif}
+  .compose-top .cstep-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--tx,#141210)}
+  .compose-body{flex:1;overflow-y:auto;padding:6px 18px 96px;scrollbar-width:none}
+  .compose-body::-webkit-scrollbar{display:none}
+  .cont-btn{
+    position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom,0));z-index:2;
+    background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:13px 26px;font-family:'League Spartan',sans-serif;font-weight:700;font-size:16px;box-shadow:var(--shadow);
+  }
+  .cont-btn:disabled{background:var(--ctl,#D9D4D0);color:var(--mut,#9B918F);box-shadow:none;cursor:default}
+
+  .perm{text-align:center;margin-top:28px}
+  .perm .permart{width:96px;height:96px;border-radius:24px;background:var(--brown-warm);margin:0 auto 16px;
+    display:flex;align-items:center;justify-content:center}
+  .perm .permart svg{width:48px;height:48px;color:#efe7df}
+  .perm h3{font-family:'DM Serif Display',serif;font-size:24px;color:var(--tx,#141210)}
+  .perm p{font-size:14.5px;font-weight:500;color:var(--warmgray);line-height:1.45;margin:10px auto 0;max-width:300px}
+  .perm .allow{margin-top:18px;background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:13px 24px;font-family:'League Spartan',sans-serif;font-weight:700;font-size:16px;box-shadow:var(--shadow)}
+
+  .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:6px}
+  .photo-thumb{position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:var(--surface,#eee)}
+  .photo-thumb img{width:100%;height:100%;object-fit:cover}
+  .photo-thumb .ord{position:absolute;top:5px;left:5px;background:var(--brown-warm);color:#fff;
+    width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  .photo-thumb .rm{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;cursor:pointer;
+    width:22px;height:22px;border-radius:50%;font-size:14px;line-height:1;padding:0}
+  .photo-add{aspect-ratio:1/1;border-radius:12px;border:2px dashed var(--mut,#C2B6AA);background:transparent;cursor:pointer;
+    color:var(--mut,#8D8579);font-size:30px;display:flex;align-items:center;justify-content:center}
+  .pick-hint{font-size:13px;font-weight:600;color:var(--mut,#9B918F);margin-top:12px;text-align:center}
+
+  .clabel{font-size:12.5px;font-weight:700;letter-spacing:.02em;color:var(--mut,#9B918F);text-transform:uppercase;margin:16px 2px 6px}
+  .locktitle,.desc-box{
+    width:100%;box-sizing:border-box;background:var(--surface,#F5F3F4);border:2px solid var(--hairline);border-radius:16px;
+    padding:12px 14px;font-family:'League Spartan',sans-serif;font-size:16px;font-weight:600;color:var(--tx,#141210);outline:none;
+  }
+  .locktitle:focus,.desc-box:focus{border-color:var(--brown-warm)}
+  .desc-box{min-height:120px;resize:none;line-height:1.4;font-weight:500}
+  .wordcount{text-align:right;font-size:12px;font-weight:600;color:var(--mut,#9B918F);margin-top:5px}
+  .wordcount.over{color:#B3402F}
+
+  /* ── comment sheet extras (composer pinned at the bottom of the sheet) ── */
+  .cmt-list{padding:2px 2px 8px}
+  .cmt-empty{text-align:center;color:var(--mut,#9B918F);font-weight:600;padding:26px 0}
+  .cmt{display:flex;gap:10px;padding:10px 0}
+  .cmt .cbody{min-width:0;flex:1}
+  .cmt .cmeta{font-size:13px;font-weight:700;color:var(--tx,#141210)}
+  .cmt .cmeta .ct{font-weight:500;color:var(--mut,#9A928B);margin-left:6px}
+  .cmt .ctext{font-size:14.5px;font-weight:500;color:var(--tx,#2a2622);line-height:1.4;margin-top:2px}
+  .cmt .ctext .tag{color:var(--accent-tx,#776357);font-weight:700}
+  .cmt .creply{background:none;border:none;cursor:pointer;color:var(--mut,#8D8579);font-weight:700;font-size:12.5px;
+    font-family:'League Spartan',sans-serif;padding:4px 0;margin-top:2px}
+  /* replies: indented, with a connecting line on the RIGHT of the reply block */
+  .cmt-replies{margin:2px 0 0 40px;padding-right:12px;position:relative}
+  .cmt-replies::after{content:"";position:absolute;top:6px;bottom:10px;right:0;width:2px;background:var(--hairline)}
+  .cmt-composer{
+    display:flex;align-items:center;gap:9px;padding:10px 4px calc(8px + env(safe-area-inset-bottom,0));
+    border-top:1px solid var(--hairline);background:var(--sheet,var(--card));position:sticky;bottom:0;
+  }
+  .cmt-composer input{flex:1;min-width:0;background:var(--input,var(--surface,#F1EEEB));border:none;border-radius:999px;
+    padding:11px 15px;font-family:'League Spartan',sans-serif;font-size:15px;font-weight:500;color:var(--tx,#141210);outline:none}
+  .cmt-composer .send{background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
+    padding:10px 16px;font-family:'League Spartan',sans-serif;font-weight:700;font-size:14px;flex:none}
+  .cmt-composer .send:disabled{background:var(--ctl,#D9D4D0);color:var(--mut,#9B918F);cursor:default}
+  .replybar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;
+    background:var(--surface,#F1EEEB);border-radius:10px;margin:0 4px}
+  .replybar span{font-size:12.5px;font-weight:600;color:var(--mut,#7d756e)}
+  .replybar button{background:none;border:none;cursor:pointer;color:var(--accent-tx,#776357);font-weight:700;font-size:12.5px}
+
+  @media (prefers-reduced-motion: reduce){ .pxheart.on{animation:none} }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div id="feedView">
+    <div class="fybar">
+      <button class="fyplus" id="composeBtn" aria-label="New post"></button>
+      <div class="fytitle serif">For You</div>
+    </div>
+    <div class="fy-search">
+      <div class="fy-searchbox">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16 L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="searchInput" placeholder="Search cars, mods, people…" aria-label="Search posts">
+        <button class="clr" id="searchClear" aria-label="Clear search" hidden>×</button>
+      </div>
+      <button class="fy-filter" id="filterBtn" aria-label="Filters">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5 H21 M6 12 H18 M10 19 H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Filters<span class="fbadge" id="filterBadge" hidden>0</span>
+      </button>
+    </div>
+    <div id="feed"></div>
+  </div>
+
+  <div id="detailView" hidden>
+    <div class="detail-head">
+      <button class="detail-back" id="detailBack" aria-label="Back"><img src="assets/icon_back.png" alt=""></button>
+      <div class="dt serif">Post</div>
+    </div>
+    <div id="detailPost"></div>
+  </div>
+
+  <nav class="nav" data-active="3">
+    <span class="navpill" aria-hidden="true"></span>
+    <a class="tab" href="index.html"><img class="i-navtire" src="assets/nav_tire_v2.png" alt=""><span class="lbl">Garage</span></a>
+    <a class="tab" href="log.html"><img class="i-navwrench" src="assets/nav_wrench.png" alt=""><span class="lbl">log</span></a>
+    <a class="tab" href="upgrades.html"><img class="i-navgear" src="assets/nav_up.png" alt=""><span class="lbl">upgrades</span></a>
+    <a class="tab active" href="foryou.html"><svg class="i-navperson" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 H15 V11 H9 Z M6 21 V16 H8 V15 H16 V16 H18 V21 Z" fill="currentColor" shape-rendering="crispEdges"/></svg><span class="lbl">for you</span></a>
+  </nav>
+</div>
+
+<!-- COMPOSE overlay (photos → details → preview) -->
+<div class="compose" id="compose">
+  <div class="compose-top">
+    <button class="cx" id="composeClose" aria-label="Cancel">×</button>
+    <button class="cx" id="composeBack" aria-label="Back" hidden>‹</button>
+    <div class="cstep-title" id="composeStepTitle">New post</div>
+  </div>
+  <div class="compose-body" id="composeBody"></div>
+  <button class="cont-btn" id="composeCont">Continue</button>
+  <input type="file" id="photoInput" accept="image/*" multiple hidden>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var $ = function (id) { return document.getElementById(id); };
+  if (window.Social) Social.seedIfEmpty();
+  var I = (window.Social && Social.ICON) || {};
+
+  /* ══════════════════ POST CARD ══════════════════ */
+  function mediaBlock(post) {
+    var wrap = document.createElement('div'); wrap.className = 'post-media';
+    var track = document.createElement('div'); track.className = 'media-track';
+    var photos = post.photos && post.photos.length ? post.photos : [null];
+    photos.forEach(function (src) {
+      if (src) { var im = document.createElement('img'); im.className = 'media-img'; im.src = src; im.alt = ''; track.appendChild(im); }
+      else { var ph = document.createElement('div'); ph.className = 'media-ph'; ph.textContent = 'Photos go here'; track.appendChild(ph); }
+    });
+    wrap.appendChild(track);
+    if (photos.length > 1) {
+      var cnt = document.createElement('div'); cnt.className = 'media-count'; cnt.textContent = '1/' + photos.length;
+      wrap.appendChild(cnt);
+      var dotsWrap = document.createElement('div'); dotsWrap.className = 'media-dots';
+      photos.forEach(function (_, i) { var d = document.createElement('span'); d.className = 'd' + (i === 0 ? ' on' : ''); dotsWrap.appendChild(d); });
+      track.addEventListener('scroll', function () {
+        var i = Math.round(track.scrollLeft / track.clientWidth);
+        cnt.textContent = (i + 1) + '/' + photos.length;
+        dotsWrap.querySelectorAll('.d').forEach(function (d, j) { d.classList.toggle('on', j === i); });
+      });
+      return { wrap: wrap, dots: dotsWrap };
+    }
+    return { wrap: wrap, dots: null };
+  }
+
+  function postCard(post) {
+    var card = document.createElement('div'); card.className = 'post';
+
+    var head = document.createElement('div'); head.className = 'post-head';
+    head.appendChild(Social.avatar(post.author, 40));
+    var u = document.createElement('div'); u.className = 'post-user';
+    u.innerHTML = '<span></span><span class="uh"></span>';
+    u.children[0].textContent = post.author.name || post.author.handle;
+    u.children[1].textContent = post.author.handle + ' · ' + Social.ago(post.ts);
+    head.appendChild(u);
+    card.appendChild(head);
+
+    var title = document.createElement('div'); title.className = 'post-title';
+    title.textContent = Social.fullTitle(post);
+    card.appendChild(title);
+
+    var media = mediaBlock(post);
+    card.appendChild(media.wrap);
+    if (media.dots) card.appendChild(media.dots);
+
+    var actions = document.createElement('div'); actions.className = 'post-actions';
+    var likeBtn = document.createElement('button'); likeBtn.className = 'act'; likeBtn.setAttribute('aria-label', 'Like');
+    likeBtn.innerHTML = I.heart(post.liked) + '<span class="cnt"></span>';
+    likeBtn.querySelector('.cnt').textContent = post.likes ? String(post.likes) : '';
+    likeBtn.addEventListener('click', function () {
+      var p = Social.toggleLike(post.id);
+      likeBtn.querySelector('.pxheart').outerHTML = I.heart(p.liked);
+      likeBtn.querySelector('.cnt').textContent = p.likes ? String(p.likes) : '';
+    });
+    actions.appendChild(likeBtn);
+
+    var cmtBtn = document.createElement('button'); cmtBtn.className = 'act'; cmtBtn.setAttribute('aria-label', 'Comments');
+    cmtBtn.innerHTML = I.comment() + '<span class="cnt"></span>';
+    var cc = Social.commentCount(post); cmtBtn.querySelector('.cnt').textContent = cc ? String(cc) : '';
+    cmtBtn.addEventListener('click', function () { openComments(post.id, null, function () { refreshCounts(card, post.id); }); });
+    actions.appendChild(cmtBtn);
+
+    var more = document.createElement('button'); more.className = 'act more'; more.setAttribute('aria-label', 'More');
+    more.innerHTML = I.dots();
+    more.addEventListener('click', function () { openMore(post); });
+    actions.appendChild(more);
+    card.appendChild(actions);
+
+    if (post.description) {
+      var desc = document.createElement('div'); desc.className = 'post-desc';
+      var un = document.createElement('span'); un.className = 'u'; un.textContent = post.author.handle;
+      desc.appendChild(un); desc.appendChild(document.createTextNode(post.description));
+      card.appendChild(desc);
+    }
+    return card;
+  }
+  function refreshCounts(card, postId) {
+    var post = Social.getPost(postId); if (!post) return;
+    var cnts = card.querySelectorAll('.act .cnt');
+    if (cnts[1]) { var cc = Social.commentCount(post); cnts[1].textContent = cc ? String(cc) : ''; }
+  }
+
+  function openMore(post) {
+    UI.sheet({ title: 'Post', label: 'Post options', build: function (body) {
+      function row(label, danger, fn) {
+        var b = document.createElement('button');
+        b.textContent = label;
+        b.style.cssText = 'width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:14px 4px;' +
+          'font-family:\'League Spartan\',sans-serif;font-weight:600;font-size:16px;border-bottom:1px solid var(--hairline);' +
+          'color:' + (danger ? '#B3402F' : 'var(--tx,#141210)');
+        b.addEventListener('click', fn); body.appendChild(b);
+      }
+      if (post.mine) {
+        row('Delete post', true, function () {
+          var list = Social.feed().filter(function (p) { return p.id !== post.id; });
+          CarBox.set('posts', list);
+          document.querySelectorAll('.ui-scrim.show').forEach(function (s) { s.click(); });
+          if (detailId === post.id) location.href = 'foryou.html'; else renderFeed();
+          UI.toast('Post deleted');
+        });
+      } else {
+        row('Report', true, function () { document.querySelectorAll('.ui-scrim.show').forEach(function (s) { s.click(); }); UI.toast('Thanks, we’ll take a look'); });
+        row('Not interested', false, function () { document.querySelectorAll('.ui-scrim.show').forEach(function (s) { s.click(); }); UI.toast('We’ll show fewer like this'); });
+      }
+    }});
+  }
+
+  /* ══════════════════ COMMENTS SHEET ══════════════════ */
+  function openComments(postId, focusCommentId, onChange) {
+    var post = Social.getPost(postId); if (!post || !window.UI) return;
+    var replyTarget = null;   /* {commentId, handle} */
+    var sh = UI.sheet({ title: 'Comments', label: 'Comments', build: function (body) {
+      var list = document.createElement('div'); list.className = 'cmt-list'; list.id = 'cmtList';
+      body.appendChild(list);
+      renderComments(list, postId);
+    }});
+    /* composer pinned to the bottom of the sheet panel */
+    var replybar = document.createElement('div'); replybar.className = 'replybar'; replybar.hidden = true;
+    replybar.innerHTML = '<span></span><button type="button">Cancel</button>';
+    var composer = document.createElement('div'); composer.className = 'cmt-composer';
+    composer.innerHTML = '<input type="text" placeholder="comment" aria-label="Add a comment" maxlength="300">' +
+      '<button class="send" disabled>Send</button>';
+    sh.panel.appendChild(replybar); sh.panel.appendChild(composer);
+    var input = composer.querySelector('input'), send = composer.querySelector('.send');
+    function setReply(t) {
+      replyTarget = t;
+      if (t) { replybar.hidden = false; replybar.querySelector('span').textContent = 'Replying to ' + t.handle;
+        input.placeholder = 'Reply to ' + t.handle + '…'; input.focus(); }
+      else { replybar.hidden = true; input.placeholder = 'comment'; }
+    }
+    replybar.querySelector('button').addEventListener('click', function () { setReply(null); });
+    input.addEventListener('input', function () { send.disabled = !input.value.trim(); });
+    function submit() {
+      var txt = input.value.trim(); if (!txt) return;
+      Social.addComment(postId, txt, replyTarget && replyTarget.commentId, replyTarget && replyTarget.handle);
+      input.value = ''; send.disabled = true; setReply(null);
+      renderComments($('cmtList'), postId);
+      if (onChange) onChange();
+    }
+    send.addEventListener('click', submit);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+
+    /* expose reply-setter to the list rows */
+    body_setReply = setReply;
+    if (focusCommentId) setTimeout(function () {
+      var el = document.getElementById('cmt-' + focusCommentId);
+      if (el) el.scrollIntoView({ block: 'center' });
+    }, 300);
+  }
+  var body_setReply = function () {};
+
+  function renderComments(list, postId) {
+    var post = Social.getPost(postId); if (!post) return;
+    list.innerHTML = '';
+    var threads = Social.threads(post);
+    if (!threads.length) { var e = document.createElement('div'); e.className = 'cmt-empty'; e.textContent = 'No comments yet. Start the conversation.'; list.appendChild(e); return; }
+    threads.forEach(function (t) {
+      list.appendChild(commentRow(t.c, postId, false));
+      if (t.replies.length) {
+        var rc = document.createElement('div'); rc.className = 'cmt-replies';
+        t.replies.forEach(function (r) { rc.appendChild(commentRow(r, postId, true)); });
+        list.appendChild(rc);
+      }
+    });
+  }
+  function commentRow(c, postId, isReply) {
+    var row = document.createElement('div'); row.className = 'cmt'; row.id = 'cmt-' + c.id;
+    row.appendChild(Social.avatar(c.author, isReply ? 28 : 34));
+    var b = document.createElement('div'); b.className = 'cbody';
+    var meta = document.createElement('div'); meta.className = 'cmeta';
+    meta.innerHTML = '<span></span><span class="ct"></span>';
+    meta.children[0].textContent = c.author.name || c.author.handle;
+    meta.children[1].textContent = Social.ago(c.ts);
+    b.appendChild(meta);
+    var tx = document.createElement('div'); tx.className = 'ctext';
+    if (c.replyTo) { var tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = c.replyTo + ' '; tx.appendChild(tag); }
+    tx.appendChild(document.createTextNode(c.text));
+    b.appendChild(tx);
+    var reply = document.createElement('button'); reply.className = 'creply'; reply.textContent = 'Reply';
+    reply.addEventListener('click', function () {
+      /* replies attach to the TOP comment of the thread, tagging whoever you hit reply on */
+      body_setReply({ commentId: c.parentId || c.id, handle: c.author.handle });
+    });
+    b.appendChild(reply);
+    row.appendChild(b);
+    return row;
+  }
+
+  /* ══════════════════ SEARCH + FILTERS ══════════════════ */
+  var searchQ = '';
+  var filters = { make: null, mod: null, nearMe: false };
+  function activeFilterCount() { return (filters.make ? 1 : 0) + (filters.mod ? 1 : 0) + (filters.nearMe ? 1 : 0); }
+  function paintFilterBtn() {
+    var n = activeFilterCount();
+    var badge = $('filterBadge'), btn = $('filterBtn');
+    btn.classList.toggle('on', n > 0);
+    if (n > 0) { badge.hidden = false; badge.textContent = String(n); } else { badge.hidden = true; }
+  }
+  var searchInput = $('searchInput'), searchClear = $('searchClear');
+  searchInput.addEventListener('input', function () {
+    searchQ = searchInput.value;
+    searchClear.hidden = !searchQ;
+    renderFeed();
+  });
+  searchClear.addEventListener('click', function () { searchInput.value = ''; searchQ = ''; searchClear.hidden = true; renderFeed(); });
+
+  $('filterBtn').addEventListener('click', function () {
+    var draft = { make: filters.make, mod: filters.mod, nearMe: filters.nearMe };
+    var sh = UI.sheet({ title: 'Filters', label: 'Filters', build: function (body) {
+      function chipRow(label, items, getSel, setSel) {
+        var l = document.createElement('div'); l.className = 'flt-label'; l.textContent = label; body.appendChild(l);
+        var wrap = document.createElement('div'); wrap.className = 'flt-chips';
+        items.forEach(function (it) {
+          var c = document.createElement('button'); c.type = 'button'; c.className = 'flt-chip'; c.textContent = it.label;
+          if (getSel() === it.value) c.classList.add('sel');
+          c.addEventListener('click', function () {
+            setSel(getSel() === it.value ? null : it.value);
+            wrap.querySelectorAll('.flt-chip').forEach(function (q) { q.classList.remove('sel'); });
+            if (getSel() != null) c.classList.add('sel');
+          });
+          wrap.appendChild(c);
+        });
+        body.appendChild(wrap);
+      }
+      /* Car make (types of car present in the feed) */
+      var makeItems = Social.makes().map(function (m) { return { value: m, label: m }; });
+      if (makeItems.length) chipRow('Type of car', makeItems, function () { return draft.make; }, function (v) { draft.make = v; });
+      /* Specific mod */
+      chipRow('Specific mod', Social.MODS.map(function (m) { return { value: m.id, label: m.label }; }),
+        function () { return draft.mod; }, function (v) { draft.mod = v; });
+      /* Location */
+      var l3 = document.createElement('div'); l3.className = 'flt-label'; l3.textContent = 'Location'; body.appendChild(l3);
+      var locWrap = document.createElement('div'); locWrap.className = 'flt-chips';
+      var near = document.createElement('button'); near.type = 'button'; near.className = 'flt-chip' + (draft.nearMe ? ' sel' : '');
+      near.textContent = 'People near me (' + Social.myCity() + ')';
+      near.addEventListener('click', function () { draft.nearMe = !draft.nearMe; near.classList.toggle('sel', draft.nearMe); });
+      locWrap.appendChild(near); body.appendChild(locWrap);
+
+      var apply = document.createElement('button'); apply.className = 'flt-apply'; apply.textContent = 'Show results';
+      apply.addEventListener('click', function () { filters = draft; paintFilterBtn(); renderFeed(); sh.close(); });
+      body.appendChild(apply);
+      var clear = document.createElement('button'); clear.className = 'flt-clear'; clear.textContent = 'Clear filters';
+      clear.addEventListener('click', function () { draft = { make: null, mod: null, nearMe: false }; filters = draft; paintFilterBtn(); renderFeed(); sh.close(); });
+      body.appendChild(clear);
+    }});
+  });
+
+  /* ══════════════════ FEED / DETAIL ══════════════════ */
+  var feed = $('feed');
+  function renderFeed() {
+    feed.innerHTML = '';
+    var posts = Social.search(Social.feed(), searchQ, filters);
+    if (!posts.length) {
+      var e = document.createElement('div'); e.className = 'fy-empty';
+      var any = searchQ || activeFilterCount();
+      e.innerHTML = any ? 'No posts match your search.<br>Try fewer filters or another keyword.' : 'Nothing here yet.<br>Tap + to share your first build.';
+      feed.appendChild(e); return;
+    }
+    posts.forEach(function (p) { feed.appendChild(postCard(p)); });
+  }
+
+  var detailId = null;
+  function showDetail(postId, commentId) {
+    var post = Social.getPost(postId);
+    $('feedView').hidden = true; $('detailView').hidden = false;
+    detailId = postId;
+    var host = $('detailPost'); host.innerHTML = '';
+    if (!post) { host.innerHTML = '<div class="fy-empty">This post is no longer available.</div>'; return; }
+    host.appendChild(postCard(post));
+    if (commentId != null) setTimeout(function () { openComments(postId, commentId, function () { /* live */ }); }, 250);
+  }
+  $('detailBack').addEventListener('click', function () { location.href = 'foryou.html'; });
+
+  /* ══════════════════ COMPOSE FLOW ══════════════════ */
+  var compose = $('compose'), cbody = $('composeBody'), cont = $('composeCont');
+  var draft = { photos: [], titleSuffix: '', description: '' };
+  var step = 0;
+
+  function openCompose() { draft = { photos: [], titleSuffix: '', description: '' }; step = 0; compose.classList.add('show'); document.documentElement.style.overflow = 'hidden'; renderStep(); }
+  function closeCompose() { compose.classList.remove('show'); document.documentElement.style.overflow = ''; }
+  $('composeBtn').addEventListener('click', openCompose);
+  $('composeClose').addEventListener('click', closeCompose);
+  $('composeBack').addEventListener('click', function () { if (step > 0) { step--; renderStep(); } });
+
+  function setStepChrome(title, contLabel, contEnabled) {
+    $('composeStepTitle').textContent = title;
+    cont.textContent = contLabel; cont.disabled = !contEnabled;
+    $('composeBack').hidden = step === 0;
+    $('composeClose').hidden = step !== 0;
+  }
+
+  var photoInput = $('photoInput');
+  photoInput.addEventListener('change', function () {
+    var files = Array.prototype.slice.call(photoInput.files || []);
+    var room = Social.MAX_PHOTOS - draft.photos.length;
+    if (room <= 0) { UI.toast('You can add up to ' + Social.MAX_PHOTOS + ' photos'); return; }
+    files.slice(0, room).forEach(function (f) { Social.compress(f, function (url) { draft.photos.push(url); if (step === 0) renderStep(); }); });
+    if (files.length > room) UI.toast('Only the first ' + Social.MAX_PHOTOS + ' photos are used');
+    photoInput.value = '';
+  });
+
+  function renderStep() {
+    cbody.scrollTop = 0;
+    if (step === 0) return renderPhotos();
+    if (step === 1) return renderDetails();
+    return renderPreview();
+  }
+
+  function renderPhotos() {
+    cbody.innerHTML = '';
+    if (!draft.photos.length) {
+      var perm = document.createElement('div'); perm.className = 'perm';
+      perm.innerHTML =
+        '<div class="permart"><svg viewBox="0 0 24 24"><path d="M4 6 H8 L9 4 H15 L16 6 H20 V19 H4 Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></div>' +
+        '<h3>Add your photos</h3>' +
+        '<p>CarBox needs access to your photo library so you can pick up to ' + Social.MAX_PHOTOS + ' photos for your post. They are selected in the order you tap them.</p>' +
+        '<button class="allow" id="allowPhotos">Allow photo access</button>';
+      cbody.appendChild(perm);
+      $('allowPhotos').addEventListener('click', function () { photoInput.click(); });
+      setStepChrome('New post', 'Continue', false);
+      return;
+    }
+    var grid = document.createElement('div'); grid.className = 'photo-grid';
+    draft.photos.forEach(function (url, i) {
+      var t = document.createElement('div'); t.className = 'photo-thumb';
+      t.innerHTML = '<img src="' + url + '" alt=""><span class="ord">' + (i + 1) + '</span><button class="rm" aria-label="Remove">×</button>';
+      t.querySelector('.rm').addEventListener('click', function () { draft.photos.splice(i, 1); renderStep(); });
+      grid.appendChild(t);
+    });
+    if (draft.photos.length < Social.MAX_PHOTOS) {
+      var add = document.createElement('button'); add.className = 'photo-add'; add.textContent = '+';
+      add.addEventListener('click', function () { photoInput.click(); });
+      grid.appendChild(add);
+    }
+    cbody.appendChild(grid);
+    var hint = document.createElement('div'); hint.className = 'pick-hint';
+    hint.textContent = draft.photos.length + ' of ' + Social.MAX_PHOTOS + ' selected · numbered in the order they’ll appear';
+    cbody.appendChild(hint);
+    setStepChrome('New post', 'Continue', true);
+  }
+
+  function renderDetails() {
+    cbody.innerHTML = '';
+    var PREFIX = Social.carLabel() + ' : ';
+
+    var l1 = document.createElement('div'); l1.className = 'clabel'; l1.textContent = 'Post title'; cbody.appendChild(l1);
+    var title = document.createElement('input'); title.className = 'locktitle'; title.type = 'text';
+    title.value = PREFIX + (draft.titleSuffix || '');
+    title.setAttribute('aria-label', 'Post title');
+    cbody.appendChild(title);
+    var lastGood = title.value;
+    function guard() {
+      if (title.value.indexOf(PREFIX) !== 0) {
+        title.value = lastGood;
+        var caret = Math.max(PREFIX.length, title.value.length);
+        try { title.setSelectionRange(caret, caret); } catch (e) {}
+        UI.toast('Your car has to stay in the title — you can’t remove it.');
+      } else { lastGood = title.value; draft.titleSuffix = title.value.slice(PREFIX.length); refreshDetailsCont(); }
+    }
+    title.addEventListener('input', guard);
+    title.addEventListener('keydown', function (e) {
+      var s = title.selectionStart, en = title.selectionEnd;
+      if ((e.key === 'Backspace' && s <= PREFIX.length && s === en) ||
+          (e.key === 'Delete' && s < PREFIX.length)) {
+        if (s <= PREFIX.length) { e.preventDefault(); try { title.setSelectionRange(PREFIX.length, PREFIX.length); } catch (er) {}
+          if (s < PREFIX.length) UI.toast('Your car has to stay in the title — you can’t remove it.'); }
+      }
+    });
+    title.addEventListener('focus', function () { setTimeout(function () { if (title.selectionStart < PREFIX.length) try { title.setSelectionRange(title.value.length, title.value.length); } catch (e) {} }, 0); });
+    var hint = document.createElement('div'); hint.className = 'wordcount'; hint.style.textAlign = 'left';
+    hint.textContent = 'Your car is added automatically. Add what the post is about after the “:” (a mod, advice, or just to connect).';
+    hint.style.color = 'var(--mut,#9B918F)'; hint.style.fontWeight = '500';
+    cbody.appendChild(hint);
+
+    var l2 = document.createElement('div'); l2.className = 'clabel'; l2.textContent = 'Description'; cbody.appendChild(l2);
+    var desc = document.createElement('textarea'); desc.className = 'desc-box'; desc.value = draft.description || '';
+    desc.placeholder = 'Tell the story: what you did, how it went, what you’d tell someone considering it…';
+    desc.setAttribute('aria-label', 'Description');
+    cbody.appendChild(desc);
+    var wc = document.createElement('div'); wc.className = 'wordcount'; cbody.appendChild(wc);
+    function words(s) { return (s.trim().match(/\S+/g) || []); }
+    var lastDesc = desc.value;
+    function updWc() {
+      var w = words(desc.value);
+      if (w.length > Social.MAX_DESC_WORDS) { desc.value = lastDesc; w = words(desc.value); UI.toast('Descriptions are limited to ' + Social.MAX_DESC_WORDS + ' words'); }
+      else { lastDesc = desc.value; draft.description = desc.value; }
+      wc.textContent = w.length + '/' + Social.MAX_DESC_WORDS + ' words';
+      wc.classList.toggle('over', w.length >= Social.MAX_DESC_WORDS);
+    }
+    desc.addEventListener('input', updWc); updWc();
+
+    function refreshDetailsCont() { cont.disabled = !draft.titleSuffix.trim(); }
+    setStepChrome('Details', 'Continue', !!draft.titleSuffix.trim());
+  }
+
+  function renderPreview() {
+    cbody.innerHTML = '';
+    var preview = { id: 'preview', mine: true, author: { handle: Social.me().handle, name: Social.me().name },
+      carLabel: Social.carLabel(), titleSuffix: draft.titleSuffix, description: draft.description,
+      photos: draft.photos, likes: 0, liked: false, comments: [], ts: Date.now() };
+    var wrap = document.createElement('div');
+    wrap.appendChild(postCard(preview));
+    /* preview is non-interactive for actions */
+    wrap.querySelectorAll('.act').forEach(function (a) { a.style.pointerEvents = 'none'; a.style.opacity = '.85'; });
+    cbody.appendChild(wrap);
+    setStepChrome('Preview', 'Post', true);
+  }
+
+  cont.addEventListener('click', function () {
+    if (step === 0) { if (!draft.photos.length) return; step = 1; renderStep(); return; }
+    if (step === 1) { if (!draft.titleSuffix.trim()) { UI.toast('Add what your post is about after the “:”'); return; } step = 2; renderStep(); return; }
+    /* step 2: publish */
+    var id = Social.addPost(draft);
+    closeCompose();
+    location.href = 'foryou.html';     /* land on the feed with the new post on top */
+  });
+
+  /* ══════════════════ BOOT ══════════════════ */
+  $('composeBtn').innerHTML = I.plus ? I.plus() : '+';
+  paintFilterBtn();
+  var params = new URLSearchParams(location.search);
+  var postParam = params.get('post');
+  if (postParam) { showDetail(postParam, params.get('c')); if (window.Social) Social.markNotifsRead(); }
+  else { renderFeed(); }
+  if (params.get('compose') === '1') openCompose();
+  UI.condense && UI.condense('For You');
+});
+</script>
+</body>
+</html>
