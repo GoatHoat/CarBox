@@ -36,6 +36,24 @@ window.Social = (function () {
   }
   function uid(prefix) { return (prefix || 'p') + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
+  /* ── profanity filter ──────────────────────────────────────────────────────
+     There was NO existing filter (CLAUDE.md was wrong). This one masks a small
+     set of vulgarities/slurs, WHOLE-WORD only (so "assess"/"Scunthorpe" are
+     safe). Applied at write time to BOTH posts and comments, and exported so
+     render code can also clean OTHER users' cloud content (never trust stored
+     text from strangers). */
+  var BADWORDS = ['fuck', 'fucker', 'fucking', 'motherfucker', 'shit', 'shitty', 'bullshit',
+    'bitch', 'bastard', 'asshole', 'ass', 'dick', 'dickhead', 'piss', 'cunt', 'slut', 'whore',
+    'douche', 'wanker', 'prick', 'twat', 'retard', 'faggot', 'fag', 'nigger', 'nigga', 'coon',
+    'spic', 'kike', 'chink'];
+  var BADSET = {}; BADWORDS.forEach(function (w) { BADSET[w] = 1; });
+  function cleanText(s) {
+    if (s == null) return s;
+    return String(s).replace(/[A-Za-z]+/g, function (w) {
+      return BADSET[w.toLowerCase()] ? w.charAt(0) + new Array(w.length).join('*') : w;
+    });
+  }
+
   /* ── posting ──
      draft = { titleSuffix, description, photos:[dataUrl|url] }. The stored title
      is "<carLabel> : <titleSuffix>" so the feed can show it verbatim. */
@@ -48,8 +66,8 @@ window.Social = (function () {
       author: { handle: m.handle, name: m.name },
       carLabel: carLabel(),
       city: myCity(),
-      titleSuffix: (draft.titleSuffix || '').trim(),
-      description: (draft.description || '').trim(),
+      titleSuffix: cleanText((draft.titleSuffix || '').trim()),
+      description: cleanText((draft.description || '').trim()),
       photos: (draft.photos || []).slice(0, MAX_PHOTOS),
       likes: 0, liked: false,
       comments: [],
@@ -80,7 +98,7 @@ window.Social = (function () {
 
   /* add a comment (parentId set = a reply). Returns the new comment id. */
   function addComment(id, text, parentId, replyToHandle) {
-    text = (text || '').trim();
+    text = cleanText((text || '').trim());
     if (!text) return null;
     var m = me();
     var c = {
@@ -278,6 +296,7 @@ window.Social = (function () {
     threads: threads, commentCount: commentCount,
     MODS: MODS, makes: makes, search: search, myCity: myCity,
     notifs: notifs, addNotif: addNotif, markNotifsRead: markNotifsRead, unreadCount: unreadCount,
-    ago: ago, compress: compress, ICON: ICON, avatar: avatar, seedIfEmpty: seedIfEmpty
+    ago: ago, compress: compress, ICON: ICON, avatar: avatar, seedIfEmpty: seedIfEmpty,
+    cleanText: cleanText
   };
 })();

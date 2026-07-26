@@ -1,57 +1,75 @@
 -- ============================================================
 -- CarBox — Block enforcement on cross-user READS (feed + garage posts)
 -- Paste into Supabase → SQL Editor → New query → Run.
--- RUN AFTER supabase_feed_schema.sql + supabase_dm_schema.sql (needs posts,
--- post_comments, post_likes, and the blocks table). Idempotent.
+-- RUN AFTER supabase_feed_schema.sql + supabase_dm_schema.sql. Idempotent.
+-- (Re-run safe: replaces the earlier one-directional version of these policies.)
 --
--- WHY: blocking used to be client-only (app hid a handle's comments), which was
--- fine while the feed was local. Now that real strangers' content is pulled in
--- live, a client-only hide is NOT a safety boundary. This makes a block a real
--- DB boundary: if EITHER party blocked the other, the blocked party's posts /
--- comments / likes simply do not come back from a query — enforced by RLS, so a
--- hand-rolled request can't route around the UI.
---
--- The block is symmetric (checked both directions) and matches the DM enforcement
--- already in supabase_dm_schema.sql. Signed-OUT viewers (auth.uid() IS NULL) are
--- unaffected here — they have no block relationships — so a public garage link
--- still resolves for anonymous visitors exactly as before.
---
--- SCOPE: posts / post_comments / post_likes (the "posts/comments/likes" a user
--- must not be able to read from a blocker). A car's own specs/entries stay
--- readable by a direct is_public link (they are not posts/comments/likes); only
--- the social content is gated, matching the requirement.
+-- WHY A SECURITY DEFINER FUNCTION (this was a real bug in the first version):
+--   A naive "not exists (select 1 from blocks ...)" inside a policy runs under
+--   the CALLER's RLS on `blocks`. The blocks policy only lets you read rows YOU
+--   created (blocker_id = auth.uid()) — intentionally, so nobody can see who
+--   blocked them. That means when A blocks B, the row (blocker=A) is invisible
+--   to B, so a subquery evaluated as B never sees it and the block silently does
+--   nothing in that direction. Proven: B could still read A's posts after A
+--   blocked B.
+--   is_blocked_between() is SECURITY DEFINER, so it sees ALL blocks regardless
+--   of who is querying, and reports a block in EITHER direction. It leaks no row
+--   contents (returns only a boolean), so the "can't see who blocked you"
+--   privacy property is preserved.
 -- ============================================================
 
--- helper predicate reused below: does a block exist between the viewer and :author
--- (either direction)?  Inlined per-policy since RLS can't call a parameterised
--- helper cleanly; kept identical across the three tables on purpose.
+create or replace function public.is_blocked_between(u1 uuid, u2 uuid)
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from blocks b
+    where (b.blocker_id = u1 and b.blocked_id = u2)
+       or (b.blocker_id = u2 and b.blocked_id = u1)
+  );
+$$;
+revoke all on function public.is_blocked_between(uuid, uuid) from public;
+grant execute on function public.is_blocked_between(uuid, uuid) to authenticated, anon;
 
--- ── POSTS ───────────────────────────────────────────────────
+-- ── FEED READS: posts / post_comments / post_likes ──────────
+-- Signed-out viewers (auth.uid() IS NULL) are unaffected (public links resolve).
 drop policy if exists "feed posts read" on posts;
 create policy "feed posts read" on posts for select using (
-  not exists (
-    select 1 from blocks b
-    where (b.blocker_id = auth.uid() and b.blocked_id = posts.user_id)
-       or (b.blocker_id = posts.user_id and b.blocked_id = auth.uid())
-  )
+  auth.uid() is null or not public.is_blocked_between(auth.uid(), posts.user_id)
 );
 
--- ── POST COMMENTS ───────────────────────────────────────────
 drop policy if exists "read post comments" on post_comments;
 create policy "read post comments" on post_comments for select using (
-  not exists (
-    select 1 from blocks b
-    where (b.blocker_id = auth.uid() and b.blocked_id = post_comments.user_id)
-       or (b.blocker_id = post_comments.user_id and b.blocked_id = auth.uid())
-  )
+  auth.uid() is null or not public.is_blocked_between(auth.uid(), post_comments.user_id)
 );
 
--- ── POST LIKES ──────────────────────────────────────────────
 drop policy if exists "read post likes" on post_likes;
 create policy "read post likes" on post_likes for select using (
-  not exists (
-    select 1 from blocks b
-    where (b.blocker_id = auth.uid() and b.blocked_id = post_likes.user_id)
-       or (b.blocker_id = post_likes.user_id and b.blocked_id = auth.uid())
+  auth.uid() is null or not public.is_blocked_between(auth.uid(), post_likes.user_id)
+);
+
+-- ── DM enforcement fix (same latent bug in supabase_dm_schema.sql) ───────────
+-- Re-issue the conversation-start and message-send checks using the definer
+-- function so a block stops NEW conversations/messages in BOTH directions, not
+-- only when the blocker is the one acting.
+drop policy if exists "start conversation if not blocked" on conversations;
+create policy "start conversation if not blocked" on conversations for insert with check (
+  (auth.uid() = user_a or auth.uid() = user_b)
+  and initiator_id = auth.uid()
+  and not public.is_blocked_between(user_a, user_b)
+);
+
+drop policy if exists "send messages respecting state and blocks" on messages;
+create policy "send messages respecting state and blocks" on messages for insert with check (
+  sender_id = auth.uid()
+  and exists (
+    select 1 from conversations c
+    where c.id = messages.conversation_id
+      and (c.user_a = auth.uid() or c.user_b = auth.uid())
+      and (c.status = 'accepted' or (c.status = 'pending' and c.initiator_id = auth.uid()))
+      and not public.is_blocked_between(c.user_a, c.user_b)
   )
 );
