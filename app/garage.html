@@ -63,86 +63,104 @@ document.addEventListener('DOMContentLoaded', function () {
      link on their phone) needs the backend, hosting + DB. When that exists,
      fetch the car JSON by id from the API here instead of CarBox.cars(). */
   var wantId = param('car');
-  var cars = CarBox.cars();
-  var car = null;
-  cars.forEach(function (c) { if (c.id === wantId) car = c; });
-  if (!car && !wantId) car = cars[0];
 
-  var prof = CarBox.get('profile');
-
-  if (!car) {
-    phone.innerHTML =
-      '<div class="pubmsg">This Coilover garage lives on its owner’s device.<br>' +
-      'Public garage links go live with the Coilover backend (accounts + hosting).' +
-      '<a class="pubcta" href="index.html">Open Coilover</a></div>';
-    return;
-  }
-
-  var v = car.vehicle || {};
   var SPEC_ROWS = [
     ['engine', 'spec_piston', 'i-piston'], ['horsepower', 'spec_bolt', 'i-bolt'], ['torque', 'spec_gearbox', 'i-gearbox'],
     ['transmission', 'spec_gear', 'i-gear'], ['drivetrain', 'spec_tire', 'i-tire'], ['accel', 'spec_gauge', 'i-gauge']
   ];
-  var specHtml = SPEC_ROWS.map(function (r) {
-    return '<div class="row"><div class="ic"><img class="' + r[2] + '" src="assets/' + r[1] + '.png" alt=""></div><div class="tx"></div></div>';
-  }).join('');
-
   var CHIP = { mod: 'MOD', maint: 'MAINTENANCE', repair: 'REPAIR', cosmetic: 'COSMETIC' };
-  var entries = car.entries || [];
-  var tlHtml = '';
-  if (entries.length) {
-    tlHtml = '<div class="tlh">Build & maintenance</div><div class="tl"><div class="rail"></div>' +
-      entries.map(function (e) {
-        var parts = [];
-        if (e.cost > 0) parts.push(CarBox.fmtMoney(e.cost));
-        if (e.miles > 0) parts.push(CarBox.fmtMiles(e.miles));
-        if (e.date) parts.push(e.date);
-        return '<div class="ent"><span class="dot"></span><div class="ecard">' +
-          '<span class="chip ' + e.type + '">' + (CHIP[e.type] || 'MOD') + '</span>' +
-          '<div class="etitle"></div><div class="emeta"></div></div></div>';
-      }).join('') + '</div>';
+
+  function showNotFound() {
+    phone.innerHTML =
+      '<div class="pubmsg">This Coilover garage isn’t available.<br>' +
+      'The link may be private, or the owner hasn’t synced it yet.' +
+      '<a class="pubcta" href="index.html">Open Coilover</a></div>';
   }
 
-  phone.innerHTML =
-    '<div class="pubbar"><span class="dot"></span>Public garage</div>' +
-    '<div class="pubprofile"><div class="avatar"></div><div>' +
-      '<div class="pname"></div><div class="phandle"></div></div></div>' +
-    '<div class="hero"><img class="i-sprite" alt=""></div>' +
-    '<h1 class="cartitle serif"></h1><div class="caryear serif"></div>' +
-    '<div class="spec">' + specHtml + '</div>' +
-    '<div class="pubstats">' +
-      '<div class="pubstat"><img src="assets/icon_thumb.png" alt=""><span class="cnt"></span></div>' +
-      '<div class="pubstat"><img class="pxcomment" src="assets/icon_comment_px.png" alt=""><span class="cnt"></span></div>' +
-    '</div>' +
-    tlHtml;
+  /* renders a car-shaped object (local OR fetched-from-cloud) + a {name,handle} */
+  function render(car, prof) {
+    prof = prof || {};
+    var v = car.vehicle || {};
+    var specHtml = SPEC_ROWS.map(function (r) {
+      return '<div class="row"><div class="ic"><img class="' + r[2] + '" src="assets/' + r[1] + '.png" alt=""></div><div class="tx"></div></div>';
+    }).join('');
 
-  /* fill text via textContent (avoids any HTML injection from stored strings) */
-  phone.querySelector('.pname').textContent = prof.name;
-  phone.querySelector('.phandle').textContent = prof.handle;
-  phone.querySelector('.cartitle').textContent = v.name || 'Car';
-  phone.querySelector('.caryear').textContent = String(v.year || '');
-  /* real counts straight off this car's own data — never a placeholder number */
-  var statCnts = phone.querySelectorAll('.pubstat .cnt');
-  statCnts[0].textContent = String(car.likes || 0);
-  statCnts[1].textContent = String((car.comments || []).length);
-  var specTx = phone.querySelectorAll('.spec .tx');
-  SPEC_ROWS.forEach(function (r, i) {
-    specTx[i].textContent = (v.specs && v.specs[r[0]] && String(v.specs[r[0]]).trim()) || '—';
-  });
-  var ents = phone.querySelectorAll('.ent');
-  entries.forEach(function (e, i) {
-    ents[i].querySelector('.etitle').textContent = e.title || '';
-    var parts = [];
-    if (e.cost > 0) parts.push(CarBox.fmtMoney(e.cost));
-    if (e.miles > 0) parts.push(CarBox.fmtMiles(e.miles));
-    if (e.date) parts.push(e.date);
-    ents[i].querySelector('.emeta').textContent = parts.join(' · ');
-  });
-  /* tint the sprite with THIS car's appearance (not the active car) */
-  var ap = car.appearance || { presetId: 'body_suv', hue: null, shade: 1 };
-  UI.tintSprite('assets/' + ap.presetId + '.png', ap.hue, ap.shade, function (url) {
-    phone.querySelector('.i-sprite').src = url;
-  });
+    var entries = car.entries || [];
+    var tlHtml = '';
+    if (entries.length) {
+      tlHtml = '<div class="tlh">Build & maintenance</div><div class="tl"><div class="rail"></div>' +
+        entries.map(function (e) {
+          return '<div class="ent"><span class="dot"></span><div class="ecard">' +
+            '<span class="chip ' + e.type + '">' + (CHIP[e.type] || 'MOD') + '</span>' +
+            '<div class="etitle"></div><div class="emeta"></div></div></div>';
+        }).join('') + '</div>';
+    }
+
+    phone.innerHTML =
+      '<div class="pubbar"><span class="dot"></span>Public garage</div>' +
+      '<div class="pubprofile"><div class="avatar"></div><div>' +
+        '<div class="pname"></div><div class="phandle"></div></div></div>' +
+      '<div class="hero"><img class="i-sprite" alt=""></div>' +
+      '<h1 class="cartitle serif"></h1><div class="caryear serif"></div>' +
+      '<div class="spec">' + specHtml + '</div>' +
+      '<div class="pubstats">' +
+        '<div class="pubstat"><img src="assets/icon_thumb.png" alt=""><span class="cnt"></span></div>' +
+        '<div class="pubstat"><img class="pxcomment" src="assets/icon_comment_px.png" alt=""><span class="cnt"></span></div>' +
+      '</div>' +
+      tlHtml;
+
+    /* fill text via textContent (avoids any HTML injection from stored strings) */
+    phone.querySelector('.pname').textContent = prof.name || '';
+    phone.querySelector('.phandle').textContent = prof.handle || '';
+    phone.querySelector('.cartitle').textContent = v.name || 'Car';
+    phone.querySelector('.caryear').textContent = String(v.year || '');
+    var statCnts = phone.querySelectorAll('.pubstat .cnt');
+    statCnts[0].textContent = String(car.likes || 0);
+    statCnts[1].textContent = String((car.comments || []).length);
+    var specTx = phone.querySelectorAll('.spec .tx');
+    SPEC_ROWS.forEach(function (r, i) {
+      specTx[i].textContent = (v.specs && v.specs[r[0]] && String(v.specs[r[0]]).trim()) || '—';
+    });
+    var ents = phone.querySelectorAll('.ent');
+    entries.forEach(function (e, i) {
+      ents[i].querySelector('.etitle').textContent = e.title || '';
+      var parts = [];
+      if (e.cost > 0) parts.push(CarBox.fmtMoney(e.cost));
+      if (e.miles > 0) parts.push(CarBox.fmtMiles(e.miles));
+      if (e.date) parts.push(e.date);
+      ents[i].querySelector('.emeta').textContent = parts.join(' · ');
+    });
+    /* tint the sprite with THIS car's appearance (not the active car) */
+    var ap = car.appearance || { presetId: 'body_suv', hue: null, shade: 1 };
+    UI.tintSprite('assets/' + ap.presetId + '.png', ap.hue, ap.shade, function (url) {
+      phone.querySelector('.i-sprite').src = url;
+    });
+  }
+
+  /* ── routing ──────────────────────────────────────────────────────────────
+     OWNER path (unchanged): the car is in THIS device's local store.
+     PUBLIC path (new): a car id that isn't local is fetched from the normalized
+     cloud tables — the only place another user's data exists. Any failure or a
+     non-public / missing car falls back to the not-found state. */
+  var localCar = null;
+  CarBox.cars().forEach(function (c) { if (c.id === wantId) localCar = c; });
+  if (!localCar && !wantId) localCar = CarBox.cars()[0];
+
+  if (localCar) {
+    render(localCar, CarBox.get('profile'));
+  } else if (wantId && window.CarBoxCloud && CarBoxCloud.available) {
+    /* show a loading state immediately (never a blank screen) and hard-cap the
+       wait so an unreachable backend falls back to not-found instead of hanging */
+    phone.innerHTML = '<div class="pubmsg">Loading garage…</div>';
+    var settled = false;
+    function settle(fn) { if (settled) return; settled = true; clearTimeout(timer); fn(); }
+    var timer = setTimeout(function () { settle(showNotFound); }, 8000);
+    CarBoxCloud.fetchPublicCar(wantId).then(function (res) {
+      settle(function () { if (res && res.car) render(res.car, res.profile); else showNotFound(); });
+    }, function () { settle(showNotFound); });
+  } else {
+    showNotFound();
+  }
 });
 </script>
 </body>

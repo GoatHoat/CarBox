@@ -62,8 +62,9 @@ alter table posts         enable row level security;
 alter table post_likes    enable row level security;
 alter table post_comments enable row level security;
 
--- POSTS
-create policy "feed posts read"   on posts for select to authenticated using (true);
+-- POSTS: world-readable (a post is public content, and a shared public-garage
+-- link must resolve for a signed-out viewer too). Writes stay own-only below.
+create policy "feed posts read"   on posts for select using (true);
 create policy "insert own post"   on posts for insert to authenticated with check (auth.uid() = user_id);
 create policy "update own post"   on posts for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "delete own post"   on posts for delete to authenticated using (auth.uid() = user_id);

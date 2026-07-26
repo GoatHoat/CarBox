@@ -14,7 +14,12 @@
   var cfg = window.CARBOX_CONFIG || {};
   var libOk = window.supabase && window.supabase.createClient;
   var keysOk = cfg.SUPABASE_URL && cfg.SUPABASE_URL.indexOf('PASTE') !== 0 && cfg.SUPABASE_ANON_KEY;
-  if (!libOk || !keysOk) { return; }   /* app stays fully local */
+  if (!libOk || !keysOk) {
+    /* app stays fully local — expose a no-op cloud reader so callers (garage.html)
+       can branch on availability without needing to know why it's unavailable */
+    window.CarBoxCloud = { available: false, fetchPublicCar: function () { return Promise.resolve(null); } };
+    return;
+  }
 
   var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
   window.sb = sb;
@@ -148,6 +153,7 @@
       var local = localState();
       if (session && session.user) {
         window.CARBOX_USER = session.user;   /* lets uploads.js switch photos to real cloud Storage */
+        mirrorNormalized();                  /* additive: mirror cars/entries/posts up on load */
         /* Adopt cloud state ONLY on a fresh device with no local garage yet
            (e.g. logging in on a new phone). If THIS device already finished
            onboarding, do NOT overwrite its local state or hard-reload under the
@@ -205,6 +211,126 @@
   if (window.CarBox && CarBox.subscribe) {
     CarBox.subscribe(function () { pushState(); });
   }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     ADDITIVE cloud mirror → normalized cars/entries/posts tables.
+     Runs ALONGSIDE the user_state blob sync above; it never replaces it. Local
+     writes always land in localStorage first (state.js) with zero dependence on
+     this. This best-effort mirror copies cars/entries/posts UP so OTHER users
+     can read them (public garages, feed). Debounced + fully guarded: no session,
+     or any failed cloud write, is swallowed and can never roll back or block the
+     local save. "My own data" is still read from the local blob, unchanged; only
+     OTHER users' data is read from these tables (see CarBoxCloud below).
+     ══════════════════════════════════════════════════════════════════════════ */
+  function makeModelFromLabel(label) {
+    var t = String(label || '').trim().split(/\s+/);
+    if (/^\d{4}$/.test(t[0])) t = t.slice(1);          /* drop a leading year */
+    return { make: t[0] || null, model: t.slice(1).join(' ') || null };
+  }
+  function mirrorEntries(cloudCarId, entries) {
+    /* replace-all: a car's entries are few, so delete + re-insert keeps the cloud
+       copy an exact mirror without needing to map per-entry ids */
+    return sb.from('entries').delete().eq('car_id', cloudCarId).then(function () {
+      if (!entries || !entries.length) return;
+      var rows = entries.map(function (e) {
+        return {
+          car_id: cloudCarId, type: e.type || 'mod', title: e.title || '',
+          cost: e.cost || 0, miles: (typeof e.miles === 'number' ? e.miles : null),
+          date: e.date || null, notes: e.notes || null, part: e.part || null,
+          shop: e.shop || null, photos: e.photos || []
+        };
+      });
+      return sb.from('entries').insert(rows);
+    });
+  }
+  function mirrorCar(userId, c, idMap) {
+    var v = c.vehicle || {};
+    return sb.from('cars').upsert({
+      client_id: c.id, user_id: userId,
+      name: v.name || null, make: v.make || null, model: v.model || null,
+      year: v.year || null, trim: v.trim || null, mileage: v.mileage || 0,
+      specs: v.specs || null, appearance: c.appearance || null,
+      goal: c.goal || null, is_public: true            /* synced cars are viewable by link */
+    }, { onConflict: 'client_id' }).select('id').maybeSingle().then(function (res) {
+      var cloudId = res && res.data && res.data.id;
+      if (!cloudId) return;
+      idMap[c.id] = cloudId;
+      return mirrorEntries(cloudId, c.entries || []);
+    });
+  }
+  function mirrorPosts(userId, posts, idMap) {
+    var chain = Promise.resolve();
+    (posts || []).forEach(function (p) {
+      if (!p || !p.mine) return;                        /* only mirror MY posts */
+      chain = chain.then(function () {
+        var mm = makeModelFromLabel(p.carLabel);
+        return sb.from('posts').upsert({
+          client_id: p.id, user_id: userId,
+          car_id: (p.carId && idMap[p.carId]) || null,
+          car_label: p.carLabel || null, make: mm.make, model: mm.model,
+          city: p.city || null, title_suffix: p.titleSuffix || null,
+          description: p.description || null, photos: p.photos || []
+        }, { onConflict: 'client_id' });
+      });
+    });
+    return chain;
+  }
+  var mirrorT = null;
+  function mirrorNormalized() {
+    if (mirrorT) clearTimeout(mirrorT);
+    mirrorT = setTimeout(function () {
+      sb.auth.getUser().then(function (r) {
+        var user = r && r.data && r.data.user;
+        if (!user) return;                              /* not signed in -> nothing to mirror */
+        var local = localState();
+        var localCars = (local && local.cars) || [];
+        var idMap = {};
+        var chain = Promise.resolve();
+        localCars.forEach(function (c) {
+          chain = chain.then(function () { return mirrorCar(user.id, c, idMap); });
+        });
+        chain
+          .then(function () { return mirrorPosts(user.id, (local && local.posts) || [], idMap); })
+          .then(function () {}, function () {});          /* swallow: local was already saved */
+      }, function () {});
+    }, 1200);
+  }
+  /* additive second subscriber: mirror on every store change (pushState stays as-is) */
+  if (window.CarBox && CarBox.subscribe) { CarBox.subscribe(mirrorNormalized); }
+
+  /* ── read OTHER users' public data (the only path for non-local data) ── */
+  window.CarBoxCloud = {
+    available: true,
+    /* resolve a shared garage link (garage.html?car=<local id>) to its public
+       cloud data, or null if it isn't found / isn't public / the fetch fails */
+    fetchPublicCar: function (clientId) {
+      if (!clientId) return Promise.resolve(null);
+      return sb.from('cars').select('*').eq('client_id', clientId).eq('is_public', true).maybeSingle()
+        .then(function (res) {
+          var row = res && res.data;
+          if (!row) return null;
+          return Promise.all([
+            sb.from('entries').select('*').eq('car_id', row.id),
+            sb.from('profiles').select('username,tag').eq('id', row.user_id).maybeSingle(),
+            sb.from('posts').select('*').eq('user_id', row.user_id).order('created_at', { ascending: false })
+          ]).then(function (arr) {
+            var entries = (arr[0] && arr[0].data) || [];
+            var prof = (arr[1] && arr[1].data) || {};
+            var posts = (arr[2] && arr[2].data) || [];
+            return {
+              car: {
+                vehicle: { name: row.name, make: row.make, model: row.model, year: row.year, trim: row.trim, specs: row.specs },
+                appearance: row.appearance,
+                entries: entries.map(function (e) { return { type: e.type, title: e.title, cost: e.cost, miles: e.miles, date: e.date }; }),
+                likes: 0, comments: []       /* car likes/comments not mirrored yet (future step) */
+              },
+              profile: { name: (prof && prof.username) || 'Coilover owner', handle: (prof && prof.tag) || '' },
+              posts: posts
+            };
+          });
+        }, function () { return null; });
+    }
+  };
 
   /* ── public auth helpers (used by login.html + settings sign out) ── */
   window.CarBoxAuth = {
