@@ -25,9 +25,9 @@ const DARK = '#1D1C1C'; // must match --page-bg in style.css dark theme so safe 
 // For REAL Apple sandbox + production, replace ios with your Apple key (appl_...);
 // for Google Play, android with your Google key (goog_...).
 const RC_API_KEY = Platform.select({
-  ios: 'test_QaxgToHQrnLJBPsiFFzwtiJlFMb',      // TODO: swap for appl_... before real Apple purchases
-  android: 'test_QaxgToHQrnLJBPsiFFzwtiJlFMb',  // TODO: swap for goog_... before Play
-  default: 'test_QaxgToHQrnLJBPsiFFzwtiJlFMb',
+  ios: 'appl_qfyDDoPnIdTchAizaHHpqHFiKWz',      // real Apple public SDK key
+  android: 'goog_REPLACE_WITH_YOUR_GOOGLE_KEY', // TODO: Play key when you add Android
+  default: 'appl_qfyDDoPnIdTchAizaHHpqHFiKWz',
 });
 const RC_ENTITLEMENT = 'pro';   // must match app/billing.js + your RevenueCat entitlement id
 
