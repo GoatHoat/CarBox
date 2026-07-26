@@ -189,9 +189,10 @@ window.CarBoxBilling = (function () {
       return Promise.resolve(n.purchase(plan)).then(function (active) { if (active) setPro(true); return !!active; });
     }
     if (!insideNativeShell()) return stripeCheckout(plan);
-    /* DEV FALLBACK: inside the native shell but no RevenueCat bridge yet. */
-    setPro(true);
-    return Promise.resolve(true);
+    /* Inside the native shell but the StoreKit bridge isn't available — FAIL,
+       never grant Pro. (The old dev fallback here granted Pro for free, which
+       leaked into the cloud and gave new sign-ins free Pro. Removed.) */
+    return Promise.reject(billingError('server', 'In-app purchase isn’t available in this build.'));
   }
   function restore() {
     var n = native();
