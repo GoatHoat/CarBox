@@ -15,14 +15,17 @@
 window.CarBoxWheels = (function () {
   'use strict';
 
-  /* preset id -> { w, h (natural px), wheels:[{x,y,r} front, rear] } */
+  /* preset id -> { w, h (natural px), wheels:[{x,y,r} front, rear] }
+     Centres found by rotational-symmetry fitting (the point the tire ring is
+     symmetric about = the true axle, so rotation never wobbles); r = the rim's
+     outer radius (tire inner edge) so ONLY the rim spins and the tire stays. */
   var GEOM = {
-    body_suv:      { w: 872, h: 340, wheels: [{ x: 170, y: 261, r: 54 }, { x: 688, y: 266, r: 54 }] },
-    body_suvcoupe: { w: 875, h: 330, wheels: [{ x: 161, y: 236, r: 50 }, { x: 703, y: 235, r: 50 }] },
-    body_coupe2:   { w: 885, h: 278, wheels: [{ x: 163, y: 201, r: 54 }, { x: 730, y: 207, r: 54 }] },
-    body_coupe4:   { w: 868, h: 265, wheels: [{ x: 157, y: 184, r: 50 }, { x: 693, y: 196, r: 50 }] },
-    body_sedan:    { w: 874, h: 284, wheels: [{ x: 147, y: 200, r: 50 }, { x: 687, y: 216, r: 50 }] },
-    sprite_chiron: { w: 1001, h: 265, wheels: [{ x: 212, y: 177, r: 58 }, { x: 836, y: 193, r: 58 }] }
+    body_suv:      { w: 872, h: 340, wheels: [{ x: 175, y: 266, r: 65 }, { x: 688, y: 267, r: 65 }] },
+    body_suvcoupe: { w: 875, h: 330, wheels: [{ x: 167, y: 232, r: 60 }, { x: 700, y: 233, r: 61 }] },
+    body_coupe2:   { w: 885, h: 278, wheels: [{ x: 169, y: 204, r: 61 }, { x: 729, y: 204, r: 62 }] },
+    body_coupe4:   { w: 868, h: 265, wheels: [{ x: 163, y: 190, r: 53 }, { x: 693, y: 197, r: 54 }] },
+    body_sedan:    { w: 874, h: 284, wheels: [{ x: 151, y: 206, r: 52 }, { x: 686, y: 217, r: 54 }] },
+    sprite_chiron: { w: 1001, h: 265, wheels: [{ x: 217, y: 171, r: 64 }, { x: 842, y: 196, r: 66 }] }
   };
 
   var styleInjected = false;
@@ -36,18 +39,18 @@ window.CarBoxWheels = (function () {
       /* keep the cross-page car morph on the image itself */
       '.cb-wheels{position:absolute;inset:0;pointer-events:none;overflow:visible}' +
       '.cb-wheel{position:absolute;border-radius:50%;overflow:hidden;' +
-        '-webkit-mask:radial-gradient(circle at 50% 50%,#000 76%,rgba(0,0,0,0) 100%);' +
-                'mask:radial-gradient(circle at 50% 50%,#000 76%,rgba(0,0,0,0) 100%)}' +
+        '-webkit-mask:radial-gradient(circle at 50% 50%,#000 85%,rgba(0,0,0,0) 100%);' +
+                'mask:radial-gradient(circle at 50% 50%,#000 85%,rgba(0,0,0,0) 100%)}' +
       '.cb-wheel-spin{position:absolute;background-repeat:no-repeat;background-size:100% 100%;' +
         'image-rendering:pixelated;' +
-        'animation:cb-spin var(--cb-wheel-dur,.5s) linear infinite;' +
+        'animation:cb-spin var(--cb-wheel-dur,.22s) linear infinite;' +
         'will-change:transform;backface-visibility:hidden}' +
       /* BOTH keyframes must use rotate() so the browser interpolates the ANGLE,
          not the (identical) start/end matrices -> a real full turn. Car faces
          left, so wheels roll counter-clockwise. */
       '@keyframes cb-spin{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}' +
       /* respect reduced motion: never stops, but rolls gently instead of a blur */
-      '@media (prefers-reduced-motion:reduce){.cb-wheel-spin{animation-duration:var(--cb-wheel-dur-rm,3.6s)}}';
+      '@media (prefers-reduced-motion:reduce){.cb-wheel-spin{animation-duration:var(--cb-wheel-dur-rm,2s)}}';
     document.head.appendChild(s);
   }
 
