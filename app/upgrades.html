@@ -70,20 +70,15 @@
   .recshead{display:flex;justify-content:flex-end;align-items:center;margin-top:12px}
   .recsorder{font-size:12px;font-weight:600;color:var(--mut,#8D8D8B);letter-spacing:.01em}
 
-  /* locked recommendations (free plan): blurred content + lock badge, matching
-     the locked-map pattern. Tapping anywhere opens the Pro paywall. */
-  .scard.locked{cursor:pointer;overflow:hidden}
-  .scard.locked .stitle,.scard.locked .smeta,.scard.locked .schip{
-    filter:blur(5px);user-select:none;pointer-events:none;
-  }
-  .scard.locked .lockwrap{
-    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:7px;
-    border-radius:16px;background:rgba(247,247,247,.34);
-  }
-  html[data-theme="dark"] .scard.locked .lockwrap{background:rgba(41,40,39,.34)}
+  /* locked recommendations (free plan): a solid opaque black box with a lock —
+     NO real content behind it (the AI never generated these for a free user).
+     Tapping anywhere opens the Pro paywall. */
+  .scard.locked{cursor:pointer;overflow:hidden;background:#141210;
+    display:flex;align-items:center;justify-content:center;min-height:92px;padding:18px}
+  .scard.locked .lockwrap{display:flex;align-items:center;justify-content:center;gap:8px}
   .scard.locked .lockwrap img{width:17px}
   .scard.locked .lockwrap .lktx{
-    font-size:13.5px;font-weight:700;color:var(--accent-tx,#776357);
+    font-size:14px;font-weight:700;color:#ECE5DD;letter-spacing:.01em;
   }
 
   .budgetline{font-size:13.5px;font-weight:600;color:var(--warmgray);margin-top:8px;cursor:pointer}
@@ -295,13 +290,35 @@ document.addEventListener('DOMContentLoaded', function () {
                  goal, filter || 'nf', budgetKey].join('|');
   var items = [];   /* [{name, benefit, detail}] — up to 5, best first */
 
-  /* ── Pro gating: first FREE_RECS are always visible, the rest need Pro ── */
+  /* ── Pro gating ──
+     A free user only ever gets FREE_RECS (2) actually GENERATED — the remaining
+     slots up to TOTAL_RECS are static "Unlock with Pro" boxes with no AI content
+     behind them (we don't pay to generate mods a free user can't see). Going Pro
+     triggers a fresh generation of the full TOTAL_RECS. */
   var FREE_RECS = 2;
+  var TOTAL_RECS = 5;
   function isPro() {
     if (window.CarBoxBilling && CarBoxBilling.isPro) return !!CarBoxBilling.isPro();
     return !!CarBox.get('isPro');
   }
+  function wantRecs() { return isPro() ? TOTAL_RECS : FREE_RECS; }   /* how many we actually generate */
   function unlockedCount() { return isPro() ? Infinity : FREE_RECS; }
+
+  /* append the black "Unlock with Pro" placeholder boxes (free plan only) */
+  function appendLockedPlaceholders() {
+    if (isPro()) return;
+    for (var i = 0; i < TOTAL_RECS - FREE_RECS; i++) {
+      var st = card(
+        '<div class="scard locked" role="button" tabindex="0" aria-label="Unlock with Coilover Pro">' +
+        '<div class="lockwrap"><img src="assets/badge_lock.png" alt="">' +
+        '<span class="lktx">Unlock with Pro</span></div></div>'
+      );
+      var lc = st.querySelector('.scard');
+      lc.addEventListener('click', function () { if (window.Pro) Pro.open(); });
+      lc.addEventListener('keydown', function (e) { if (e.key === 'Enter' && window.Pro) Pro.open(); });
+      recsWrap.appendChild(st);
+    }
+  }
 
   function card(html) {
     var stage = document.createElement('div');
@@ -311,12 +328,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   function renderSkeleton() {
     recsWrap.querySelectorAll('.stage').forEach(function (el) { el.remove(); });
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < wantRecs(); i++) {   /* only the ones we're actually generating */
       recsWrap.appendChild(card(
         '<div class="scard skel" aria-hidden="true">' +
         '<div class="skelline w40"></div><div class="skelline w70"></div><div class="skelline w55"></div></div>'
       ));
     }
+    appendLockedPlaceholders();   /* free: show the 3 locked boxes immediately */
   }
 
   var CHECK_SVG = '<svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" ' +
@@ -371,57 +389,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function renderRecs() {
     recsWrap.querySelectorAll('.stage').forEach(function (el) { el.remove(); });
-    var freeUpTo = unlockedCount();
     /* the ordering hint only appears once there is a list to order */
     orderLabel.textContent = items.length > 1 ? 'Best pick first' : '';
 
-    items.forEach(function (mod, i) {
-      if (i < freeUpTo) {
-        var stage = card(
-          '<div class="scard" data-name="' + mod.name.replace(/"/g, '&quot;') + '" role="button" tabindex="0" data-press>' +
-          '<span class="schip">RECOMMENDED</span>' +
-          '<div class="stitle"></div>' +
-          '<div class="smeta"></div>' +
-          '<button class="addmap">Add to map</button></div>'
-        );
-        stage.querySelector('.stitle').textContent = mod.name;
-        stage.querySelector('.smeta').textContent = clean(mod.benefit);
-        var sc = stage.querySelector('.scard');
-        sc.addEventListener('click', function (e) {
-          if (e.target.closest('.addmap')) return;
-          openDetail(mod);
-        });
-        sc.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter') openDetail(mod);
-        });
-        stage.querySelector('.addmap').addEventListener('click', function () {
-          CarBox.set('mappedMod', mod.name);
-          var b = this;
-          b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
-          paintMapped();
-          loadShops();   /* swap the map section to this mod's shops */
-        });
-        recsWrap.appendChild(stage);
-        return;
-      }
-      /* LOCKED (free plan): the mod is already fetched and cached, we just blur
-         it. Going Pro re-renders from the same cache with no new AI call. */
-      var lockStage = card(
-        '<div class="scard locked" role="button" tabindex="0" aria-label="Unlock with Coilover Pro">' +
+    /* every fetched item is a real, unlocked card (free users only ever have
+       FREE_RECS of them; Pro users have TOTAL_RECS) */
+    items.forEach(function (mod) {
+      var stage = card(
+        '<div class="scard" data-name="' + mod.name.replace(/"/g, '&quot;') + '" role="button" tabindex="0" data-press>' +
         '<span class="schip">RECOMMENDED</span>' +
         '<div class="stitle"></div>' +
         '<div class="smeta"></div>' +
-        '<div class="lockwrap"><img src="assets/badge_lock.png" alt="">' +
-        '<span class="lktx">Unlock with Pro</span></div></div>'
+        '<button class="addmap">Add to map</button></div>'
       );
-      lockStage.querySelector('.stitle').textContent = mod.name;
-      lockStage.querySelector('.smeta').textContent = clean(mod.benefit);
-      var lc = lockStage.querySelector('.scard');
-      function openPaywall() { if (window.Pro) Pro.open(); }
-      lc.addEventListener('click', openPaywall);
-      lc.addEventListener('keydown', function (e) { if (e.key === 'Enter') openPaywall(); });
-      recsWrap.appendChild(lockStage);
+      stage.querySelector('.stitle').textContent = mod.name;
+      stage.querySelector('.smeta').textContent = clean(mod.benefit);
+      var sc = stage.querySelector('.scard');
+      sc.addEventListener('click', function (e) {
+        if (e.target.closest('.addmap')) return;
+        openDetail(mod);
+      });
+      sc.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') openDetail(mod);
+      });
+      stage.querySelector('.addmap').addEventListener('click', function () {
+        CarBox.set('mappedMod', mod.name);
+        var b = this;
+        b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+        paintMapped();
+        loadShops();   /* swap the map section to this mod's shops */
+      });
+      recsWrap.appendChild(stage);
     });
+
+    /* free plan: the remaining slots are solid "Unlock with Pro" boxes with no
+       generated content — we never spent a generation on them */
+    appendLockedPlaceholders();
 
     if (!CarBox.get('mappedMod') || mappedName() !== CarBox.get('mappedMod')) {
       CarBox.set('mappedMod', mappedName());
@@ -429,10 +432,10 @@ document.addEventListener('DOMContentLoaded', function () {
     paintMapped();
   }
 
-  /* Going Pro unlocks the cards already in memory. No refetch: the locked items
-     were fetched with the rest, so this is purely a re-render. */
+  /* Going Pro: NOW generate the full set (the extra mods were never generated
+     while free). Only if recs were already shown for this car. */
   document.addEventListener('carbox-pro', function () {
-    if (items.length) { renderRecs(); loadShops(); }
+    if (items.length) { fetchRecs(); }
   });
 
   /* ── LOCAL FALLBACK recommender (budget-aware) ──
@@ -440,8 +443,8 @@ document.addEventListener('DOMContentLoaded', function () {
      Rules-based pools per goal + aspiration, each with an approx installed cost;
      filtered by the budget cap so it never suggests something unaffordable.
      Detail strings contain no em/en dashes. Returns { items, note }. */
-  var WANT_RECS = 5;
   function selectByBudget(pool, cap) {
+    var WANT_RECS = wantRecs();   /* 2 for free, 5 for Pro */
     /* Rank by PRIORITY, not price: the best first mod for a goal is often not
        the cheapest one, and ordering by cost produced actively bad advice (it
        put brake cooling ducts above track pads). Cost is used only to decide
@@ -568,14 +571,15 @@ document.addEventListener('DOMContentLoaded', function () {
      never on page load. `fetchRecs` is what makes the billed call. */
   function fetchRecs() {
     var cap = budget ? budget.max : null;
+    var want = wantRecs();   /* only generate what this plan is entitled to */
     renderSkeleton();
     api('/api/recommend', {
       make: vehicle.make, model: vehicle.model, year: vehicle.year,
       trim: vehicle.trim || '', specs: vehicle.specs || {}, goal: goal,
-      filter: filter || CarBoxGoals.BEST_OVERALL, budget: budget
+      filter: filter || CarBoxGoals.BEST_OVERALL, budget: budget, count: want
     }, 25000).then(function (data) {
-      if (data && data.recommendations && data.recommendations.length === WANT_RECS) {
-        items = data.recommendations.map(function (m) {
+      if (data && data.recommendations && data.recommendations.length >= want) {
+        items = data.recommendations.slice(0, want).map(function (m) {
           return { name: m.name, benefit: clean(m.benefit), detail: clean(m.detail) };
         });
         CarBox.set('recs', { key: recsKey, items: items, source: 'api' });
@@ -597,6 +601,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var cached = CarBox.get('recs');
     if (!cached || cached.key !== recsKey || !cached.items || !cached.items.length) return false;
     items = cached.items;
+    /* Pro but only the free count was ever generated (cached before upgrading)
+       -> generate the full set now instead of showing a short list */
+    if (isPro() && items.length < TOTAL_RECS) { fetchRecs(); return true; }
     renderNote(cached.source === 'api' ? null : (cached.note || null));
     renderRecs();
     loadShops();

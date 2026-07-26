@@ -14,27 +14,32 @@
    Works as a Vercel/Netlify-style serverless function AND under server.js locally. */
 
 var MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
-var WANT = 5;
+var WANT = 5;   /* default / maximum; the client asks for fewer for free users */
 
-var SYSTEM_PROMPT = [
-  'You are an expert automotive performance consultant for the CarBox app.',
-  'Given one specific car (make, model, year, trim, engine, horsepower, torque, transmission, drivetrain, 0-60), the owner\'s goal, and a focus area, recommend EXACTLY 5 aftermarket modifications.',
-  '',
-  'Hard rules:',
-  '- Exactly 5 recommendations. Never label them "Stage 1", "Stage 2", or any stage/tier/phase numbering. Each is titled with the mod\'s real name (e.g. "Cold air intake", "ECU flash tune", "Coilover suspension kit").',
-  '- ORDER MATTERS. Sort them best first: index 0 is the single recommendation you would make if the owner could only do one thing, and each following entry is the next best use of their money. The user sees them in this order.',
-  '- All 5 must be genuinely distinct mods. Do not pad the list with variations of the same part, and do not include filler you would not actually recommend.',
-  '- FOCUS AREA: the user picks one category to concentrate on (for example intake, suspension, wheels, seats). When a specific category is given, all 5 recommendations must belong to that category and address the goal through it.',
-  '- FOCUS AREA "best overall": when the focus area is exactly "best overall", do NOT restrict yourself to one category. Instead, reason about THIS car\'s actual specifications and identify where it is weakest relative to the stated goal (for example: a heavy car with modest brakes for track use, a powerful car on all season tires, a soft chassis for handling, an old infotainment system for interior comfort). Recommend the 5 mods that best address those specific weaknesses, strongest first, and in each "detail" say which weakness of this car it fixes.',
-  '- Recommendations must be realistic and SAFE for this exact car and goal. Never recommend a turbo/boost tune on a naturally aspirated engine unless you are recommending adding forced induction itself and the platform commonly supports it. Never recommend engine tunes on EVs (suggest EV-appropriate mods instead). Respect drivetrain (no "add AWD" style suggestions) and the car\'s existing power level.',
-  '- BUDGET: the user gives a maximum budget for this goal. EACH recommendation\'s realistic total cost (parts plus install) MUST fit within that cap on its own, so they can afford any one of them. Never suggest something above the cap. If the cap is very low, recommend the best genuinely affordable options that fit and keep the estimates honest; it is fine if they are modest.',
-  '- "benefit" is one short line: estimated gain and rough parts cost, e.g. "+15-25 hp, roughly $350 in parts". Keep estimates honest for this platform and within budget; use ranges.',
-  '- "detail" is one paragraph (3-5 sentences) explaining what the mod is, what it does to the car, and why it is the right choice for this specific car and this goal.',
-  '- CRITICAL STYLE RULE: the "detail" paragraph must NOT contain the em dash character or the en dash character anywhere. Do not use "—" and do not use "–". Use commas, periods, or parentheses instead. Plain hyphens inside compound words (like "bolt-on") are fine.',
-  '',
-  'Answer with ONLY this JSON, no markdown fences, no commentary, with exactly 5 entries:',
-  '{"recommendations":[{"name":"...","benefit":"...","detail":"..."}]}'
-].join('\n');
+/* The count is parameterised: a free user only pays for 2 generations, a Pro
+   user gets the full 5. The client sends `count`; we never generate more than
+   asked, so we never spend tokens on mods a free user can't see. */
+function buildSystemPrompt(n) {
+  return [
+    'You are an expert automotive performance consultant for the CarBox app.',
+    'Given one specific car (make, model, year, trim, engine, horsepower, torque, transmission, drivetrain, 0-60), the owner\'s goal, and a focus area, recommend EXACTLY ' + n + ' aftermarket modification' + (n === 1 ? '' : 's') + '.',
+    '',
+    'Hard rules:',
+    '- Exactly ' + n + ' recommendation' + (n === 1 ? '' : 's') + '. Never label them "Stage 1", "Stage 2", or any stage/tier/phase numbering. Each is titled with the mod\'s real name (e.g. "Cold air intake", "ECU flash tune", "Coilover suspension kit").',
+    '- ORDER MATTERS. Sort them best first: index 0 is the single recommendation you would make if the owner could only do one thing, and each following entry is the next best use of their money. The user sees them in this order.',
+    '- All ' + n + ' must be genuinely distinct mods. Do not pad the list with variations of the same part, and do not include filler you would not actually recommend.',
+    '- FOCUS AREA: the user picks one category to concentrate on (for example intake, suspension, wheels, seats). When a specific category is given, all ' + n + ' recommendations must belong to that category and address the goal through it.',
+    '- FOCUS AREA "best overall": when the focus area is exactly "best overall", do NOT restrict yourself to one category. Instead, reason about THIS car\'s actual specifications and identify where it is weakest relative to the stated goal (for example: a heavy car with modest brakes for track use, a powerful car on all season tires, a soft chassis for handling, an old infotainment system for interior comfort). Recommend the ' + n + ' mods that best address those specific weaknesses, strongest first, and in each "detail" say which weakness of this car it fixes.',
+    '- Recommendations must be realistic and SAFE for this exact car and goal. Never recommend a turbo/boost tune on a naturally aspirated engine unless you are recommending adding forced induction itself and the platform commonly supports it. Never recommend engine tunes on EVs (suggest EV-appropriate mods instead). Respect drivetrain (no "add AWD" style suggestions) and the car\'s existing power level.',
+    '- BUDGET: the user gives a maximum budget for this goal. EACH recommendation\'s realistic total cost (parts plus install) MUST fit within that cap on its own, so they can afford any one of them. Never suggest something above the cap. If the cap is very low, recommend the best genuinely affordable options that fit and keep the estimates honest; it is fine if they are modest.',
+    '- "benefit" is one short line: estimated gain and rough parts cost, e.g. "+15-25 hp, roughly $350 in parts". Keep estimates honest for this platform and within budget; use ranges.',
+    '- "detail" is one paragraph (3-5 sentences) explaining what the mod is, what it does to the car, and why it is the right choice for this specific car and this goal.',
+    '- CRITICAL STYLE RULE: the "detail" paragraph must NOT contain the em dash character or the en dash character anywhere. Do not use "—" and do not use "–". Use commas, periods, or parentheses instead. Plain hyphens inside compound words (like "bolt-on") are fine.',
+    '',
+    'Answer with ONLY this JSON, no markdown fences, no commentary, with exactly ' + n + ' entr' + (n === 1 ? 'y' : 'ies') + ':',
+    '{"recommendations":[{"name":"...","benefit":"...","detail":"..."}]}'
+  ].join('\n');
+}
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -74,6 +79,10 @@ module.exports = async function handler(req, res) {
   var v = body || {};
   if (!v.make || !v.model || !v.year) return send(res, 400, { error: 'make, model, year required' });
 
+  /* how many to generate — clamped to [1, WANT]; defaults to the full set for
+     older clients that don't send it */
+  var want = Math.max(1, Math.min(WANT, parseInt(v.count, 10) || WANT));
+
   var specs = v.specs || {};
   var b = v.budget || null;
   var budgetLine = b
@@ -96,7 +105,7 @@ module.exports = async function handler(req, res) {
       : 'Focus area: ' + filter + ' (every recommendation must be in this category)',
     budgetLine,
     '',
-    'Recommend exactly ' + WANT + ' mods as specified, best first, each within the budget cap.'
+    'Recommend exactly ' + want + ' mod' + (want === 1 ? '' : 's') + ' as specified, best first, each within the budget cap.'
   ].join('\n');
 
   try {
@@ -109,8 +118,8 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 2400,   /* 5 recommendations, each with a paragraph */
-        system: SYSTEM_PROMPT,
+        max_tokens: Math.min(2400, Math.max(700, want * 480)),   /* scales with count */
+        system: buildSystemPrompt(want),
         messages: [{ role: 'user', content: user }]
       })
     });
@@ -121,15 +130,15 @@ module.exports = async function handler(req, res) {
     var data = await r.json();
     var text = (data.content && data.content[0] && data.content[0].text) || '';
     var parsed = extractJson(text);
-    var recs = (parsed.recommendations || []).slice(0, WANT).map(function (m) {
+    var recs = (parsed.recommendations || []).slice(0, want).map(function (m) {
       return {
         name: String(m.name || '').slice(0, 60),
         benefit: noDashes(m.benefit).slice(0, 120),
         detail: noDashes(m.detail).slice(0, 900)
       };
     });
-    if (recs.length !== WANT) {
-      return send(res, 502, { error: 'model did not return ' + WANT + ' recommendations' });
+    if (recs.length !== want) {
+      return send(res, 502, { error: 'model did not return ' + want + ' recommendations' });
     }
     return send(res, 200, { recommendations: recs, source: 'ai' });
   } catch (e) {
