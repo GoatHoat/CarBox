@@ -20,7 +20,7 @@
 <script defer src="onboarding.js"></script>
 <link rel="prefetch" href="index.html">
 <style>
-  .phone{padding:16px 18px 40px;min-height:100vh;overflow-x:hidden}
+  .phone{padding:16px 18px 40px;min-height:100vh;overflow-x:hidden;margin:0 auto}
   .ob-steps{width:100%}
   .ostep{width:100%;max-width:100%}
 
@@ -100,8 +100,8 @@
   }
 
   /* Step 1 Welcome */
-  .welcome{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%}
-  .ob-sprite{width:300px;max-width:86%;margin:0 auto 2px}
+  .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;max-width:360px;margin:0 auto;min-width:0}
+  .ob-sprite{width:250px;max-width:72%;margin:0 auto 10px}
   .ob-word{font-size:60px;color:var(--tx,#141210);line-height:1;letter-spacing:-1px}
   .ob-tag{font-size:16px;font-weight:500;color:var(--mut,#8D8D8B);margin-top:8px}
   .welcome .ob-btn{max-width:340px;margin-top:26px}
@@ -263,7 +263,7 @@
     <!-- Step 1 — Welcome -->
     <section class="ostep welcome-step active" data-step="1">
       <div class="welcome">
-        <img class="ob-sprite" src="assets/sprite_chiron.png" alt="">
+        <img class="ob-sprite" src="assets/log_empty_garage.png" alt="">
         <h1 class="serif ob-word">Coilover</h1>
         <p class="ob-tag">Your garage, your build, your story.</p>
         <button class="ob-btn" id="ob-start">Get Started</button>
