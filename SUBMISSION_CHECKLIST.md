@@ -15,48 +15,34 @@ done during/after review setup).
 
 ## 2. In-app purchase (Pro subscription)
 
-**As of 2026-07-24, Stripe is the PRIMARY, DEFAULT purchase path everywhere** — including
-inside the native iOS shell. The paywall's main **"Subscribe"** button (`app/pro.js`) opens a
-Monthly/Annual picker whose options call `CarBoxBilling.purchaseViaStripe(plan)` unconditionally.
-Apple IAP / StoreKit is now the **secondary** option, reached only through the small
-**"or pay on app"** link (which calls `CarBoxBilling.purchase('annual')`). Apple still requires
-the native app to keep StoreKit available, so the native bridge below still has to exist for launch.
+**As of 2026-07-25 the paywall's Subscribe button is PLATFORM-GATED for App Store compliance**
+(`app/pro.js`). Inside the native iOS shell (`window.CARBOX_NATIVE_SHELL === true`) the plan
+picker's Subscribe button calls `CarBoxBilling.purchase(plan)` → **Apple StoreKit** (via the
+RevenueCat bridge in `expo-shell/App.js`). In a plain browser / on the website it calls
+`CarBoxBilling.purchaseViaStripe(plan)` → **Stripe** (lower fees). The old redundant/misleading
+**"or pay on app"** secondary button was removed — there is now exactly one Subscribe path per
+platform, and **no external Stripe checkout ever opens from inside the app** (that would be an
+automatic Guideline 3.1.1 rejection without Apple's External Purchase Link Entitlement, which we
+don't have).
 
-> ⚠️ **This default raises the App Store stakes.** The compliance risk is no longer a small
-> secondary link — it is the **main button**. See the last item in this section.
-
+- [x] **[DONE]** Compliance gate in `app/pro.js`: in-app → StoreKit, web → Stripe. No Stripe-in-
+  Safari from within the app.
 - [ ] **[BLOCKS]** In App Store Connect create the subscription products with IDs matching
-  `app/config.js` → `CARBOX_BILLING`: **`carbox_pro_monthly`** and **`carbox_pro_annual`**.
-- [ ] **[BLOCKS]** Wire **RevenueCat** (recommended) in the Expo shell so the secondary
-  "or pay on app" path is a real StoreKit purchase:
-  1. `npx expo install react-native-purchases` (or `expo-in-app-purchases`).
-  2. In `expo-shell/App.js`, configure RevenueCat with your **public SDK key**, then inject a
-     `window.CarBoxNativeBilling` object into the WebView with `getEntitlement()`, `purchase(plan)`,
-     `restore()`, `manage()` (the web app already calls exactly these — see `app/billing.js`).
-  3. Entitlement identifier must be **`pro`** (matches `app/billing.js`).
-- Until this is wired, "or pay on app" and "Restore" fall back to a **local flag** (clearly
-  marked NON-PRODUCTION in `billing.js`) *only inside the native shell*. **A shipping build must
-  have the native bridge**, or Apple will reject (real StoreKit + working Restore are required).
+  `app/config.js` → `CARBOX_BILLING`: **`coilover_pro_monthly`** and **`carbox_pro_annually`**.
+  They must reach a state RevenueCat can read (attached to the app / submitted with the 1.0 build —
+  `READY_TO_SUBMIT` products don't reliably appear in `getOfferings()`).
+- [x] **[DONE]** **RevenueCat** is wired in `expo-shell/App.js` (lazy `ensureRC()`, `window.
+  CarBoxNativeBilling` bridge with `getEntitlement/purchase/restore/manage`, entitlement id `pro`,
+  real Apple public key `appl_...`). `react-native-purchases` installed.
+- [ ] **[BLOCKS]** In the RevenueCat dashboard: add the two App Store products, put them in an
+  Offering with **Monthly** + **Annual** packages, and set that offering as **Current**. The
+  bridge maps `plan` → package by type; a missing package returns a clear error.
 - [x] **[DONE]** Stripe backend (`server/api/stripe-checkout.js`, `stripe-webhook.js`,
-  `stripe-portal.js`) is built, and `app/billing.js` wires the paywall's Subscribe button to it.
-  See `server/README.md` → "Stripe setup" for the one-time Stripe Dashboard steps (account,
+  `stripe-portal.js`) is built for the **web** path, and `app/billing.js` wires it. See
+  `server/README.md` → "Stripe setup" for the one-time Stripe Dashboard steps (account,
   products/prices, webhook, API keys) — these have to be done by you, not in code.
-- [ ] **[BLOCKS — most likely rejection reason]** The **default "Subscribe" button now sends the
-  user to Stripe Checkout on every platform, including inside the native iOS shell** (owner
-  decision 2026-07-24), via `CarBoxBilling.purchaseViaStripe` in `app/billing.js`. **This is NOT
-  App Store compliant as shipped** — Apple requires the External Purchase Link Entitlement before
-  an external (non-StoreKit) checkout can legally appear inside the real app, let alone be the
-  primary call to action, and that hasn't been applied for (can't be, until Apple Developer
-  enrollment happens — see section 1). Fine for Expo Go / dev testing only. Before the real
-  production build, do ONE of:
-  - (a) apply for and get the External Purchase Link Entitlement, and present the Stripe option
-    with Apple's exact required disclosure format; **and/or**
-  - (b) re-gate `app/pro.js` so that when `CARBOX_NATIVE_SHELL` is true the **"Subscribe" button
-    routes to `CarBoxBilling.purchase(plan)` (StoreKit)** instead of Stripe, keeping Stripe for
-    browsers only — i.e. flip which path is default inside the shell.
-
-  This is now the single most likely reason a submission would get rejected, because it is the
-  main purchase button, not an easily-hidden secondary link. Do not skip it.
+- [ ] **[TEST]** In a sandbox account inside a real build, confirm the in-app Subscribe completes a
+  StoreKit purchase and flips the device to Pro; on the website, confirm Subscribe opens Stripe.
 
 ## 3. Backend (server functions + keys)
 The `/server` folder holds the proxy that keeps keys server-side. Deploy it and set env vars.

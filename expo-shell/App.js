@@ -34,8 +34,9 @@ const RC_ENTITLEMENT = 'pro';   // must match app/billing.js + your RevenueCat e
 // The web paywall (app/pro.js -> app/billing.js) calls a bridge object it expects
 // at window.CarBoxNativeBilling. This stub, injected before the page loads, turns
 // those calls into postMessages and returns Promises that resolve when the native
-// side answers (see handleBilling below). Only the SECONDARY "or pay on app"
-// button routes here; the main Subscribe button is Stripe (web).
+// side answers (see handleBilling below). Inside this iOS shell the paywall's
+// Subscribe button routes HERE (StoreKit) — App Store compliance; Stripe is only
+// used on the website, never from within the app.
 const NATIVE_BRIDGE = `(function(){
   window.CARBOX_NATIVE_SHELL = true;
   if (window.CarBoxNativeBilling) return;

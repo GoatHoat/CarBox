@@ -520,7 +520,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     CarBox.set('onboardingComplete', true);
     show(8, 'fwd');
+    /* after the checkmark animation, play the one-time welcome sequence
+       (garage door opens -> zoom -> headlights video -> reveal into the Garage).
+       onboardingComplete is already true, so bailing out lands on the Garage. */
     var delay = reduced ? 700 : 1500;
-    setTimeout(function () { location.replace('index.html?v=' + Date.now()); }, delay);
+    setTimeout(function () { location.replace('welcome.html'); }, delay);
   });
 });

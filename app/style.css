@@ -142,7 +142,7 @@ html[data-theme="dark"] .nav{background:#3A3633}
 }
 
 /* ── Garage page ─────────────────────────────────────────────── */
-.toprow{position:relative;min-height:104px}
+.toprow{position:relative;min-height:0}
 .notif{
   margin:0 auto;width:fit-content;max-width:250px;
   display:flex;align-items:center;justify-content:center;gap:7px;
@@ -152,10 +152,10 @@ html[data-theme="dark"] .nav{background:#3A3633}
 .notif span{font-weight:600;font-size:14px;color:var(--tx,#242220);white-space:nowrap}
 .notif img{width:21px}
 .iconstack{
-  position:absolute;top:0;right:0;
+  position:absolute;top:18px;right:0;
   display:flex;flex-direction:column;gap:9px;align-items:center;
 }
-.profile{display:flex;align-items:center;gap:16px;margin-top:-40px}
+.profile{display:flex;align-items:center;gap:16px;margin-top:8px}
 .avatar{
   width:76px;height:76px;border-radius:50%;background:#080808;
   border:3px solid #6E5A46;box-shadow:0 0 0 4px var(--bg), var(--shadow);

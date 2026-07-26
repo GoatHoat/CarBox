@@ -212,6 +212,10 @@
     signIn: function (email, pass) { return sb.auth.signInWithPassword({ email: email, password: pass }); },
     signUp: function (email, pass) { return sb.auth.signUp({ email: email, password: pass }); },
     resetPassword: function (email) { return sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/login.html' }); },
+    /* used by login.html's "set a new password" panel, reached via the emailed
+       reset link (Supabase puts the recovery session in the URL, which the
+       client auto-detects — see the onAuthStateChange listener in login.html) */
+    updatePassword: function (newPass) { return sb.auth.updateUser({ password: newPass }); },
     signOut: function () {
       sessionStorage.removeItem('cbPulled');
       localStorage.removeItem('cbSignedUp');

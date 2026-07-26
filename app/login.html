@@ -6,6 +6,15 @@
 <title>Coilover — Log in</title>
 <style>html{background:#E9E9E9}</style>
 <script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<!-- Scanner-safe reset-link redirect: runs before anything else loads. The
+     reset email points here with the REAL Supabase confirmation URL hidden in
+     a #confirm= fragment (see server/README.md "Password reset email" note).
+     Fragments are never sent in an HTTP request, so an email security scanner
+     doing a plain fetch of this page never sees or consumes the real link —
+     only a real browser running this script does, immediately forwarding to
+     it. That real link is single-use, so this must fire once, fast, with no
+     user action required. -->
+<script>(function(){var h=location.hash.slice(1);var m=/^confirm=(.+)$/.exec(h);if(m)location.replace(m[1]);})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -30,7 +39,7 @@
 </style>
 </head>
 <body>
-  <div class="login">
+  <div class="login" id="loginView">
     <h1>Welcome back</h1>
     <p>Log in to your Coilover garage</p>
     <div class="fld"><label>Email</label><input id="email" type="email" autocomplete="email" inputmode="email"></div>
@@ -40,8 +49,21 @@
     <div class="alt"><a href="#" id="forgot">Forgot password?</a></div>
     <div class="alt">New here? <a href="onboarding.html">Create an account</a></div>
   </div>
+
+  <!-- Shown instead of the form above when the page is opened from a password
+       reset email — Supabase's link carries a recovery session in the URL,
+       detected below via onAuthStateChange('PASSWORD_RECOVERY'). Hidden by
+       default so a normal visit to login.html never shows this. -->
+  <div class="login" id="resetView" style="display:none">
+    <h1>Set a new password</h1>
+    <p>Choose a new password for your Coilover account</p>
+    <div class="fld"><label>New password</label><input id="newpass" type="password" autocomplete="new-password"></div>
+    <div class="err" id="resetErr"></div>
+    <button class="go" id="resetGo">Set new password</button>
+  </div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  var loginView = document.getElementById('loginView'), resetView = document.getElementById('resetView');
   var email = document.getElementById('email'), pass = document.getElementById('pass');
   var go = document.getElementById('go'), err = document.getElementById('err');
   function valid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) && pass.value.length >= 1; }
@@ -77,6 +99,44 @@ document.addEventListener('DOMContentLoaded', function () {
       err.textContent = 'Check your email for a password reset link.';
     }, function () { err.textContent = 'Network error'; });
   });
+
+  /* ── Password recovery landing ──
+     Supabase's reset-link click lands here with a recovery session encoded in
+     the URL. supabase-js auto-detects it and fires PASSWORD_RECOVERY once the
+     client's ready. Swap to the "set a new password" panel instead of showing
+     a normal login form (which would otherwise ask for a password the user is
+     here specifically because they forgot). */
+  var newpass = document.getElementById('newpass');
+  var resetGo = document.getElementById('resetGo'), resetErr = document.getElementById('resetErr');
+  function showResetPanel() {
+    loginView.style.display = 'none';
+    resetView.style.display = '';
+  }
+  /* fast path: the URL itself says recovery, so switch immediately instead of
+     waiting on the async event (avoids a flash of the login form). */
+  if (/type=recovery/.test(location.hash) || /type=recovery/.test(location.search)) showResetPanel();
+
+  if (window.sb && sb.auth && sb.auth.onAuthStateChange) {
+    sb.auth.onAuthStateChange(function (event) {
+      if (event === 'PASSWORD_RECOVERY') showResetPanel();
+    });
+  }
+
+  if (resetGo) {
+    resetGo.addEventListener('click', function () {
+      var pw = newpass.value;
+      if (!pw || pw.length < 6) { resetErr.style.color = ''; resetErr.textContent = 'Use at least 6 characters.'; return; }
+      if (!window.CarBoxAuth || !window.CarBoxAuth.updatePassword) { resetErr.textContent = 'Connection not configured yet.'; return; }
+      resetGo.disabled = true; resetErr.style.color = ''; resetErr.textContent = 'Saving…';
+      CarBoxAuth.updatePassword(pw).then(function (res) {
+        if (res && res.error) { resetErr.textContent = res.error.message || 'Could not set password'; resetGo.disabled = false; return; }
+        resetErr.style.color = 'var(--accent-tx,#5C7350)';
+        resetErr.textContent = 'Password updated — loading your garage…';
+        try { localStorage.setItem('cbSignedUp', '1'); sessionStorage.removeItem('cbPulled'); } catch (e) {}
+        setTimeout(function () { location.replace('index.html'); }, 900);
+      }, function () { resetErr.textContent = 'Network error'; resetGo.disabled = false; });
+    });
+  }
 });
 </script>
 </body>

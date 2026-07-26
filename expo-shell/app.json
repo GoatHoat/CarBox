@@ -11,13 +11,18 @@
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#F4F4F4",
-      "dark": { "image": "./assets/splash-icon.png", "backgroundColor": "#1D1C1C" }
+      "dark": {
+        "image": "./assets/splash-icon.png",
+        "backgroundColor": "#1D1C1C"
+      }
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.coilover.app",
-      "buildNumber": "1",
-      "config": { "usesNonExemptEncryption": false },
+      "buildNumber": "2",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Coilover uses your location to find nearby shops that can perform your recommended mods and to show how far away they are. Your location is used only for this and is never shared.",
         "NSCameraUsageDescription": "Coilover uses the camera so you can take photos of your car and its mods to add to a log entry.",
@@ -45,6 +50,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d621c55e-a40f-4d1d-ac70-1a51df730667"
+      }
     }
   }
 }
