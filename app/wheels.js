@@ -41,8 +41,11 @@ window.CarBoxWheels = (function () {
       '.cb-wheel-spin{position:absolute;background-repeat:no-repeat;background-size:100% 100%;' +
         'image-rendering:pixelated;' +
         'animation:cb-spin var(--cb-wheel-dur,.5s) linear infinite;' +
-        'transform:translateZ(0);will-change:transform;backface-visibility:hidden}' +
-      '@keyframes cb-spin{to{transform:rotate(-360deg)}}' +   /* car faces left -> wheels roll CCW */
+        'will-change:transform;backface-visibility:hidden}' +
+      /* BOTH keyframes must use rotate() so the browser interpolates the ANGLE,
+         not the (identical) start/end matrices -> a real full turn. Car faces
+         left, so wheels roll counter-clockwise. */
+      '@keyframes cb-spin{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}' +
       /* respect reduced motion: never stops, but rolls gently instead of a blur */
       '@media (prefers-reduced-motion:reduce){.cb-wheel-spin{animation-duration:var(--cb-wheel-dur-rm,3.6s)}}';
     document.head.appendChild(s);
