@@ -76,7 +76,9 @@ window.CarBoxBilling = (function () {
     if (code === 'not-signed-in') return 'Sign in to subscribe';
     if (code === 'not-configured') return 'Subscriptions aren’t set up yet — try again later';
     if (code === 'network') return 'Couldn’t reach Coilover — check your connection';
-    return fallback || 'Purchase could not be completed';
+    /* surface the actual message when there is one (e.g. the native StoreKit /
+       RevenueCat bridge explaining exactly what's wrong) rather than a generic line */
+    return (err && err.message) || fallback || 'Purchase could not be completed';
   }
 
   function setPro(v) {

@@ -42,6 +42,7 @@ window.CARBOX_LEGAL = {
    SUBMISSION_CHECKLIST.md); these are here for reference/parity only. */
 window.CARBOX_BILLING = {
   ENTITLEMENT: 'pro',
-  PRODUCT_MONTHLY: 'carbox_pro_monthly',   // create in App Store Connect
-  PRODUCT_ANNUAL: 'carbox_pro_annual'
+  /* must match the ACTUAL App Store Connect product IDs (permanent, can't rename) */
+  PRODUCT_MONTHLY: 'coilover_pro_monthly',
+  PRODUCT_ANNUAL: 'carbox_pro_annually'
 };
