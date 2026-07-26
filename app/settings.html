@@ -287,9 +287,6 @@
       </div>
       <img class="chev-r" src="assets/icon_chevron.png" alt="">
     </div>
-    <div class="setrow rowbtn" id="replayintro" role="button" tabindex="0">
-      <div class="stx">Replay intro animation</div>
-    </div>
     <div class="setrow rowbtn" id="signout" role="button" tabindex="0">
       <div class="stx">Sign out</div>
     </div>
@@ -809,10 +806,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* Dev tools (Redo onboarding, Switch to Pro/Base, the 7-tap title unlock) were
      permanently removed on 2026-07-24 — the app is non-dev on every device. */
-
-  /* Replay the one-time welcome/onboarding animation on demand */
-  var replay = document.getElementById('replayintro');
-  if (replay) replay.addEventListener('click', function () { location.href = 'welcome.html'; });
 
   /* ════ CARBOX PRO ════ */
   function paintPlan() {
