@@ -151,7 +151,6 @@
 <script defer src="carform.js"></script>
 <script defer src="social.js"></script>
 <script defer src="nav.js"></script>
-<script defer src="wheels.js"></script>
 <link rel="prefetch" href="log.html">
 <link rel="prefetch" href="upgrades.html">
 <script type="speculationrules">
@@ -189,7 +188,7 @@
 
   <!-- DETAIL VIEW: the single-car garage (what it looked like before) -->
   <div id="detailView">
-  <div class="hero"><div class="i-spritewrap"><img class="i-sprite" alt="Your car"><div class="cb-wheels" aria-hidden="true"></div></div></div>
+  <div class="hero"><img class="i-sprite" alt="Your car"></div>
   <h1 class="cartitle serif"></h1>
   <div class="caryear serif"></div>
   <!-- fill the real car synchronously so the demo car never shows -->
@@ -311,9 +310,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('.cartitle').textContent = vehicle.name;
     document.querySelector('.caryear').textContent = String(vehicle.year);
     paintSpecs(vehicle);
-    var sprite = document.querySelector('.i-sprite');
-    UI.carSprite(sprite);
-    if (window.CarBoxWheels) CarBoxWheels.mount(sprite);   /* spin the wheels (Garage only) */
+    UI.carSprite(document.querySelector('.i-sprite'));
     /* service reminder is Log-only now — no pill on the Garage */
     renderPostsGrid();
   }
@@ -730,9 +727,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /* subtle parallax on the hero sprite (move the wrapper so the wheels track it) */
+  /* subtle parallax on the hero sprite */
   if (!UI.reduced()) {
-    var hero = document.querySelector('.i-spritewrap') || document.querySelector('.i-sprite');
+    var hero = document.querySelector('.i-sprite');
     var pTick = false;
     window.addEventListener('scroll', function () {
       if (pTick) return;

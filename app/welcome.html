@@ -69,29 +69,21 @@
   var step = 0;      /* 0,1,2 = door frames; then 'video' */
   var busy = false;
 
-  /* swap to the next door frame with a chest-pop (grows + settles, never shrinks
-     below the screen so no edge ever shows) */
+  /* Reveal the next (more-open) frame by fading the CURRENT one away on top of
+     it. The more-open frame is placed fully opaque UNDERNEATH, so there's never
+     a gap to black — it reads as one continuous garage door rolling open, not a
+     swap to a new image. */
   function openDoor(nextSrc) {
     busy = true;
     var incoming = door.cloneNode(false);
     incoming.removeAttribute('id');
     incoming.src = nextSrc;
-    incoming.style.opacity = '0';
-    stage.insertBefore(incoming, door.nextSibling);
+    incoming.style.opacity = '1';
+    stage.insertBefore(incoming, door);        /* underneath the current frame */
     var old = door; door = incoming;
-
-    var dur = reduced ? 200 : 420;
-    var a = incoming.animate(
-      reduced
-        ? [{ opacity: 0 }, { opacity: 1 }]
-        : [{ opacity: 0, transform: 'scale(1)' },
-           { opacity: 1, transform: 'scale(1.045)', offset: 0.45 },
-           { opacity: 1, transform: 'scale(1)' }],
-      { duration: dur, easing: 'ease-out', fill: 'forwards' }
-    );
-    old.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: 'ease-out', fill: 'forwards' })
-       .onfinish = function () { if (old.parentNode) old.parentNode.removeChild(old); };
-    a.onfinish = function () { busy = false; };
+    var dur = reduced ? 150 : 320;
+    old.animate([{ opacity: 1 }, { opacity: 0 }], { duration: dur, easing: 'ease-in-out', fill: 'forwards' })
+       .onfinish = function () { if (old.parentNode) old.parentNode.removeChild(old); busy = false; };
   }
 
   /* final tap: fast zoom into the doorway, then play the headlights video from 0 */

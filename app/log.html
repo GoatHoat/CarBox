@@ -123,8 +123,7 @@
 
   .logempty{text-align:center;padding:26px 0 10px}
   .logempty img{width:230px;margin:0 auto 6px}
-  .logempty .le-garage{width:118px;margin-bottom:12px}
-  html[data-theme="dark"] .logempty .le-garage{filter:invert(1)}
+  .logempty .le-garage{width:220px;margin-bottom:12px}
   .le-tx{font-size:17px;font-weight:700;color:var(--tx,#141311)}
   .le-sub{font-size:13px;font-weight:500;color:var(--mut,#9A928B);margin-top:2px}
   .le-arrow{
@@ -538,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
     rail.style.display = 'none';
     var empty = document.createElement('div');
     empty.className = 'logempty';
-    empty.innerHTML = '<img class="le-garage" src="assets/pixel_garage.png" alt=""><div class="le-tx">No entries yet</div>' +
+    empty.innerHTML = '<img class="le-garage" src="assets/log_empty_garage.png" alt=""><div class="le-tx">No entries yet</div>' +
       '<div class="le-sub">Log your first mod or service</div><div class="le-arrow">↓</div>';
     timeline.appendChild(empty);
   }
