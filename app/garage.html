@@ -22,8 +22,14 @@
   .pubprofile{display:flex;align-items:center;gap:14px;margin-top:6px}
   .pubprofile .avatar{width:52px;height:52px}
   .caryear{margin-bottom:6px}
-  .publikes{display:flex;align-items:center;gap:7px;justify-content:center;margin-top:12px;color:var(--meta);font-weight:600;font-size:14px}
-  .publikes img{width:20px}
+  /* like/comment row: icon then count immediately to its right, matching the
+     For You feed's .act/.cnt pattern (was: centered single stat, wrong counts) */
+  .pubstats{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:12px}
+  .pubstat{display:flex;align-items:center;gap:6px;color:var(--tx,#141210)}
+  .pubstat img{width:20px;height:auto;display:block}
+  .pubstat .pxcomment{width:19px}
+  html[data-theme="dark"] .pubstat .pxcomment{filter:invert(1)}
+  .pubstat .cnt{font-size:14px;font-weight:700;color:var(--tx,#141210);min-width:6px}
   /* read-only timeline (mirrors log.html visuals) */
   .tl{position:relative;margin-top:16px}
   .tl .rail{position:absolute;left:9px;top:22px;bottom:22px;width:3px;background:#6E5B4B;border-radius:2px}
@@ -74,12 +80,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var v = car.vehicle || {};
   var SPEC_ROWS = [
-    ['engine', 'spec_piston'], ['horsepower', 'spec_bolt'], ['torque', 'spec_gearbox'],
-    ['transmission', 'spec_gear'], ['drivetrain', 'spec_tire'], ['accel', 'spec_gauge']
+    ['engine', 'spec_piston', 'i-piston'], ['horsepower', 'spec_bolt', 'i-bolt'], ['torque', 'spec_gearbox', 'i-gearbox'],
+    ['transmission', 'spec_gear', 'i-gear'], ['drivetrain', 'spec_tire', 'i-tire'], ['accel', 'spec_gauge', 'i-gauge']
   ];
   var specHtml = SPEC_ROWS.map(function (r) {
-    var val = (v.specs && v.specs[r[0]] && String(v.specs[r[0]]).trim()) || '—';
-    return '<div class="row"><div class="ic"><img src="assets/' + r[1] + '.png" alt=""></div><div class="tx"></div></div>';
+    return '<div class="row"><div class="ic"><img class="' + r[2] + '" src="assets/' + r[1] + '.png" alt=""></div><div class="tx"></div></div>';
   }).join('');
 
   var CHIP = { mod: 'MOD', maint: 'MAINTENANCE', repair: 'REPAIR', cosmetic: 'COSMETIC' };
@@ -105,7 +110,10 @@ document.addEventListener('DOMContentLoaded', function () {
     '<div class="hero"><img class="i-sprite" alt=""></div>' +
     '<h1 class="cartitle serif"></h1><div class="caryear serif"></div>' +
     '<div class="spec">' + specHtml + '</div>' +
-    '<div class="publikes"><img src="assets/icon_thumb.png" alt=""><span></span></div>' +
+    '<div class="pubstats">' +
+      '<div class="pubstat"><img src="assets/icon_thumb.png" alt=""><span class="cnt"></span></div>' +
+      '<div class="pubstat"><img class="pxcomment" src="assets/icon_comment_px.png" alt=""><span class="cnt"></span></div>' +
+    '</div>' +
     tlHtml;
 
   /* fill text via textContent (avoids any HTML injection from stored strings) */
@@ -113,7 +121,10 @@ document.addEventListener('DOMContentLoaded', function () {
   phone.querySelector('.phandle').textContent = prof.handle;
   phone.querySelector('.cartitle').textContent = v.name || 'Car';
   phone.querySelector('.caryear').textContent = String(v.year || '');
-  phone.querySelector('.publikes span').textContent = (car.likes || 0) + ' likes';
+  /* real counts straight off this car's own data — never a placeholder number */
+  var statCnts = phone.querySelectorAll('.pubstat .cnt');
+  statCnts[0].textContent = String(car.likes || 0);
+  statCnts[1].textContent = String((car.comments || []).length);
   var specTx = phone.querySelectorAll('.spec .tx');
   SPEC_ROWS.forEach(function (r, i) {
     specTx[i].textContent = (v.specs && v.specs[r[0]] && String(v.specs[r[0]]).trim()) || '—';

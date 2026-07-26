@@ -239,59 +239,14 @@ window.Social = (function () {
     return el;
   }
 
-  /* ── one-time seed so the feed, grid, and notifications have content ──
-     Several other users' posts + two of MINE (which the garage grid shows and
-     which the seeded likes/comments notify me about). Idempotent. */
+  /* ── first-run init: no fake users/posts — the feed starts genuinely empty
+     until the person actually posts something. Only marks `posts` as
+     initialized (so this doesn't re-run every load); never touches
+     `notifications` (that would clobber real ones). Idempotent. */
   function seedIfEmpty() {
     if (!window.CarBox) return;
-    if (CarBox.get('posts')) return;               /* already seeded/created */
-    var now = Date.now(), H = 3600000;
-    var EX = ['assets/photo_exhaust_1.jpg', 'assets/photo_exhaust_2.jpg', 'assets/photo_exhaust_3.jpg'];
-    function c(handle, name, text, mins, parentId, replyTo) {
-      return { id: uid('c'), author: { handle: handle, name: name, mine: false }, text: text,
-        parentId: parentId || null, replyTo: replyTo || null, ts: now - mins * 60000 };
-    }
-    var mine = me();
-    var myA = { handle: mine.handle, name: mine.name };
-    var posts = [
-      { id: 'seed-1', mine: false, author: { handle: '@TurboTom', name: 'Turbo Tom' }, city: 'Austin',
-        carLabel: '2019 Subaru WRX STI', titleSuffix: 'Full turbo-back exhaust + tune',
-        description: 'Finally finished the turbo-back with a Cobb Stage 2 tune. Sounds unreal and pulls so much harder up top. Swipe for the before/after.',
-        photos: [EX[0], EX[1]], likes: 214, liked: false, ts: now - 2 * H,
-        comments: [ c('@LinaDrives', 'Lina', 'That note must be insane in person.', 90),
-          c('@BoostedBen', 'Ben', 'What downpipe did you run?', 70),
-          c('@TurboTom', 'Turbo Tom', 'Catless 3in, worth every penny', 60, null, null) ] },
-      { id: 'seed-2', mine: false, author: { handle: '@LinaDrives', name: 'Lina Drives' }, city: 'Denver',
-        carLabel: '2021 BMW M240i', titleSuffix: 'New wheels + a small drop',
-        description: 'Went with 19s and lowering springs. Closed the wheel gap and it finally sits right.',
-        photos: [EX[2]], likes: 98, liked: false, ts: now - 6 * H,
-        comments: [ c('@TurboTom', 'Turbo Tom', 'Stance is perfect', 200) ] },
-      { id: 'seed-3', mine: false, author: { handle: '@ApexAri', name: 'Apex Ari' }, city: 'Austin',
-        carLabel: '2018 Honda Civic Type R', titleSuffix: 'Track day advice?',
-        description: 'First HPDE next month. Pads and fluid are done. Anything else I should sort before I go?',
-        photos: [EX[1]], likes: 41, liked: false, ts: now - 20 * H, comments: [] },
-      /* MY posts (show on the garage grid; seeded activity feeds notifications) */
-      { id: 'seed-mine-1', mine: true, carId: (CarBox.activeCarId && CarBox.activeCarId()) || null,
-        author: myA, city: myCity(), carLabel: carLabel(), titleSuffix: 'Fresh coilovers went on today',
-        description: 'Dialed in the ride height and corner balanced it. Night and day difference in the twisties.',
-        photos: [EX[2], EX[0]], likes: 12, liked: false, ts: now - 26 * H,
-        comments: [ c('@TurboTom', 'Turbo Tom', 'Looks mean, what brand?', 300) ] },
-      { id: 'seed-mine-2', mine: true, carId: (CarBox.activeCarId && CarBox.activeCarId()) || null,
-        author: myA, city: myCity(), carLabel: carLabel(), titleSuffix: 'Just want to connect with local builds',
-        description: 'New to the area and looking for people to drive with on weekends.',
-        photos: [EX[1]], likes: 5, liked: false, ts: now - 50 * H, comments: [] }
-    ];
-    CarBox.set('posts', posts);
-
-    /* notifications about MY posts (newest first) */
-    CarBox.set('notifications', [
-      { id: uid('n'), type: 'comment', postId: 'seed-mine-1', commentId: posts[3].comments[0].id,
-        user: { handle: '@TurboTom', name: 'Turbo Tom' }, text: 'Looks mean, what brand?', unread: true, ts: now - 300 * 60000 },
-      { id: uid('n'), type: 'like', postId: 'seed-mine-1',
-        user: { handle: '@LinaDrives', name: 'Lina Drives' }, unread: true, ts: now - 240 * 60000 },
-      { id: uid('n'), type: 'like', postId: 'seed-mine-2',
-        user: { handle: '@ApexAri', name: 'Apex Ari' }, unread: false, ts: now - 600 * 60000 }
-    ]);
+    if (CarBox.get('posts')) return;               /* already initialized */
+    CarBox.set('posts', []);
   }
 
   return {

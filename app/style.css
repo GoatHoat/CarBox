@@ -53,7 +53,6 @@ html[data-theme="dark"] .directions{border-color:#77726E}
 html[data-theme="dark"] .badge{background:#D9D3CD;color:#2A2521}
 html[data-theme="dark"] .tab.active .lbl{color:#2A2521}   /* label sits on the light pill */
 html[data-theme="dark"] .mapimg{content:url("assets/map_shops_dark.png")}
-html[data-theme="dark"] .tab:not(.active) .i-navgear{filter:invert(.82)}
 html[data-theme="dark"] .goalcard.sel{box-shadow:var(--shadow),inset 0 0 0 3.5px #9D8573}
 html[data-theme="dark"] .presettile.sel{box-shadow:var(--shadow),inset 0 0 0 2.5px #9D8573}
 html[data-theme="dark"] .monoswatch.sel{box-shadow:var(--shadow),0 0 0 2.5px #9D8573}
@@ -133,8 +132,9 @@ html[data-theme="dark"] .nav{background:#3A3633}
 .i-navwrench{width:27px}
 .i-navgear{width:22px}
 .i-navperson{width:22px;margin-top:7px;pointer-events:none}
-/* black icon: invert to light on the dark nav, but keep dark on the light active pill */
-html[data-theme="dark"] .tab:not(.active) .i-navperson{filter:invert(1)}
+/* upgrades/for-you icons stay flat black in every theme, same as Garage/log —
+   they used to invert to white/light-grey on the dark nav, which read as
+   "not black" next to the other two tabs */
 .tab .lbl{
   position:absolute;bottom:3px;left:0;right:0;
   font-family:'DM Serif Display',serif;font-size:12.5px;color:var(--tx,#2A2521);

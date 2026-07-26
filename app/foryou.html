@@ -176,10 +176,12 @@
   .cmt-composer .send{background:var(--brown-warm);color:#FBF8F4;border:none;border-radius:999px;cursor:pointer;
     padding:11px 17px;font-family:'League Spartan',sans-serif;font-weight:700;font-size:14px;flex:none}
   .cmt-composer .send:disabled{background:var(--ctl,#D9D4D0);color:var(--mut,#9B918F);cursor:default}
-  /* reply indicator: minimal inline text, NOT a boxed rectangle */
+  /* reply indicator: minimal inline text, NOT a boxed rectangle. [hidden] must
+     win over the flex display below or the bar (and its old Cancel button)
+     shows even when not replying to anything. */
+  .replybar[hidden]{display:none}
   .replybar{display:flex;align-items:center;gap:10px;padding:6px 10px 2px;background:none}
-  .replybar span{font-size:12.5px;font-weight:600;color:var(--mut,#7d756e)}
-  .replybar button{background:none;border:none;cursor:pointer;color:var(--accent-tx,#776357);font-weight:700;font-size:12.5px;padding:0}
+  .replybar span{font-size:12.5px;font-weight:600;color:var(--mut,#7d756e);cursor:pointer}
 
   @media (prefers-reduced-motion: reduce){ .pxheart.on{animation:none} }
 </style>
@@ -358,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }});
     /* composer pinned to the bottom of the sheet panel */
     var replybar = document.createElement('div'); replybar.className = 'replybar'; replybar.hidden = true;
-    replybar.innerHTML = '<span></span><button type="button">Cancel</button>';
+    replybar.innerHTML = '<span title="Tap to cancel the reply"></span>';
     var composer = document.createElement('div'); composer.className = 'cmt-composer';
     composer.innerHTML = '<input type="text" placeholder="comment" aria-label="Add a comment" maxlength="300">' +
       '<button class="send" disabled>Send</button>';
@@ -366,11 +368,12 @@ document.addEventListener('DOMContentLoaded', function () {
     var input = composer.querySelector('input'), send = composer.querySelector('.send');
     function setReply(t) {
       replyTarget = t;
-      if (t) { replybar.hidden = false; replybar.querySelector('span').textContent = 'Replying to ' + t.handle;
+      if (t) { replybar.hidden = false; replybar.querySelector('span').textContent = 'Replying to ' + t.handle + '  ✕';
         input.placeholder = 'Reply to ' + t.handle + '…'; input.focus(); }
       else { replybar.hidden = true; input.placeholder = 'comment'; }
     }
-    replybar.querySelector('button').addEventListener('click', function () { setReply(null); });
+    /* tapping the indicator itself cancels the reply — no separate button needed */
+    replybar.querySelector('span').addEventListener('click', function () { setReply(null); });
     input.addEventListener('input', function () { send.disabled = !input.value.trim(); });
     function submit() {
       var txt = input.value.trim(); if (!txt) return;
