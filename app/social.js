@@ -239,12 +239,33 @@ window.Social = (function () {
     return el;
   }
 
+  /* ── retroactive cleanup: strips the fake TurboTom/LinaDrives/ApexAri seed
+     posts (and their notifications) that an OLDER build already wrote into
+     someone's localStorage before fake seeding was removed. Fixing the
+     seeder alone doesn't touch data it already persisted on a device — this
+     is what actually removes it. Exact-id match only, so it can never touch
+     a real post/notification. Safe to run every load (no-op once clean). */
+  var FAKE_SEED_IDS = { 'seed-1': 1, 'seed-2': 1, 'seed-3': 1, 'seed-mine-1': 1, 'seed-mine-2': 1 };
+  function purgeFakeSeed() {
+    var posts = CarBox.get('posts');
+    if (Array.isArray(posts)) {
+      var cleanPosts = posts.filter(function (p) { return !FAKE_SEED_IDS[p.id]; });
+      if (cleanPosts.length !== posts.length) CarBox.set('posts', cleanPosts);
+    }
+    var notifs = CarBox.get('notifications');
+    if (Array.isArray(notifs)) {
+      var cleanNotifs = notifs.filter(function (n) { return !FAKE_SEED_IDS[n.postId]; });
+      if (cleanNotifs.length !== notifs.length) CarBox.set('notifications', cleanNotifs);
+    }
+  }
+
   /* ── first-run init: no fake users/posts — the feed starts genuinely empty
      until the person actually posts something. Only marks `posts` as
      initialized (so this doesn't re-run every load); never touches
      `notifications` (that would clobber real ones). Idempotent. */
   function seedIfEmpty() {
     if (!window.CarBox) return;
+    purgeFakeSeed();
     if (CarBox.get('posts')) return;               /* already initialized */
     CarBox.set('posts', []);
   }
