@@ -250,6 +250,13 @@
     </div>
     <div class="setrow">
       <div>
+        <div class="stx">Show my garage in Discover</div>
+        <div class="ssub">Let others find you by car or city. A link you share still works either way.</div>
+      </div>
+      <button class="switch" id="sw-discover" role="switch" aria-checked="false" aria-label="Show my garage in Discover"></button>
+    </div>
+    <div class="setrow">
+      <div>
         <div class="stx">Units</div>
         <div class="ssub">Applies to every mileage in the app</div>
       </div>
@@ -617,6 +624,14 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   bindSwitch('sw-rem', 'reminders');
   bindSwitch('sw-notif', 'notifsOn');
+  /* Discover opt-in: local toggle (default off) that ALSO writes the server-side
+     profiles.discoverable flag the discovery RLS gate reads */
+  bindSwitch('sw-discover', 'discoverable');
+  if ($('sw-discover')) {
+    $('sw-discover').addEventListener('click', function () {
+      if (window.CarBoxCloud && CarBoxCloud.setDiscoverable) CarBoxCloud.setDiscoverable(!!CarBox.get('discoverable'));
+    });
+  }
 
   var segUnits = $('segUnits');
   function paintUnits() { segUnits.classList.toggle('km', CarBox.get('units') === 'km'); }

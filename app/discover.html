@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Coilover — Discover</title>
+<style>html{background:#E9E9E9}</style>
+<script>(function(){var t='system';try{t=(JSON.parse(localStorage.getItem('carbox.v1'))||{}).theme||'system'}catch(e){}if(t==='system')t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=League+Spartan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script defer src="state.js"></script>
+<script defer src="config.js"></script>
+<script defer src="vendor/supabase.js"></script>
+<script defer src="supabase.js"></script>
+<script defer src="ui.js"></script>
+<style>
+  .dc-head{display:flex;align-items:center;gap:4px;margin:2px 0 8px}
+  .dc-back{background:none;border:none;cursor:pointer;padding:6px 8px 6px 0;display:flex;align-items:center}
+  .dc-back img{width:30px}
+  .dc-title{font-family:'DM Serif Display',serif;font-size:26px;color:var(--tx,#141210)}
+  .dc-searchbox{display:flex;align-items:center;gap:8px;background:var(--surface,#F1EEEB);border-radius:999px;padding:10px 15px;margin-bottom:6px}
+  .dc-searchbox svg{width:18px;height:18px;color:var(--mut,#9B918F);flex:none}
+  .dc-searchbox input{flex:1;min-width:0;background:none;border:none;outline:none;font-family:'League Spartan',sans-serif;font-size:15.5px;font-weight:500;color:var(--tx,#141210)}
+  .dc-hint{font-size:12.5px;font-weight:500;color:var(--mut,#9A928B);margin:2px 4px 12px;line-height:1.4}
+  .dc-list{display:flex;flex-direction:column;gap:10px;padding-bottom:30px}
+  .dc-card{display:flex;align-items:center;gap:13px;background:var(--surface,#F5F4F3);border-radius:18px;box-shadow:var(--shadow);
+    padding:11px 14px;text-decoration:none;cursor:pointer}
+  .dc-card .dc-sprite{width:92px;flex:none;pointer-events:none}
+  .dc-nm{font-size:16px;font-weight:600;color:var(--tx,#17130F);line-height:1.15}
+  .dc-sub{font-size:13px;font-weight:500;color:var(--meta);margin-top:2px}
+  .dc-tag{font-size:12.5px;font-weight:600;color:var(--accent-tx,#776357);margin-top:3px}
+  .dc-msg{text-align:center;padding:44px 24px;font-size:15px;font-weight:600;color:var(--mut,#9A928B);line-height:1.5}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="dc-head">
+    <button class="dc-back" id="dcBack" aria-label="Back"><img src="assets/icon_back.png" alt=""></button>
+    <div class="dc-title serif">Discover</div>
+  </div>
+  <div class="dc-searchbox">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16 L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <input type="text" id="dcSearch" placeholder="Search by car or city…" aria-label="Search people">
+  </div>
+  <div class="dc-hint">Only people who turned on “Show my garage in Discover” appear here. You can turn it on in Settings.</div>
+  <div class="dc-list" id="dcList"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var list = document.getElementById('dcList');
+  var search = document.getElementById('dcSearch');
+  document.getElementById('dcBack').addEventListener('click', function () {
+    if (history.length > 1) history.back(); else location.href = 'foryou.html';
+  });
+
+  function msg(text) { list.innerHTML = '<div class="dc-msg">' + text + '</div>'; }
+
+  if (!window.CarBoxCloud || !CarBoxCloud.available) {
+    msg('Discover needs a connection.<br>Your app still works offline — check back when you’re online.');
+    return;
+  }
+
+  function render(people) {
+    if (!people || !people.length) {
+      msg('No one to show yet.<br>People appear here once they turn on Discover in their Settings.');
+      return;
+    }
+    list.innerHTML = '';
+    people.forEach(function (p) {
+      var a = document.createElement('a');
+      a.className = 'dc-card';
+      a.href = 'garage.html?car=' + encodeURIComponent(p.carId);
+      var img = document.createElement('img');
+      img.className = 'dc-sprite'; img.alt = '';
+      var ap = p.appearance || { presetId: 'body_suv', hue: null, shade: 1 };
+      UI.tintSprite('assets/' + (ap.presetId || 'body_suv') + '.png', ap.hue, ap.shade, function (url) { img.src = url; });
+      var info = document.createElement('div');
+      var nm = document.createElement('div'); nm.className = 'dc-nm'; nm.textContent = p.name || (p.make + ' ' + p.model) || 'Car';
+      var sub = document.createElement('div'); sub.className = 'dc-sub';
+      sub.textContent = [p.year, [p.make, p.model].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+      var tag = document.createElement('div'); tag.className = 'dc-tag';
+      tag.textContent = (p.tag ? '@' + String(p.tag).replace(/^@/, '') : '') + (p.city ? '  ·  ' + p.city : '');
+      info.appendChild(nm); info.appendChild(sub); if (tag.textContent) info.appendChild(tag);
+      a.appendChild(img); a.appendChild(info);
+      list.appendChild(a);
+    });
+  }
+
+  var seq = 0;
+  function load(q) {
+    var mine = ++seq;
+    if (!list.children.length || list.querySelector('.dc-msg')) msg('Finding people…');
+    CarBoxCloud.discover(q).then(function (people) {
+      if (mine !== seq) return;         /* ignore stale responses */
+      render(people);
+    }, function () { if (mine === seq) render([]); });
+  }
+
+  var t = null;
+  search.addEventListener('input', function () {
+    clearTimeout(t);
+    var q = search.value;
+    t = setTimeout(function () { load(q); }, 250);
+  });
+
+  load('');
+});
+</script>
+</body>
+</html>

@@ -15,9 +15,14 @@
   var libOk = window.supabase && window.supabase.createClient;
   var keysOk = cfg.SUPABASE_URL && cfg.SUPABASE_URL.indexOf('PASTE') !== 0 && cfg.SUPABASE_ANON_KEY;
   if (!libOk || !keysOk) {
-    /* app stays fully local — expose a no-op cloud reader so callers (garage.html)
-       can branch on availability without needing to know why it's unavailable */
-    window.CarBoxCloud = { available: false, fetchPublicCar: function () { return Promise.resolve(null); } };
+    /* app stays fully local — expose a no-op cloud reader so callers (garage.html,
+       discover.html, settings) can branch on availability without knowing why */
+    window.CarBoxCloud = {
+      available: false,
+      fetchPublicCar: function () { return Promise.resolve(null); },
+      discover: function () { return Promise.resolve([]); },
+      setDiscoverable: function () { return Promise.resolve(); }
+    };
     return;
   }
 
@@ -154,6 +159,11 @@
       if (session && session.user) {
         window.CARBOX_USER = session.user;   /* lets uploads.js switch photos to real cloud Storage */
         mirrorNormalized();                  /* additive: mirror cars/entries/posts up on load */
+        /* reflect the cloud Discover opt-in into local state so the toggle is accurate */
+        sb.from('profiles').select('discoverable').eq('id', session.user.id).maybeSingle().then(function (res) {
+          var d = res && res.data;
+          if (d && window.CarBox && !!CarBox.get('discoverable') !== !!d.discoverable) CarBox.set('discoverable', !!d.discoverable);
+        }, function () {});
         /* Adopt cloud state ONLY on a fresh device with no local garage yet
            (e.g. logging in on a new phone). If THIS device already finished
            onboarding, do NOT overwrite its local state or hard-reload under the
@@ -329,6 +339,50 @@
             };
           });
         }, function () { return null; });
+    },
+
+    /* flip the current user's Discover opt-in (server-side profiles.discoverable,
+       the field the discovery RLS gate reads). Best-effort. */
+    setDiscoverable: function (on) {
+      return sb.auth.getUser().then(function (r) {
+        var u = r && r.data && r.data.user;
+        if (!u) return;
+        return sb.from('profiles').update({ discoverable: !!on }).eq('id', u.id);
+      }).then(function () {}, function () {});
+    },
+
+    /* find OTHER users who opted into Discover, by car make/model/name or city.
+       GATE: this reads the profiles table, whose "discoverable profiles read" RLS
+       only returns rows where discoverable = true — so a non-opted-in user is
+       never even enumerated here (enforced server-side, not just hidden). We then
+       fetch only THOSE users' cars. Returns [] when signed-out/offline/none. */
+    discover: function (query) {
+      query = String(query || '').trim().toLowerCase();
+      return sb.from('profiles').select('id,username,tag,city').eq('discoverable', true).limit(200)
+        .then(function (res) {
+          var profs = (res && res.data) || [];
+          if (!profs.length) return [];
+          var byId = {};
+          var ids = profs.map(function (p) { byId[p.id] = p; return p.id; });
+          return sb.from('cars').select('client_id,name,make,model,year,appearance,user_id')
+            .in('user_id', ids).eq('is_public', true).limit(300)
+            .then(function (cres) {
+              var cars = (cres && cres.data) || [];
+              var list = cars.map(function (c) {
+                var p = byId[c.user_id] || {};
+                return {
+                  carId: c.client_id, name: c.name, make: c.make, model: c.model, year: c.year,
+                  appearance: c.appearance, username: p.username || '', tag: p.tag || '', city: p.city || ''
+                };
+              }).filter(function (x) { return x.carId; });
+              if (query) {
+                list = list.filter(function (x) {
+                  return [x.name, x.make, x.model, x.city, x.username].join(' ').toLowerCase().indexOf(query) >= 0;
+                });
+              }
+              return list;
+            }, function () { return []; });
+        }, function () { return []; });
     }
   };
 

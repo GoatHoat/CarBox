@@ -28,6 +28,8 @@
   }
   .fyplus svg{width:22px;height:22px}
   .fytitle{position:absolute;left:0;right:0;text-align:center;font-size:26px;color:var(--tx,#141210);pointer-events:none}
+  .fydiscover{margin-left:auto}
+  .fydiscover svg{width:22px;height:22px}
 
   /* search + filters row */
   .fy-search{display:flex;align-items:center;gap:9px;margin:2px 0 10px}
@@ -192,6 +194,9 @@
     <div class="fybar">
       <button class="fyplus" id="composeBtn" aria-label="New post"></button>
       <div class="fytitle serif">For You</div>
+      <a class="fyplus fydiscover" href="discover.html" aria-label="Discover people">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 8.5 L11 11 L8.5 15.5 L13 13 Z" fill="currentColor"/></svg>
+      </a>
     </div>
     <div class="fy-search">
       <div class="fy-searchbox">
