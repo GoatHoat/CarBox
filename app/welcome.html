@@ -12,35 +12,17 @@
   #stage{ position:fixed; inset:0; background:#100f0f; overflow:hidden; touch-action:manipulation; }
 
   /* the garage-door frames fill the screen (your originals, unaltered) and
-     swap with a chest-pop on each tap */
+     reveal the next, more-open frame on each tap — one continuous open */
   .door{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-         will-change:transform,opacity; }
+         will-change:opacity; }
 
-  /* headlights video sits at the bottom of the stack so the door zooms in FRONT
-     of it, then dissolves to reveal it */
-  #videoWrap{ position:absolute; inset:0; background:#100f0f; opacity:0; pointer-events:none;
-    display:flex; align-items:center; justify-content:center; }
-  #vid{ width:100%; height:100%; object-fit:contain; background:#100f0f; }
-
-  #continue{ position:absolute; left:50%; bottom:7%; transform:translateX(-50%) scale(0);
-    background:#615142; color:#fff; border:none; cursor:pointer;
-    font-family:inherit; font-weight:700; font-size:19px; letter-spacing:.4px;
-    padding:16px 56px; border-radius:999px; box-shadow:0 12px 30px rgba(0,0,0,.5);
-    opacity:0; pointer-events:none; }
-  #continue.show{ animation:pop .5s cubic-bezier(.3,1.4,.4,1) forwards; pointer-events:auto; }
-  @keyframes pop{ 0%{transform:translateX(-50%) scale(0);opacity:0}
-                  60%{transform:translateX(-50%) scale(1.08);opacity:1}
-                  100%{transform:translateX(-50%) scale(1);opacity:1} }
-  #continue:active{ filter:brightness(.9); }
-
+  /* quick fade to black before handing off to the Garage (which blur-reveals) */
   #fade{ position:absolute; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity .28s ease; }
 </style>
 </head>
 <body>
 <div id="stage" aria-label="Tap anywhere to continue">
-  <div id="videoWrap"><video id="vid" src="assets/ob_headlights.mp4" muted playsinline preload="auto"></video></div>
   <img class="door" id="door" src="assets/ob_door0.png" alt="">
-  <button id="continue">Continue</button>
   <div id="fade"></div>
 </div>
 
@@ -52,27 +34,20 @@
   try { if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({ theme: 'dark' })); } catch (e) {}
 
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var SPRING = 'cubic-bezier(.3,1.4,.4,1)';
 
   var stage = document.getElementById('stage');
   var door  = document.getElementById('door');
-  var vwrap = document.getElementById('videoWrap');
-  var vid   = document.getElementById('vid');
-  var cont  = document.getElementById('continue');
   var fade  = document.getElementById('fade');
-  vid.loop = false;
 
-  var DOORS = ['assets/ob_door0.png','assets/ob_door1.png','assets/ob_door2.png','assets/ob_door3.png'];
+  var DOORS = ['assets/ob_door0.png', 'assets/ob_door1.png', 'assets/ob_door2.png'];
   DOORS.forEach(function (s) { var i = new Image(); i.src = s; });   /* preload frames */
-  try { vid.load(); } catch (e) {}                                   /* preload video */
 
-  var step = 0;      /* 0,1,2 = door frames; then 'video' */
+  var step = 0;      /* 0,1 -> open the next frame; 2 -> into the Garage */
   var busy = false;
 
-  /* Reveal the next (more-open) frame by fading the CURRENT one away on top of
-     it. The more-open frame is placed fully opaque UNDERNEATH, so there's never
-     a gap to black — it reads as one continuous garage door rolling open, not a
-     swap to a new image. */
+  /* Reveal the next (more-open) frame by fading the current one away on top of
+     it. The more-open frame sits fully opaque UNDERNEATH, so there's never a gap
+     to black — it reads as one continuous garage door rolling open. */
   function openDoor(nextSrc) {
     busy = true;
     var incoming = door.cloneNode(false);
@@ -86,52 +61,18 @@
        .onfinish = function () { if (old.parentNode) old.parentNode.removeChild(old); busy = false; };
   }
 
-  /* final tap: fast zoom into the doorway, then play the headlights video from 0 */
-  function zoomIntoGarage() {
-    busy = true; step = 'video';
-    var zoom = door.cloneNode(false);
-    zoom.removeAttribute('id');
-    zoom.src = 'assets/ob_door3.png';           /* transparent, text-free, aligned */
-    stage.insertBefore(zoom, door.nextSibling);
-    var old = door; door = zoom;
-    if (old.parentNode) old.parentNode.removeChild(old);
-    zoom.style.transformOrigin = '50% 53%';     /* the glowing doorway */
-
-    var dur = reduced ? 420 : 640;
-    var z = zoom.animate(
-      [{ transform: 'scale(1)' }, { transform: 'scale(12)' }],
-      { duration: dur, easing: 'cubic-bezier(.55,.06,.9,.32)', fill: 'forwards' }   /* fast ease-in */
-    );
-    z.onfinish = function () {
-      /* the zoomed yellow now fills the screen; start the video underneath and
-         dissolve the yellow away so the video plays from its very first frame */
-      vwrap.style.opacity = '1';
-      try { vid.currentTime = 0; } catch (e) {}
-      var p = vid.play(); if (p && p.catch) p.catch(function () {});
-      zoom.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-out', fill: 'forwards' })
-          .onfinish = function () { if (zoom.parentNode) zoom.parentNode.removeChild(zoom); };
-      armContinue();                              /* Continue pops in 2s into the video */
-    };
-  }
-
-  var continueArmed = false;
-  function armContinue() {
-    if (continueArmed) return; continueArmed = true;
-    setTimeout(function () { cont.style.opacity = '1'; cont.classList.add('show'); }, 2000);
-  }
-
-  stage.addEventListener('click', function (e) {
-    if (e.target === cont) return;
-    if (busy || step === 'video') return;
-    if (step < 2) { step++; openDoor(DOORS[step]); }
-    else { zoomIntoGarage(); }
-  });
-
-  cont.addEventListener('click', function () {
-    cont.disabled = true;
-    try { sessionStorage.setItem('carbox.reveal', '1'); } catch (err) {}
+  /* after the last tap, hand off to the Garage with the blur reveal */
+  function goToGarage() {
+    busy = true;
+    try { sessionStorage.setItem('carbox.reveal', '1'); } catch (e) {}
     fade.style.opacity = '1';
     setTimeout(function () { location.replace('index.html?v=' + Date.now()); }, 260);
+  }
+
+  stage.addEventListener('click', function () {
+    if (busy) return;
+    if (step < 2) { step++; openDoor(DOORS[step]); }   /* door0 -> door1 -> door2 */
+    else { goToGarage(); }                              /* 3rd tap opens the Garage */
   });
 })();
 </script>
