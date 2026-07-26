@@ -4,10 +4,12 @@
 document.addEventListener('DOMContentLoaded', function () {
 
   /* ─── Coilover age policy ────────────────────────────────────────────────
-     16 is Coilover's OWN chosen minimum. Apple doesn't mandate a specific
-     number, but whatever we set must be genuinely enforced (step 4 blocks
-     under-age users), not merely asked. Change here to change the policy. */
-  var MIN_AGE = 16;
+     13 is Coilover's OWN chosen minimum (the COPPA line — under-13 users need
+     parental-consent handling this app doesn't implement, so it must never
+     let them in). Apple doesn't mandate a specific number beyond that, but
+     whatever we set must be genuinely enforced (step 4 blocks under-age
+     users), not merely asked. Change here to change the policy. */
+  var MIN_AGE = 13;
 
   /* ─── SECURITY NOTE ────────────────────────────────────────────────────
      This prototype has NO backend. The password is kept only in local state
