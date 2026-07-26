@@ -42,10 +42,17 @@ const NATIVE_BRIDGE = `(function(){
   var pending = {}, seq = 0;
   function call(method, arg){
     return new Promise(function(resolve, reject){
-      var id = 'rc' + (++seq);
-      pending[id] = { resolve: resolve, reject: reject };
+      var id = 'rc' + (++seq), done = false;
+      var to = setTimeout(function(){
+        if (done || !pending[id]) return; done = true; delete pending[id];
+        reject(new Error('The App Store took too long to respond. Make sure you are signed into a Sandbox account and your products are Ready to Submit.'));
+      }, 45000);
+      pending[id] = {
+        resolve: function(v){ if (done) return; done = true; clearTimeout(to); resolve(v); },
+        reject:  function(e){ if (done) return; done = true; clearTimeout(to); reject(e); }
+      };
       try { window.ReactNativeWebView.postMessage(JSON.stringify({ __rc: 1, id: id, method: method, arg: arg })); }
-      catch (e) { delete pending[id]; reject(e); }
+      catch (e) { if (!done){ done = true; clearTimeout(to); delete pending[id]; reject(e); } }
     });
   }
   window.__cbBillingResult = function(id, ok, value){
@@ -114,6 +121,16 @@ export default function App() {
     return null;
   }
 
+  // show a toast in the web app (also proves the native->web inject path works)
+  function notify(msg) {
+    if (!webref.current) return;
+    webref.current.injectJavaScript('window.UI&&UI.toast&&UI.toast(' + JSON.stringify(msg) + '); true;');
+  }
+  // race a promise against a timeout so a hung StoreKit call can't freeze the flow
+  function withTimeout(p, ms, msg) {
+    return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(msg)), ms))]);
+  }
+
   // native side of the billing bridge: answer getEntitlement/purchase/restore/manage
   async function handleBilling(d) {
     const reply = (ok, value) => {
@@ -143,9 +160,17 @@ export default function App() {
         const info = await Purchases.getCustomerInfo();
         reply(true, !!(info.entitlements.active && info.entitlements.active[RC_ENTITLEMENT]));
       } else if (d.method === 'purchase') {
-        const offerings = await Purchases.getOfferings();
-        const pkg = planPackage(offerings.current, d.arg);
-        if (!pkg) return reply(false, 'That plan is not available yet.');
+        notify('Contacting the App Store…');
+        const offerings = await withTimeout(Purchases.getOfferings(), 20000,
+          'Could not reach the App Store for your products. Check you are signed into a Sandbox account and the products are Ready to Submit.');
+        const current = offerings && offerings.current;
+        if (!current) return reply(false, 'No RevenueCat offering is set as Current. Set your offering to Current in RevenueCat.');
+        const pkg = planPackage(current, d.arg);
+        if (!pkg) {
+          const n = (current.availablePackages || []).length;
+          return reply(false, 'Your offering has no ' + (d.arg === 'monthly' ? 'Monthly' : 'Annual') +
+            ' package (found ' + n + ' package(s)). Add Monthly/Annual packages pointing at your App Store products.');
+        }
         try {
           const { customerInfo } = await Purchases.purchasePackage(pkg);
           reply(true, !!(customerInfo.entitlements.active && customerInfo.entitlements.active[RC_ENTITLEMENT]));
