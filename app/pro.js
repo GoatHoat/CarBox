@@ -1,21 +1,25 @@
 /* Coilover Pro paywall — centered modal, two screens inside one card.
-   Screen 1: benefits + a primary "Subscribe" button + a secondary "or pay on
-   app" link. Screen 2 (slides in when Subscribe is tapped): a Monthly/Annual
-   picker whose options START CHECKOUT immediately.
+   Screen 1: benefits + a primary "Subscribe" button. Screen 2 (slides in when
+   Subscribe is tapped): a Monthly/Annual picker whose options START CHECKOUT
+   immediately.
 
-   PRIMARY path = Stripe: "Subscribe" -> plan picker -> CarBoxBilling
-   .purchaseViaStripe(plan), unconditionally, on every platform including inside
-   the native iOS shell. SECONDARY path = the native/in-app purchase (StoreKit
-   when the RevenueCat bridge is present, Stripe otherwise), reached only via the
-   small "or pay on app" link, defaulted to the annual plan.
-
-   Because Stripe is now the DEFAULT purchase everywhere, the App Store External
-   Purchase Link Entitlement caveat now applies to the MAIN button, not just a
-   secondary link — see CarBoxBilling.purchaseViaStripe in billing.js and
-   SUBMISSION_CHECKLIST.md section 2. No free trial: the plan charges
-   immediately, so the disclosure copy must not promise one. */
+   PLATFORM-GATED (2026-07-26, reversing the 2026-07-24 Stripe-default decision):
+   Apple requires the app's own purchase mechanism to be StoreKit, full stop —
+   an external checkout can't be the thing that actually unlocks a paid feature,
+   regardless of a US "external purchase link" allowance, which only covers
+   ALSO showing a link, not replacing IAP with one (see APPLE_REVIEW_AUDIT.md).
+   So: INSIDE the native iOS shell, "Subscribe" -> plan picker -> CarBoxBilling
+   .purchase(plan) (StoreKit via RevenueCat) is PRIMARY, and a small secondary
+   "or subscribe on the web" link (screen 1 only, defaults to annual) offers
+   CarBoxBilling.purchaseViaStripe as a cheaper alternative — kept deliberately
+   less prominent than the Subscribe button per Apple's rules on external links.
+   OUTSIDE the native shell (the plain website), there's no StoreKit available
+   at all, so "Subscribe" -> plan picker -> Stripe is the only path and the
+   secondary link is not shown. No free trial: the plan charges immediately,
+   so the disclosure copy must not promise one. */
 window.Pro = (function () {
   var showing = false;
+  function nativeShell() { return !!window.CARBOX_NATIVE_SHELL; }
 
   /* disclosure block (App Store 3.1.2). Shown on BOTH screens so the
      auto-renew terms sit next to whichever purchase control the user uses. */
@@ -67,7 +71,7 @@ window.Pro = (function () {
         '<div class="pro-benefit"><img src="assets/pro_doc.png" alt=""><div>' +
           '<div class="pb-top">PDF history export for resale</div></div></div>' +
         '<button class="pro-cta">Subscribe</button>' +
-        '<button class="pro-stripe-link">or pay on app</button>' +
+        (nativeShell() ? '<button class="pro-stripe-link">or subscribe on the web</button>' : '') +
         MICRO +
       '</div>' +
 
@@ -197,10 +201,8 @@ window.Pro = (function () {
       try { console.error('[Coilover] purchase failed:', err); } catch (e) {}
     }
 
-    /* ── PRIMARY: Subscribe -> plan picker -> Stripe checkout ──
-       "Subscribe" itself only advances to screen 2; the plan option there is
-       what actually starts Stripe (which navigates away, so its promise never
-       settles on success — only a rejection comes back here). */
+    /* "Subscribe" itself only advances to screen 2; the plan option there is
+       what actually starts a purchase. */
     card.querySelector('.pro-cta').addEventListener('click', function () {
       showStep('2', 'fwd');
     });
@@ -215,41 +217,60 @@ window.Pro = (function () {
         this.classList.add('sel');
       });
     });
-    /* the explicit Subscribe button buys the selected plan via Stripe */
+    /* ── PRIMARY: the plan-picker's Subscribe button ──
+       Inside the native shell this MUST be StoreKit (Apple requires the app's
+       own unlock mechanism to be IAP); only the plain website falls back to
+       Stripe, since there's no StoreKit to use there at all. */
     card.querySelector('.pro-buy').addEventListener('click', function () {
       var btn = this;
-      if (btn.disabled || !window.CarBoxBilling || !CarBoxBilling.purchaseViaStripe) return;
+      if (btn.disabled) return;
       var selEl = card.querySelector('.pro-planopt.sel') || card.querySelector('.pro-planopt[data-plan="annual"]');
       var plan = (selEl && selEl.getAttribute('data-plan')) || 'annual';
-      btn.disabled = true; btn.classList.add('loading'); btn.textContent = 'Starting checkout…';
-      card.querySelectorAll('.pro-planopt').forEach(function (o) { o.disabled = true; });
-      CarBoxBilling.purchaseViaStripe(plan).then(function () {
-        /* navigates away to Stripe Checkout on success; nothing to do here */
-      }, function (err) {
+      var reset = function () {
         btn.disabled = false; btn.classList.remove('loading'); btn.textContent = 'Subscribe';
         card.querySelectorAll('.pro-planopt').forEach(function (o) { o.disabled = false; });
-        toastErr(err, 'Could not start Stripe checkout');
-      });
+      };
+      btn.disabled = true; btn.classList.add('loading');
+      card.querySelectorAll('.pro-planopt').forEach(function (o) { o.disabled = true; });
+
+      if (nativeShell()) {
+        if (!window.CarBoxBilling || !CarBoxBilling.purchase) { reset(); return; }
+        btn.textContent = 'Processing…';
+        CarBoxBilling.purchase(plan).then(function (active) {
+          if (active) { close(); UI.toast('Welcome to Coilover Pro'); }
+          else { reset(); UI.toast('Purchase cancelled'); }
+        }, function (err) {
+          reset();
+          toastErr(err, 'Purchase could not be completed');
+        });
+      } else {
+        if (!window.CarBoxBilling || !CarBoxBilling.purchaseViaStripe) { reset(); return; }
+        btn.textContent = 'Starting checkout…';
+        CarBoxBilling.purchaseViaStripe(plan).then(function () {
+          /* navigates away to Stripe Checkout on success; nothing to do here */
+        }, function (err) {
+          reset();
+          toastErr(err, 'Could not start Stripe checkout');
+        });
+      }
     });
 
-    /* ── SECONDARY: "or pay on app" -> the native/in-app purchase path ──
-       Defaults to annual (no plan picker on screen 1). Inside the native shell
-       this is StoreKit (or the dev fallback); in a plain browser CarBoxBilling
-       .purchase falls through to Stripe. Resolves true/false, so unlike the
-       Stripe path it can report success here and close with a confirmation. */
-    card.querySelector('.pro-stripe-link').addEventListener('click', function () {
+    /* ── SECONDARY (native shell only): "or subscribe on the web" -> Stripe ──
+       A cheaper alternative for people who'd rather not pay Apple's cut, kept
+       deliberately less prominent than the Subscribe button above (Apple only
+       permits an external-purchase link alongside IAP, not in place of it).
+       Defaults to annual; navigates away, so there's no success case to handle
+       here — only a rejection can come back. */
+    var stripeLink = card.querySelector('.pro-stripe-link');
+    if (stripeLink) stripeLink.addEventListener('click', function () {
       var btn = this;
-      if (btn.disabled) return;
+      if (btn.disabled || !window.CarBoxBilling || !CarBoxBilling.purchaseViaStripe) return;
       btn.disabled = true;
-      var run = (window.CarBoxBilling && CarBoxBilling.purchase)
-        ? CarBoxBilling.purchase('annual')
-        : (CarBox.set('isPro', true), document.dispatchEvent(new CustomEvent('carbox-pro')), Promise.resolve(true));
-      Promise.resolve(run).then(function (active) {
-        if (active) { close(); UI.toast('Welcome to Coilover Pro'); }
-        else { btn.disabled = false; UI.toast('Purchase cancelled'); }
+      CarBoxBilling.purchaseViaStripe('annual').then(function () {
+        /* navigates away to Stripe Checkout on success; nothing to do here */
       }, function (err) {
         btn.disabled = false;
-        toastErr(err, 'Purchase could not be completed');
+        toastErr(err, 'Could not start checkout');
       });
     });
   }

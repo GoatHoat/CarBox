@@ -324,6 +324,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (cnts[1]) { var cc = Social.commentCount(post); cnts[1].textContent = cc ? String(cc) : ''; }
   }
 
+  /* ── blocking: one shared list (also used by the Garage's older comment
+     system), so blocking someone hides their posts AND their comments here ── */
+  function isBlocked(handle) { return (CarBox.get('blocked') || []).indexOf(handle) !== -1; }
+  function blockHandle(handle) {
+    var bl = CarBox.get('blocked') || [];
+    if (bl.indexOf(handle) === -1) bl.push(handle);
+    CarBox.set('blocked', bl);
+  }
+  function closeSheets() { document.querySelectorAll('.ui-scrim.show').forEach(function (s) { s.click(); }); }
+
   function openMore(post) {
     UI.sheet({ title: 'Post', label: 'Post options', build: function (body) {
       function row(label, danger, fn) {
@@ -338,13 +348,19 @@ document.addEventListener('DOMContentLoaded', function () {
         row('Delete post', true, function () {
           var list = Social.feed().filter(function (p) { return p.id !== post.id; });
           CarBox.set('posts', list);
-          document.querySelectorAll('.ui-scrim.show').forEach(function (s) { s.click(); });
+          closeSheets();
           if (detailId === post.id) location.href = 'foryou.html'; else renderFeed();
           UI.toast('Post deleted');
         });
       } else {
-        row('Report', true, function () { document.querySelectorAll('.ui-scrim.show').forEach(function (s) { s.click(); }); UI.toast('Thanks, we’ll take a look'); });
-        row('Not interested', false, function () { document.querySelectorAll('.ui-scrim.show').forEach(function (s) { s.click(); }); UI.toast('We’ll show fewer like this'); });
+        row('Report', true, function () { closeSheets(); UI.toast('Thanks, we’ll take a look'); });
+        row('Block ' + post.author.handle, true, function () {
+          blockHandle(post.author.handle);
+          closeSheets();
+          if (detailId === post.id) location.href = 'foryou.html'; else renderFeed();
+          UI.toast('Blocked ' + post.author.handle);
+        });
+        row('Not interested', false, function () { closeSheets(); UI.toast('We’ll show fewer like this'); });
       }
     }});
   }
@@ -352,6 +368,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ══════════════════ COMMENTS SHEET ══════════════════ */
   function openComments(postId, focusCommentId, onChange) {
     var post = Social.getPost(postId); if (!post || !window.UI) return;
+    onCommentsChanged = onChange;
     var replyTarget = null;   /* {commentId, handle} */
     var sh = UI.sheet({ title: 'Comments', label: 'Comments', build: function (body) {
       var list = document.createElement('div'); list.className = 'cmt-list'; list.id = 'cmtList';
@@ -394,10 +411,22 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   var body_setReply = function () {};
 
+  /* removes a comment and any replies attached to it */
+  function deleteComment(postId, commentId) {
+    var list = Social.feed();
+    list.forEach(function (p) {
+      if (p.id !== postId) return;
+      p.comments = (p.comments || []).filter(function (c) { return c.id !== commentId && c.parentId !== commentId; });
+    });
+    CarBox.set('posts', list);
+  }
+
   function renderComments(list, postId) {
     var post = Social.getPost(postId); if (!post) return;
     list.innerHTML = '';
-    var threads = Social.threads(post);
+    /* hide comments (and their replies) from anyone the user has blocked */
+    var visible = (post.comments || []).filter(function (c) { return !isBlocked(c.author.handle); });
+    var threads = Social.threads({ comments: visible });
     if (!threads.length) { var e = document.createElement('div'); e.className = 'cmt-empty'; e.textContent = 'No comments yet. Start the conversation.'; list.appendChild(e); return; }
     threads.forEach(function (t) {
       list.appendChild(commentRow(t.c, postId, false));
@@ -421,15 +450,35 @@ document.addEventListener('DOMContentLoaded', function () {
     if (c.replyTo) { var tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = c.replyTo + ' '; tx.appendChild(tag); }
     tx.appendChild(document.createTextNode(c.text));
     b.appendChild(tx);
-    var reply = document.createElement('button'); reply.className = 'creply'; reply.textContent = 'Reply';
-    reply.addEventListener('click', function () {
+    var acts = document.createElement('div'); acts.style.cssText = 'display:flex;gap:14px;margin-top:2px';
+    function actBtn(label, fn) {
+      var btn = document.createElement('button'); btn.className = 'creply'; btn.textContent = label;
+      btn.addEventListener('click', fn); acts.appendChild(btn);
+    }
+    actBtn('Reply', function () {
       /* replies attach to the TOP comment of the thread, tagging whoever you hit reply on */
       body_setReply({ commentId: c.parentId || c.id, handle: c.author.handle });
     });
-    b.appendChild(reply);
+    if (c.author.mine) {
+      actBtn('Delete', function () {
+        deleteComment(postId, c.id);
+        renderComments(document.getElementById('cmtList'), postId);
+        if (onCommentsChanged) onCommentsChanged();
+      });
+    } else {
+      actBtn('Report', function () { UI.toast('Thanks, we’ll take a look'); });
+      actBtn('Block', function () {
+        blockHandle(c.author.handle);
+        renderComments(document.getElementById('cmtList'), postId);
+        if (onCommentsChanged) onCommentsChanged();
+        UI.toast('Blocked ' + c.author.handle);
+      });
+    }
+    b.appendChild(acts);
     row.appendChild(b);
     return row;
   }
+  var onCommentsChanged = null;
 
   /* ══════════════════ SEARCH + FILTERS ══════════════════ */
   var searchQ = '';
@@ -494,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var feed = $('feed');
   function renderFeed() {
     feed.innerHTML = '';
-    var posts = Social.search(Social.feed(), searchQ, filters);
+    var posts = Social.search(Social.feed(), searchQ, filters).filter(function (p) { return p.mine || !isBlocked(p.author.handle); });
     if (!posts.length) {
       var e = document.createElement('div'); e.className = 'fy-empty';
       var any = searchQ || activeFilterCount();

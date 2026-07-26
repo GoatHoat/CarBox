@@ -201,25 +201,9 @@
     }, function () {});
   }
 
-  /* ── keep profiles.discoverable / profiles.city in sync (Social, 2026-07-24) ──
-     Discover reads other users' rows straight from `profiles`/`cars` (RLS-gated),
-     NOT from the per-user `user_state` JSON blob that pushState() writes — so
-     those two fields need their own direct upsert whenever they change, or a
-     user flipping the Settings toggle would never actually become discoverable. */
-  function pushProfileField(key, value) {
-    if (key !== 'discoverable' && key !== 'city') return;
-    sb.auth.getUser().then(function (r) {
-      var user = r && r.data && r.data.user;
-      if (!user) return;
-      var patch = { id: user.id };
-      patch[key] = value;
-      sb.from('profiles').upsert(patch).then(function () {}, function () {});
-    });
-  }
-
   /* push whenever the store changes (only takes effect once a session exists) */
   if (window.CarBox && CarBox.subscribe) {
-    CarBox.subscribe(function (key, value) { pushState(); pushProfileField(key, value); });
+    CarBox.subscribe(function () { pushState(); });
   }
 
   /* ── public auth helpers (used by login.html + settings sign out) ── */

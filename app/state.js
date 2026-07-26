@@ -193,15 +193,7 @@ window.CarBox = (function () {
     units: 'mi',
     reminders: true,
     notifsOn: true,
-    blocked: [],   /* handles the user has blocked (their comments are hidden) */
-    /* ── Social (2026-07-24): account-level, NOT per-car — mirrors units/currency.
-       discoverable: opt-in, OFF by default; must be flipped on in Settings before
-       this user shows up in anyone else's Discover list. city: optional free-text
-       the user types themselves — NEVER device geolocation. Both are also synced
-       to the `profiles` table (see supabase.js) because Discover reads profiles/
-       cars directly, not the localStorage-mirroring user_state blob. */
-    discoverable: false,
-    city: ''
+    blocked: []   /* handles the user has blocked (their comments are hidden) */
   };
 
   /* ── migration: wrap a legacy flat single-car store into cars[0] ── */

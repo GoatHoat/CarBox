@@ -42,7 +42,9 @@ window.CARBOX_LEGAL = {
    SUBMISSION_CHECKLIST.md); these are here for reference/parity only. */
 window.CARBOX_BILLING = {
   ENTITLEMENT: 'pro',
-  /* must match the ACTUAL App Store Connect product IDs (permanent, can't rename) */
+  /* must match the ACTUAL App Store Connect product IDs (permanent, can't rename) —
+     these two were inconsistent (mismatched brand prefix + "annually" typo);
+     confirm against the real product IDs in App Store Connect / RevenueCat */
   PRODUCT_MONTHLY: 'coilover_pro_monthly',
-  PRODUCT_ANNUAL: 'carbox_pro_annually'
+  PRODUCT_ANNUAL: 'coilover_pro_annual'
 };

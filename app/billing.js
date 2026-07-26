@@ -1,32 +1,29 @@
 /* CarBoxBilling — the single gate for the Pro entitlement.
 
-   THREE possible payment paths, picked automatically at call time:
+   TWO payment paths, picked by platform (2026-07-26 — reversed the 2026-07-24
+   Stripe-everywhere decision: Apple requires the app's own unlock mechanism to
+   be StoreKit, not an external checkout, so Stripe can only be a secondary
+   option inside the native shell, never the default):
 
-   1. NATIVE (iOS app, RevenueCat wired) — real StoreKit subscriptions. The
-      Expo shell injects `window.CarBoxNativeBilling` into the WebView with:
+   1. NATIVE (iOS app, RevenueCat wired) — `purchase(plan)` is the PRIMARY path
+      inside the native shell. The Expo shell injects `window.CarBoxNativeBilling`
+      into the WebView with:
           getEntitlement() -> Promise<bool>
           purchase(plan)   -> Promise<bool>
           restore()        -> Promise<bool>
           manage()         -> void
-      (See SUBMISSION_CHECKLIST.md + expo-shell for where to add it.)
+      If the bridge is missing inside the native shell, purchase() FAILS rather
+      than granting Pro for free (see below) — there is no dev fallback.
 
-   2. WEB / STRIPE — Stripe Checkout (session from /api/stripe-checkout); the
-      entitlement is written back by /api/stripe-webhook into Supabase's
-      user_state, which the rest of the app already syncs from (see supabase.js).
-      As of 2026-07-24 this is the PRIMARY, DEFAULT purchase path everywhere —
-      the paywall's main "Subscribe" button routes here on every platform,
-      INCLUDING inside the native iOS shell (see purchaseViaStripe below). Apple
-      still requires StoreKit as the purchase path in a shipped iOS app unless
-      the External Purchase Link Entitlement is granted, so this default MUST be
-      re-gated or that entitlement obtained before an App Store submission. The
-      Expo shell still sets `window.CARBOX_NATIVE_SHELL = true` (see App.js) so
-      the code can tell "inside our iOS app" apart from "in a browser."
-
-   3. NATIVE / IN-APP (secondary) — the paywall's small "or pay on app" link
-      routes to purchase(), which uses StoreKit when the RevenueCat bridge is
-      present, and otherwise (a) Stripe in a plain browser or (b) a DEV FALLBACK
-      flag inside the native shell before the bridge is wired. NON-PRODUCTION for
-      that last case; a shipping build must have CarBoxNativeBilling for it. */
+   2. WEB / STRIPE — `purchaseViaStripe(plan)` (session from /api/stripe-checkout;
+      entitlement written back by /api/stripe-webhook into Supabase's user_state,
+      which the rest of the app already syncs from — see supabase.js). This is
+      the ONLY path on the plain website (no StoreKit available there), and a
+      secondary "or subscribe on the web" link inside the native app for anyone
+      who'd rather avoid Apple's cut — kept deliberately less prominent than the
+      native Subscribe button, per Apple's rules on external purchase links.
+      The Expo shell sets `window.CARBOX_NATIVE_SHELL = true` (see App.js) so
+      the code can tell "inside our iOS app" apart from "in a browser." */
 window.CarBoxBilling = (function () {
   function native() { return window.CarBoxNativeBilling || null; }
   function insideNativeShell() { return !!window.CARBOX_NATIVE_SHELL; }
@@ -156,18 +153,10 @@ window.CarBoxBilling = (function () {
     })();
   }
 
-  /* Stripe Checkout, unconditionally — no native-shell check. Owner decision
-     (2026-07-24): Stripe is now the PRIMARY, DEFAULT purchase path everywhere.
-     The paywall's main "Subscribe" button routes here on every platform,
-     including inside the native iOS shell; Apple IAP is only the secondary
-     "or pay on app" option now. Because this is the DEFAULT (not a small
-     secondary link), the App Store compliance stakes are higher: Apple requires
-     their External Purchase Link Entitlement before an external checkout can
-     legally ship inside the real App Store build, and we don't have it yet
-     (Apple Developer enrollment hasn't happened, so it can't even be applied
-     for). Safe for Expo Go / dev testing now, but this default MUST be re-gated
-     (StoreKit-only inside the native shell) or that entitlement obtained before
-     the production App Store submission. Flagged in SUBMISSION_CHECKLIST.md §2. */
+  /* Stripe Checkout. This function itself has no platform check — pro.js is
+     what decides WHEN to call it: the only path on the plain website (no
+     StoreKit there), and a secondary "or subscribe on the web" link inside the
+     native app, never the native app's main Subscribe button (see pro.js). */
   function stripeCheckout(plan) {
     var user = window.CARBOX_USER;
     if (!user || !user.id) {
