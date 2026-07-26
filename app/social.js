@@ -34,7 +34,10 @@ window.Social = (function () {
     for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i];
     return null;
   }
-  function uid(prefix) { return (prefix || 'p') + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function uid(prefix) {
+    if (window.crypto && window.crypto.randomUUID) return (prefix || 'p') + '-' + window.crypto.randomUUID();
+    return (prefix || 'p') + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) + Math.random().toString(36).slice(2, 6);
+  }
 
   /* ── profanity filter ──────────────────────────────────────────────────────
      There was NO existing filter (CLAUDE.md was wrong). This one masks a small

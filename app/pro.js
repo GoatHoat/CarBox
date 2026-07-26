@@ -117,6 +117,7 @@ window.Pro = (function () {
       card.querySelectorAll('.pro-planopt').forEach(function (o) { o.disabled = false; o.classList.remove('loading'); });
       var buy = card.querySelector('.pro-buy'); if (buy) { buy.disabled = false; buy.classList.remove('loading'); buy.textContent = 'Subscribe'; }
       var cta = card.querySelector('.pro-cta'); if (cta) cta.disabled = false;
+      var link = card.querySelector('.pro-stripe-link'); if (link) link.disabled = false;
     }
     function onPageShow(e) { if (e.persisted) reenablePlans(); }
     window.addEventListener('pageshow', onPageShow);

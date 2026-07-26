@@ -31,8 +31,13 @@ window.CarBox = (function () {
   function normalizeGoal(g) { return GOAL_ALIASES[g] || g || 'More power'; }
 
   function clone(v) { return v == null ? v : JSON.parse(JSON.stringify(v)); }
+  /* car ids double as the public share-link token now that garages are mirrored
+     to a real, publicly-readable Supabase table (supabase.js mirrorCar,
+     is_public:true) — Date.now()+Math.random() alone is guessable, so prefer a
+     real random UUID wherever it's available. */
   function uid(prefix) {
-    return (prefix || 'car') + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    if (window.crypto && window.crypto.randomUUID) return (prefix || 'car') + '-' + window.crypto.randomUUID();
+    return (prefix || 'car') + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7) + Math.random().toString(36).slice(2, 7);
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
