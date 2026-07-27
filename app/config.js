@@ -32,6 +32,7 @@ try { localStorage.removeItem('carbox.dev'); } catch (e) {}
 window.CARBOX_LEGAL = {
   PRIVACY_URL: 'https://carbox-one.vercel.app/privacy.html',
   TERMS_URL: 'https://carbox-one.vercel.app/terms.html',
+  SUPPORT_URL: 'https://carbox-one.vercel.app/support.html',
   SUPPORT_EMAIL: 'carbox.app@outlook.com',
   APPSTORE_URL: 'https://REPLACE_WITH_YOUR_APP_STORE_URL'
 };
