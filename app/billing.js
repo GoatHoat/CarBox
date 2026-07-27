@@ -83,8 +83,13 @@ window.CarBoxBilling = (function () {
     if (v) { try { document.dispatchEvent(new CustomEvent('carbox-pro')); } catch (e) {} }
   }
 
-  /* on load, if the native bridge exists, sync isPro to the REAL entitlement */
+  /* on load, if the native bridge exists, sync isPro to the REAL entitlement.
+     Skipped for the local-only App Store reviewer demo (state.js
+     loadReviewerDemo) — that account has no real purchase to check, and this
+     sync would otherwise immediately clobber its forced isPro:true back to
+     false on the very next page load. */
   function syncEntitlement() {
+    if (window.CarBox && CarBox.get('reviewerDemo')) return;
     var n = native();
     if (!n || !n.getEntitlement) return;
     try { Promise.resolve(n.getEntitlement()).then(function (active) { setPro(!!active); }, function () {}); } catch (e) {}

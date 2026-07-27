@@ -299,6 +299,9 @@ window.CarBox = (function () {
     state = load();
     state.onboardingComplete = true;
     state.isPro = true;
+    /* tells billing.js's syncEntitlement() to leave isPro alone — there is no
+       real purchase behind this account for it to check against */
+    state.reviewerDemo = true;
     save();
   }
 
