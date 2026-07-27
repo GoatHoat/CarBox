@@ -288,6 +288,20 @@ window.CarBox = (function () {
   }
   save();
 
+  /* One-shot LOCAL-ONLY demo login for App Store reviewers (see login.html's
+     special-cased reviewer credential). Never touches Supabase auth — just
+     resets this browser's store to a clean, fully-populated demo garage with
+     Pro unlocked so every feature (incl. paid ones) is reviewable without a
+     real purchase or a real backend account. account stays null, so
+     supabase.js's reconcile() has no email/password to try signing up with. */
+  function loadReviewerDemo() {
+    try { localStorage.removeItem(KEY); sessionStorage.removeItem('cbPulled'); localStorage.removeItem('cbSignedUp'); } catch (e) {}
+    state = load();
+    state.onboardingComplete = true;
+    state.isPro = true;
+    save();
+  }
+
   function notify(key, value) { subs.forEach(function (fn) { try { fn(key, clone(value)); } catch (e) {} }); }
 
   function get(key) {
@@ -384,6 +398,7 @@ window.CarBox = (function () {
     get: get, set: set, subscribe: subscribe,
     reload: function () { state = load(); },
     requireOnboarding: requireOnboarding,
+    loadReviewerDemo: loadReviewerDemo,
     fmtMoney: fmtMoney, fmtMiles: fmtMiles, toUnits: toUnits,
     totals: totals, isSeed: isSeed,
     /* multi-car API */

@@ -66,12 +66,26 @@ document.addEventListener('DOMContentLoaded', function () {
   var loginView = document.getElementById('loginView'), resetView = document.getElementById('resetView');
   var email = document.getElementById('email'), pass = document.getElementById('pass');
   var go = document.getElementById('go'), err = document.getElementById('err');
-  function valid() { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) && pass.value.length >= 1; }
+  /* App Store reviewer demo login (see App Store Connect → App Review
+     Information). Never touches Supabase — just loads a clean, fully
+     populated local demo garage with Pro unlocked, so a reviewer can see
+     every feature without a real account or a real purchase. This is the
+     credential given to Apple; it's a local demo shortcut, not a backend
+     bypass, so there's nothing of real value to protect here. */
+  var REVIEWER_EMAIL = 'applereviewer', REVIEWER_PASS = '@ppleR3v!er';
+  function isReviewerLogin() { return email.value.trim() === REVIEWER_EMAIL && pass.value === REVIEWER_PASS; }
+  function valid() { return isReviewerLogin() || (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) && pass.value.length >= 1); }
   function refresh() { go.disabled = !valid(); err.textContent = ''; }
   email.addEventListener('input', refresh); pass.addEventListener('input', refresh);
 
   go.addEventListener('click', function () {
     if (!valid()) return;
+    if (isReviewerLogin()) {
+      go.disabled = true; err.style.color = 'var(--accent-tx,#5C7350)'; err.textContent = 'Loading review demo…';
+      if (window.CarBox && CarBox.loadReviewerDemo) CarBox.loadReviewerDemo();
+      location.replace('index.html');
+      return;
+    }
     if (!window.CarBoxAuth || !window.CarBoxAuth.available) {
       err.textContent = 'Connection not configured yet.'; return;
     }
